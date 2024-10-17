@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel='stylesheet' type='text/css' href ="vendorhome.css">
+</head>
+<body>
+    <nav>
+        <button type="button">HOME</button>
+        <button type="button">ORDERS</button>
+        <button type="button" onclick="createBooth()">CREATE BOOTH</button>
+    </nav>
+
+    <header>
+        <h1>YOUR BOOTHS</h1>
+    </header>
+
+    <section class="booth-container">
+        <div class="box">
+            <div class="booth-header">
+                <h2>BOOTH NAME</h2>                
+            </div>
+            <div class="booth-description">
+                <p>booth description</p>
+            </div>
+            <div class="buttons">
+                <button type="button" id="edit-button" onclick="editBooth()">EDIT</button>
+                <button type="button" id="delete-button">DELETE</button>
+            </div>
+        </div>
+    </section>
+
+    <!--POPUP CREATING BOOTH-->
+    <section>
+        <div class="create-booth" id="create">
+
+            <h2>CREATE YOUR BOOTH</h2>
+
+            <div class="grid">
+                <div id="image-part">
+                    <img src="1564534_customer_man_user_account_profile_icon.png" id="image">
+                    <label for="input-file">CHOOSE BOOTH IMAGE</label>
+                    <input type="file" accept="image/jpeg, image/png, image/jpg" id="input-file" name="input-file">
+                </div>
+                <form id="name-part">
+                    <label for="name">BOOTH NAME</label>
+                    <input type="text" placeholder="Enter booth name" id ="name" name="name" required>
+                </form>
+                <form id="schedule-part">
+                    <label for="schedule">SCHEDULE</label>
+                    <input type="text" placeholder="Enter schedule" id ="schedule" name="schedule" required>
+                </form>
+                <form id="location-part">
+                    <label for="location">LOCATION</label>
+                    <input type="text" placeholder="Enter location" id ="location" name="location" required>
+                </form>   
+                <form id="description-part">
+                    <label for="description">DESCRIPTION</label>
+                    <textarea placeholder="Enter description" id ="description" name = "description" rows="5" cols="30" maxlength="150"></textarea>    
+                </form>
+            </div>
+            
+            <div class="create-button">
+                <button type="button" onclick="createBoothFinished()" id="finish-create">CREATE</button>
+            </div>
+        </div>
+    </section>
+
+    <!--POPUP EDITING BOOTH-->
+    <section>
+        <div class="edit-booth" id="edit">
+
+            <h2>EDIT YOUR BOOTH</h2>
+
+            <div class="grid">
+                <div id="image-part">
+                    <img src="1564534_customer_man_user_account_profile_icon.png" id="image">
+                    <label for="input-file">CHOOSE BOOTH IMAGE</label>
+                    <input type="file" accept="image/jpeg, image/png, image/jpg" id="input-file" name="input-file">
+                </div>
+                <form id="name-part">
+                    <label for="name">BOOTH NAME</label>
+                    <input type="text" placeholder="Enter booth name" id ="name" name="name" required>
+                </form>
+                <form id="schedule-part">
+                    <label for="schedule">SCHEDULE</label>
+                    <input type="text" placeholder="Enter schedule" id ="schedule" name="schedule" required>
+                </form>
+                <form id="location-part">
+                    <label for="location">LOCATION</label>
+                    <input type="text" placeholder="Enter location" id ="location" name="location" required>
+                </form>   
+                <form id="description-part">
+                    <label for="description">DESCRIPTION</label>
+                    <textarea placeholder="Enter description" id ="description" name="description" rows="5" cols="30" maxlength="150"></textarea>    
+                </form>
+            </div>
+            
+            <div class="edit-button">
+                <button type="button" onclick="editBoothFinished()" id="finish-edit">DONE</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let create = document.getElementById("create");
+        let edit = document.getElementById("edit");
+    
+        //opens popup in creating a booth
+        function createBooth() {
+            create.classList.add("open-createBooth");
+            edit.classList.remove("open-editBooth"); // Ensure edit is hidden
+        }
+    
+        //closes popup in creating a booth
+        function createBoothFinished() {
+            create.classList.remove("open-createBooth");
+        }
+    
+        //opens popup in editing a booth
+        function editBooth() {
+            edit.classList.add("open-editBooth"); // Show edit section
+            create.classList.remove("open-createBooth"); // Ensure create is hidden
+        }
+    
+        //closes popup in editing a booth
+        function editBoothFinished() {
+            edit.classList.remove("open-editBooth");
+        }
+    
+        //for changing image of booth
+        let boothImage = document.getElementById("image");
+        let inputFile = document.getElementById("input-file");
+    
+        inputFile.onchange = function() {
+            boothImage.src = URL.createObjectURL(inputFile.files[0]);
+        }
+    </script>
+    
+</body>
+</html>
