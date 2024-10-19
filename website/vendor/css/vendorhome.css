@@ -32,14 +32,19 @@ section {
     align-items: center; 
 }
 
-.box{
-    height: 300px;
-    width: 400px;
-    border: 1px solid black;
-    margin: 10px;
-    flex-direction: column;
-    align-items: center; 
-    border-radius: 5px;
+.box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* or space-around/space-evenly depending on your preference */
+    gap: 20px; /* This will handle both row and column gaps */
+}
+
+.box > * {
+    flex: 1 1 calc(33.33% - 20px); /* Three equal columns with 20px space */
+    box-sizing: border-box;
+    border: 2px solid black; 
+    padding: 10px; 
+    border-radius: 5px; 
 }
 
 .booth-header{
@@ -48,7 +53,6 @@ section {
     align-items: center;  
     height: 80px; 
     border-bottom: 1px solid black;
-    margin-bottom: 10px;
 }
 
 .booth-description{
