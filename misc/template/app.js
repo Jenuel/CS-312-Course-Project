@@ -1,18 +1,19 @@
-let openShopping = document.querySelector('.shopping');
-let closeShopping = document.querySelector('.closeShopping');
+let openShopping = document.querySelector('.shopping'); // for opening card
+let closeShopping = document.querySelector('.closeShopping'); // for closing card
 let list = document.querySelector('.list');
 let listCard = document.querySelector('.listCard');
 let body = document.querySelector('body');
 let total = document.querySelector('.total');
 let quantity = document.querySelector('.quantity');
 
-openShopping.addEventListener('click', ()=>{
+openShopping.addEventListener('click', ()=>{ //for opening card
     body.classList.add('active');
 })
-closeShopping.addEventListener('click', ()=>{
+closeShopping.addEventListener('click', ()=>{ //for closing card
     body.classList.remove('active');
 })
 
+//objects that are inside the array are the value for each item
 let products = [
     {
         id: 1,
@@ -51,21 +52,26 @@ let products = [
         price: 120000
     }
 ];
+
 let listCards  = [];
 function initApp(){
-    products.forEach((value, key) =>{
-        let newDiv = document.createElement('div');
-        newDiv.classList.add('item');
-        newDiv.innerHTML = `
+    products.forEach((value, key) =>{ // iterates the products array where value is the current element and keey is its corresponding index
+        let newDiv = document.createElement('div'); // creates a new div inside the HTML
+        newDiv.classList.add('item'); // for each item created, it will be stored in a new class called "item"
+        //sets values inside the newDiv element 
+        //toLocaleString() used for adding a comma for every thousand
+        newDiv.innerHTML = ` 
             <img src="image/${value.image}">
             <div class="title">${value.name}</div>
             <div class="price">${value.price.toLocaleString()}</div>
             <button onclick="addToCard(${key})">Add To Card</button>`;
-        list.appendChild(newDiv);
+        list.appendChild(newDiv); // appends to the list class in the HTML
     })
 }
+
 initApp();
-function addToCard(key){
+
+function addToCard(key){ // for adding a product in the shopping cart
     if(listCards[key] == null){
         // copy product form list to list card
         listCards[key] = JSON.parse(JSON.stringify(products[key]));
@@ -73,6 +79,7 @@ function addToCard(key){
     }
     reloadCard();
 }
+
 function reloadCard(){
     listCard.innerHTML = '';
     let count = 0;
@@ -97,6 +104,7 @@ function reloadCard(){
     total.innerText = totalPrice.toLocaleString();
     quantity.innerText = count;
 }
+
 function changeQuantity(key, quantity){
     if(quantity == 0){
         delete listCards[key];

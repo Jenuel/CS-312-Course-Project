@@ -17,16 +17,7 @@
 
     <section class="booth-container">
         <div class="box">
-            <div class="booth-header">
-                <h2>BOOTH NAME</h2>                
-            </div>
-            <div class="booth-description">
-                <p>booth description</p>
-            </div>
-            <div class="buttons">
-                <button type="button" id="edit-button" onclick="editBooth()">EDIT</button>
-                <button type="button" id="delete-button">DELETE</button>
-            </div>
+            
         </div>
     </section>
 
@@ -102,40 +93,7 @@
         </div>
     </section>
 
-    <script>
-        let create = document.getElementById("create");
-        let edit = document.getElementById("edit");
-    
-        //opens popup in creating a booth
-        function createBooth() {
-            create.classList.add("open-createBooth");
-            edit.classList.remove("open-editBooth"); // Ensure edit is hidden
-        }
-    
-        //closes popup in creating a booth
-        function createBoothFinished() {
-            create.classList.remove("open-createBooth");
-        }
-    
-        //opens popup in editing a booth
-        function editBooth() {
-            edit.classList.add("open-editBooth"); // Show edit section
-            create.classList.remove("open-createBooth"); // Ensure create is hidden
-        }
-    
-        //closes popup in editing a booth
-        function editBoothFinished() {
-            edit.classList.remove("open-editBooth");
-        }
-    
-        //for changing image of booth
-        let boothImage = document.getElementById("image");
-        let inputFile = document.getElementById("input-file");
-    
-        inputFile.onchange = function() {
-            boothImage.src = URL.createObjectURL(inputFile.files[0]);
-        }
-    </script>
+    <script src="..\js\vendorhome.js"></script>
     
 </body>
 </html>
