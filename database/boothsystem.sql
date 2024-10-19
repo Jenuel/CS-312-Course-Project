@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2024 at 02:46 PM
+-- Generation Time: Oct 19, 2024 at 03:14 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -66,6 +66,40 @@ CREATE TABLE `booth_members` (
   `VendorID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `booth_members`
+--
+
+INSERT INTO `booth_members` (`BoothID`, `VendorID`) VALUES
+(13, 1),
+(13, 6),
+(13, 7),
+(13, 8),
+(14, 2),
+(14, 9),
+(15, 3),
+(15, 10),
+(16, 4),
+(16, 11),
+(17, 5),
+(17, 12),
+(18, 1),
+(18, 6),
+(18, 7),
+(18, 8),
+(19, 2),
+(19, 9),
+(20, 3),
+(20, 10),
+(21, 4),
+(21, 11),
+(22, 5),
+(22, 12),
+(23, 1),
+(23, 6),
+(23, 7),
+(23, 8);
+
 -- --------------------------------------------------------
 
 --
@@ -113,7 +147,11 @@ INSERT INTO `customer` (`CustomerID`, `UserID`) VALUES
 (2, 8),
 (3, 9),
 (4, 10),
-(5, 11);
+(5, 11),
+(6, 18),
+(10, 19),
+(11, 20),
+(12, 21);
 
 -- --------------------------------------------------------
 
@@ -247,7 +285,17 @@ INSERT INTO `users` (`UserID`, `FirstName`, `LastName`, `SchoolEmail`, `Password
 (8, 'Bruce', 'Wayne', 'bruce.wayne@school.edu', 'batman123'),
 (9, 'Clark', 'Kent', 'clark.kent@school.edu', 'superman987'),
 (10, 'Natasha', 'Romanoff', 'natasha.romanoff@school.edu', 'blackWidow456'),
-(11, 'Steve', 'Rogers', 'steve.rogers@school.edu', 'captainAmerica654');
+(11, 'Steve', 'Rogers', 'steve.rogers@school.edu', 'captainAmerica654'),
+(12, 'Emily', 'Clark', 'emily.clark@school.edu', 'emilyPass456'),
+(13, 'Michael', 'Green', 'michael.green@school.edu', 'mikeSecure789'),
+(14, 'Sarah', 'Adams', 'sarah.adams@school.edu', 'sarahPass321'),
+(15, 'David', 'Wilson', 'david.wilson@school.edu', 'davidPwd654'),
+(16, 'Olivia', 'Taylor', 'olivia.taylor@school.edu', 'oliviaPass987'),
+(17, 'James', 'Brown', 'james.brown@school.edu', 'jamesSecure123'),
+(18, 'Sophia', 'Miller', 'sophia.miller@school.edu', 'sophiaPwd456'),
+(19, 'Liam', 'Davis', 'liam.davis@school.edu', 'liamSecure789'),
+(20, 'Ava', 'Martinez', 'ava.martinez@school.edu', 'avaPass321'),
+(21, 'Noah', 'Garcia', 'noah.garcia@school.edu', 'noahSecure654');
 
 -- --------------------------------------------------------
 
@@ -271,7 +319,13 @@ INSERT INTO `vendor` (`VendorID`, `UserID`, `OrgID`) VALUES
 (3, 3, 3),
 (4, 4, 4),
 (5, 5, 5),
-(6, 6, 1);
+(6, 6, 1),
+(7, 12, 1),
+(8, 13, 1),
+(9, 14, 2),
+(10, 15, 3),
+(11, 16, 4),
+(12, 17, 5);
 
 --
 -- Indexes for dumped tables
@@ -386,7 +440,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `inventory`
@@ -395,22 +449,40 @@ ALTER TABLE `inventory`
   MODIFY `InventoryID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `order`
+--
+ALTER TABLE `order`
+  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `organization`
 --
 ALTER TABLE `organization`
   MODIFY `OrgID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `product`
+--
+ALTER TABLE `product`
+  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `reserve_rules`
+--
+ALTER TABLE `reserve_rules`
+  MODIFY `ReserveID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `vendor`
 --
 ALTER TABLE `vendor`
-  MODIFY `VendorID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `VendorID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
