@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $insertStmt->bind_param("ssss", $firstName, $lastName, $email, $hashedPassword);
 
             if ($insertStmt->execute()) {
-                header("Location: ../../../website/auth/login.html"); // Should be home.html with token/session
+                echo json_encode(["success" => true, "message" => "User registered successfully"]); //Redirection will happen in the frontend
             } else {
                 echo json_encode(["error" => "Error: " . $conn->error]);
             }
@@ -79,8 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user']['role'] = 'vendor';
                 $_SESSION['user']['VendorID'] = $vendor['VendorID'];
                 $_SESSION['user']['OrgID'] = $vendor['OrgID'];
-                
-                header('Location: ../../../website/vendor/html/vendorhome');
+                echo json_encode(["success" => true, "message" => "User login successfully"]); //Redirection will happen in frontend
                 exit;
             }
 
@@ -96,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user']['role'] = 'customer';
                 $_SESSION['user']['CustomerID'] = $customer['CustomerID'];
                 
-                header('Location: ../../../website/client/html/clienthome');
+                echo json_encode(["success" => true, "message" => "User login successfully"]); //Redirection will happen in frontend
                 exit;
             }
 
