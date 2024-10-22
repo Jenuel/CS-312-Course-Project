@@ -57,7 +57,7 @@ function getData() {
     });
 }
 
-// function in appending values to the booth!!!!!!!!!!!!!!
+// function in appending values to the booth
 function displayBooths(){
     booths.forEach((value) => { // loops through the array of objects
         let valueDiv = document.createElement('div'); // creates new div
@@ -79,14 +79,42 @@ function displayBooths(){
     })
 }
 
-function createBoothFunction() {
-    //comply the data for creating a booth!!!!!!!!!
+function createBoothFunction() { //integrate it to create function button
     const formData = {
-        username: document.getElementById('username').value,
-        password: document.getElementById('password').value
+        title: document.getElementById('').value,
+        description: document.getElementById('').value,
+        schedules: document.getElementById('').value,
+        location: document.getElementById('').value,
+        boothIcon: null,//document.getElementById('').value, FOR NOW
+        status: null, //document.getElementById('').value, FOR NOW
     };
 
-    //logic for creating a booth (fetch)!!!!!!!!!!!!
+    fetch('../../../backend/php/auth/boothRoutes.php', {
+        method: 'POST',
+        body: JSON.stringify(formData), 
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log("Booth created successfully");
+            alert("Booth created successfully");
+        } else {
+            console.error(data.error);
+            alert(data.error || 'Error creating booth');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
 }
 
 getData();
