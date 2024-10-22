@@ -14,7 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
        
         $orgID = $_SESSION['user']['OrgID']; 
       
-        $query = "SELECT * FROM booths WHERE OrgID = ?";
+        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
+              FROM booths b
+              JOIN organization o ON b.OrgID = o.OrgID
+              WHERE b.OrgID = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("i", $orgID);
         $stmt->execute();
@@ -25,11 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $booths[] = $row;
         }
         
-    
         echo json_encode($booths);
 
     } elseif ($_SESSION['user']['role'] === 'customer') {
-        $query = "SELECT * FROM booths";
+        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
+              FROM booths b
+              JOIN organization o ON b.OrgID = o.OrgID";
         $stmt = $conn->prepare($query);
         $stmt->execute();
         $boothResult = $stmt->get_result();
@@ -55,9 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     //boothIcon
     //status?
 
-    $insertQuery = "INSERT INTO booths (orgID, title, description, schedules, location ) VALUES (?, ?, ?, ?, ?)";
+    $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?)";
     $insertStmt = $conn->prepare($insertQuery);
-    $insertStmt->bind_param("sssss", $orgID, $title, $description, $schedules, $location);
+    $insertStmt->bind_param("sssss", $orgID, $title, $description, $schedules, $location); //check if the data types are correct
     if ($insertStmt->execute()) {
         http_response_code(201); // Send 201 Created status code
         echo json_encode(["success" => "Booth created successfully"]); 
