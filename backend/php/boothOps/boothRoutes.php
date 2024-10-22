@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $orgID = $_SESSION['user']['OrgID']; 
       
         $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
-              FROM booths b
+              FROM booth b
               JOIN organization o ON b.OrgID = o.OrgID
               WHERE b.OrgID = ?";
         $stmt = $conn->prepare($query);
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     } elseif ($_SESSION['user']['role'] === 'customer') {
         $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
-              FROM booths b
+              FROM booth b
               JOIN organization o ON b.OrgID = o.OrgID";
         $stmt = $conn->prepare($query);
         $stmt->execute();
