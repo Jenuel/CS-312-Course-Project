@@ -10,17 +10,17 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     document.getElementById('passwordError').textContent = '';
     document.getElementById('confirmPasswordError').textContent = '';
 
-    // Edit the logic for first name!!!!!!!
-    const firstName = document.getElementById('name').value;
+    // First Name validation
+    const firstName = document.getElementById('firstName').value;
     if (firstName.length < 3) {
-        document.getElementById('nameError').textContent = 'Name must be at least 3 characters long.';
+        document.getElementById('firstNameError').textContent = 'Name must be at least 3 characters long.';
         isValid = false;
     }
 
-    // Edit the logic for first name!!!!!!!
-    const lastName = document.getElementById('name').value;
+    //Last Name validation
+    const lastName = document.getElementById('lastName').value;
     if (lastName.length < 3) {
-        document.getElementById('nameError').textContent = 'Name must be at least 3 characters long.';
+        document.getElementById('lastNameError').textContent = 'Name must be at least 3 characters long.';
         isValid = false;
     }
 
@@ -47,21 +47,21 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     }
 
     if (isValid) {
-        handleRegistration();
+        handleRegistration(password);
     }
 });
-//fix the logic of the function for registration!!!!!!!!!
-function handleRegistration(event) {
+
+function handleRegistration(password) {
     event.preventDefault(); // Prevent form from submitting the default way
 
     const formData = {
         firstName: document.getElementById('firstName').value,
         lastName: document.getElementById('lastName').value,
         email: document.getElementById('email').value,
-        password: document.getElementById('password').value,
+        password: password,
         action: 'signUp'
     };
-    
+
     fetch('../../../backend/php/auth/authRoutes.php', {
         method: 'POST',
         body: JSON.stringify(formData), 
@@ -77,16 +77,12 @@ function handleRegistration(event) {
     })
     .then(data => {
         if (data.success) {
-            console.log("Login successful"); 
-            if(data.role == "vendor"){ //checks the role of the newly authenticated user
-                window.location.href = '../../vendor/html/client-home.html';//redirect to vendor side
-            } else {
-                window.location.href = '../../client/html/vendor-home.html'; //redirect to customer side
-            }                
+            console.log("Registration successful"); 
+            window.location.href = '../html/login.html';   
         } else {
-            console.error(data.message);
+            console.error(data.error);
             // Show error message to the user
-            alert(data.message || 'Login failed');
+            alert(data.error || 'Registration failed');
         }
     })
     .catch(error => {
