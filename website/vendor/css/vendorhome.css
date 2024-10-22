@@ -1,66 +1,64 @@
-body{
+body {
     margin: 0;
     text-align: center;
 }
 
-/**NAVBAR*/
+/** NAVBAR */
 nav {
     background-color: red;
     display: flex;
 }
 
-nav button{
+nav button {
     padding: 10px;
     margin: 10px;
 }
 
-/**GENERAL*/
-
+/** GENERAL */
 section {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/**BOOTH CONTAINERS AND BOOTH CONTAINER ITEMS*/
-
-.booth-container{
+/** BOOTH CONTAINERS AND BOOTH CONTAINER ITEMS */
+.booth-container {
     display: flex;
     flex-wrap: wrap;
     margin: 30px;
-    justify-content: center; 
-    align-items: center; 
+    justify-content: center;
+    align-items: center;
 }
 
 .box {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between; /* or space-around/space-evenly depending on your preference */
-    gap: 20px; /* This will handle both row and column gaps */
+    justify-content: space-between;
+    gap: 20px;
 }
 
 .box > * {
-    flex: 1 1 calc(33.33% - 20px); /* Three equal columns with 20px space */
+    flex: 1 1 calc(33.33% - 20px);
     box-sizing: border-box;
-    border: 2px solid black; 
-    padding: 10px; 
-    border-radius: 5px; 
+    border: 2px solid black;
+    padding: 10px;
+    border-radius: 5px;
 }
 
-.booth-header{
+.booth-header {
     display: flex;
-    justify-content: center; 
-    align-items: center;  
-    height: 80px; 
+    justify-content: center;
+    align-items: center;
+    height: 80px;
     border-bottom: 1px solid black;
 }
 
-.booth-description{
+.booth-description {
     width: 90%;
-    height: 130px; 
+    height: 130px;
     margin: 0 auto;
-    padding: 10px;  
-    word-wrap: break-word; 
+    padding: 10px;
+    word-wrap: break-word;
     margin-bottom: 10px;
 }
 
@@ -69,14 +67,14 @@ section {
     justify-content: space-evenly;
 }
 
-.buttons button{
+.buttons button {
     width: 180px;
-    height: 40px
+    height: 40px;
 }
 
-/**CSS FOR THE POPUP IN CREATING A BOOTH AND EDITING A BOOTH*/
-
-.create-booth {
+/** CSS FOR THE POPUP IN CREATING AND EDITING A BOOTH */
+.create-booth,
+.edit-booth {
     width: 800px;
     height: 530px;
     position: absolute;
@@ -88,7 +86,8 @@ section {
     text-align: center;
 }
 
-.create-booth form, .edit-booth form {
+.create-booth form,
+.edit-booth form {
     text-align: start;
 }
 
@@ -96,27 +95,28 @@ input, label {
     display: block;
 }
 
-input, textarea{
+input, textarea {
     width: 80%;
 }
 
-::placeholder{
+::placeholder {
     color: black;
 }
 
-.grid{
+.grid {
     padding-top: 20px;
     display: grid;
     row-gap: 20px;
     align-items: start;
-    grid-template-areas: "image name"
-                         "image schedule"
-                         "image location"
-                         "image description";
+    grid-template-areas:
+        "image-field name-field"
+        "image-field schedule-field"
+        "image-field location-field"
+        "image-field description-field";
 }
 
-.grid #image-part{
-    grid-area: image;
+.grid #image-field {
+    grid-area: image-field;
     width: 90%;
 }
 
@@ -126,7 +126,7 @@ input, textarea{
     border: 1px solid black;
 }
 
-#image-part label{
+#image-field label {
     display: block;
     width: 200px;
     border: 1px solid black;
@@ -137,57 +137,44 @@ input, textarea{
     cursor: pointer;
 }
 
-.grid #input-file{
+.grid #input-file {
     display: none;
 }
 
-#name-part{
-    grid-area: name;
+.field{
+    margin-bottom: 20px;
 }
 
-#schedule-part{
-    grid-area: schedule;
+.name .field {
+    grid-area: name-field;
 }
 
-#location-part{
-    grid-area: location;
+.schedule .field {
+    grid-area: schedule-field;
 }
 
-#description-part{
-    grid-area: description;
+.location .field {
+    grid-area: location-field;
 }
 
-textarea{
+.description .field {
+    grid-area: description-field;
+}
+
+textarea {
     resize: none;
     border: 2px solid black;
 }
 
-.edit-booth{
-    width: 800px;
-    height: 530px;
-    position: absolute;
-    background-color: white;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    visibility: hidden;
-    text-align: center;
-}
-
-#finish-create, #finish-edit{
+#finish-create, #finish-edit {
     width: 80%;
     height: 40px;
     cursor: pointer;
-    margin-top: 50px;
+    margin-top: -50px;
 }
 
-/**JAVASCRIPT RELATED CLASSES*/
-.open-editBooth{
-    visibility: visible;
-    border: 5px solid black;
-}
-
-.open-createBooth{
+/** JAVASCRIPT RELATED CLASSES */
+.open-editBooth, .open-createBooth {
     visibility: visible;
     border: 5px solid black;
 }
