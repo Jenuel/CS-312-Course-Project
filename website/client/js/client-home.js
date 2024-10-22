@@ -6,7 +6,6 @@ function getData() {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + sessionStorage.getItem('sessionID')  
         }
     })
     .then(response => response.json())  
