@@ -34,54 +34,31 @@ inputFile.onchange = function() {
 //for creating and appending values of a booth
 let box = document.querySelector(".box"); // where the child will be appended
 
-// array values that gives information to the children that will be appended on "box"
-let booths = [
-    {
-        image: "1.png",
-        boothName: "booth 1",
-        schedule: "8:30 - 9:30 am",
-        location: "main campus",
-        description: "booth for something"
-    }, 
-    {
-        image: "2.png",
-        boothName: "booth 2",
-        schedule: "8:30 - 9:30 am",
-        location: "main campus",
-        description: "booth for something"
-    }, 
-    {
-        image: "3.png",
-        boothName: "booth 3",
-        schedule: "8:30 - 9:30 am",
-        location: "main campus",
-        description: "booth for something"
-    }, 
-    {
-        image: "4.png",
-        boothName: "booth 4",
-        schedule: "8:30 - 9:30 am",
-        location: "main campus",
-        description: "booth for something"
-    }, 
-    {
-        image: "5.png",
-        boothName: "booth 5",
-        schedule: "8:30 - 9:30 am",
-        location: "main campus",
-        description: "booth for something"
-    }, 
-    {
-        image: "5.png",
-        boothName: "booth 6",
-        schedule: "8:30 - 9:30 am",
-        location: "main campus",
-        description: "booth for something"
-    }
-];
+// fetches the data and calls the displaying function
+function getData() {
+    fetch('../../../backend/php/auth/boothRoutes.php', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem('sessionID')  
+        }
+    })
+    .then(response => response.json())  
+    .then(data => {
+        if (data.error) {
+            console.error('Error:', data.error);
+        } else {
+            console.log('Booths data:', data);
+            displayBooths(data);
+        }
+    })
+    .catch(error => {
+        console.error('Request failed', error);
+    });
+}
 
-// function in appending values to the booth
-function readBoothValues(){
+// function in appending values to the booth!!!!!!!!!!!!!!
+function displayBooths(){
     booths.forEach((value) => { // loops through the array of objects
         let valueDiv = document.createElement('div'); // creates new div
         valueDiv.classList.add('item'); // new class called item
@@ -102,4 +79,14 @@ function readBoothValues(){
     })
 }
 
-readBoothValues(); // runs the function
+function createBoothFunction() {
+    //comply the data for creating a booth!!!!!!!!!
+    const formData = {
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+    };
+
+    //logic for creating a booth (fetch)!!!!!!!!!!!!
+}
+
+getData();
