@@ -56,15 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $description = $_POST['description'];
     $schedules = $_POST['schedules'];
     $location = $_POST['location'];
-    //boothIcon
-    //status?
+    $boothIcon = $_POST['boothIcon'];
+    $status = $_POST['status'];
 
     $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?)";
     $insertStmt = $conn->prepare($insertQuery);
-    $insertStmt->bind_param("sssss", $orgID, $title, $description, $schedules, $location); //check if the data types are correct
+    $insertStmt->bind_param("ssssbsi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID); //check if the data types are correct
     if ($insertStmt->execute()) {
         http_response_code(201); // Send 201 Created status code
-        echo json_encode(["success" => "Booth created successfully"]); 
+        echo json_encode(["success" => true]); 
     } else {
         echo json_encode(["error" => "Error: " . $conn->error]);
     }
