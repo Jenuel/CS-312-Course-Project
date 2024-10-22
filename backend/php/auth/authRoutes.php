@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {    
-            echo json_encode(["error" => "Email already in use"]);
+            echo json_encode(["success" => false, "error" => "Email already in use"]);
         } else {
             $insertQuery = "INSERT INTO users (FirstName, LastName, SchoolEmail, Password) 
                             VALUES (?, ?, ?, ?)";
