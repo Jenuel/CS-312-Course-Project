@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sign-Up
     if ($action === 'signUp') {
     
-        $firstName = $_POST['fName'];
-        $lastName = $_POST['lName'];
+        $firstName = $_POST['firstName'];
+        $lastName = $_POST['lastName'];
         $email = $_POST['email'];
         $password = $_POST['password'];
 
@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user']['role'] = 'vendor';
                 $_SESSION['user']['VendorID'] = $vendor['VendorID'];
                 $_SESSION['user']['OrgID'] = $vendor['OrgID'];
-                echo json_encode(["success" => true, "message" => "User login successfully"]); //Redirection will happen in frontend
+                echo json_encode(["success" => true, "role" => "vendor", "message" => "User login successfully"]); //Redirection will happen in frontend
                 exit;
             }
 
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user']['role'] = 'customer';
                 $_SESSION['user']['CustomerID'] = $customer['CustomerID'];
                 
-                echo json_encode(["success" => true, "message" => "User login successfully"]); //Redirection will happen in frontend
+                echo json_encode(["success" => true, "role" => "customer", "message" => "User login successfully"]); //Redirection will happen in frontend
                 exit;
             }
 
