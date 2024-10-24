@@ -1,11 +1,13 @@
 <?php
 
-require_once '../connectDb';
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
+
+$test=json_decode(file_get_contents("php://input"), true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'];
+    $action = $test['action'];
     
     // Sign-Up
     if ($action === 'signUp') {
@@ -42,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Login
     } elseif ($action === 'signIn') {
 
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+        $email = $test['email'];
+        $password = $test['password'];
 
         // Hash the password using MD5
         $hashedPassword = md5($password);
@@ -51,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $sql = "SELECT * FROM users WHERE SchoolEmail = ? AND Password = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $email, $hashedPassword);
+        $stmt->bind_param("ss", $email, $password);
         $stmt->execute();
         $result = $stmt->get_result();
 
