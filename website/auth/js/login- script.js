@@ -8,7 +8,7 @@ function handleLogin(event) {
     };
 
    
-    fetch('../../../backend/php/auth/authRoutes.php', {
+    fetch('http://localhost/CS-312-Course-Project/backend/php/auth/authRoutes.php', {
         method: 'POST',
         body: JSON.stringify(formData), 
         headers: {
@@ -16,18 +16,24 @@ function handleLogin(event) {
         }
     })
     .then(response => {
+        console.log(response);
+        
         if (!response.ok) {
+            console.log("success")
             throw new Error('Network response was not ok');
+        } else {
+            console.log("failure")
         }
         return response.json();
     })
+  
     .then(data => {
         if (data.success) {
             console.log("Login successful"); 
             if(data.role == "vendor"){ //checks the role of the newly authenticated user
-                window.location.href = '../../vendor/html/client-home.html';//redirect to vendor side
+                window.location.href = 'http://localhost/CS-312-Course-Project/website/client/html/client-home.html';//redirect to vendor side
             } else {
-                window.location.href = '../../client/html/vendor-home.html'; //redirect to customer side
+                window.location.href = 'http://localhost/CS-312-Course-Project/website/vendor/html/vendor-home.html'; //redirect to customer side
             }                
         } else {
             console.error(data.message);
