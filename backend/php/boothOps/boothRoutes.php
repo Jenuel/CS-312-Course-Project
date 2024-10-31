@@ -7,7 +7,7 @@ if (!isset($_SESSION['user'])) {
     echo json_encode(["error" => "Unauthorized"]);
     exit();
 }
-
+/*this get still not sure if will be working */
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if ($_SESSION['user']['role'] === 'vendor') {
@@ -49,15 +49,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode(["error" => "Role not recognized"]);
     }
 
+
+$post=json_decode(file_get_contents("php://input"), true);
+
 // Handling POST request (e.g., submitting form data or updates)
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orgID = $_SESSION['user']['OrgID'];
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $schedules = $_POST['schedules'];
-    $location = $_POST['location'];
-    $boothIcon = $_POST['boothIcon'];
-    $status = $_POST['status'];
+    $title = $post['title'];
+    $description = $post['description'];
+    $schedules = $post['schedules'];
+    $location = $post['location'];
+    $boothIcon = $post['boothIcon'];
+    $status = $post['status'];
 
     $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?)";
     $insertStmt = $conn->prepare($insertQuery);

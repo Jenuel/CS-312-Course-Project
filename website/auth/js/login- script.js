@@ -45,6 +45,9 @@ function handleLogin(event) {
             alert(data.message || 'Login failed');
         }
     }, 
+
+
+    /*
     function (rejectionReason) { // 3
         console.log('Error parsing JSON from response:', rejectionReason, responseClone); // 4
         responseClone.text() // 5
@@ -53,6 +56,8 @@ function handleLogin(event) {
         });
 
     }
+
+    */
 
     )
     .catch(error => {

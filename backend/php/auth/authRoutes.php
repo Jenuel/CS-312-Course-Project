@@ -62,12 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             session_start();
             $_SESSION['user'] = [
-                'id' => $user['id'],
+                'UserID' => $user['UserID'],
                 'FirstName' => $user['FirstName'],
                 'LastName' => $user['LastName']
             ];
 
-            $userID = $user['id'];
+            $userID = $user['UserID'];
 
             // Check if the user is a vendor
             $vendorQuery = "SELECT VendorID, OrgID FROM VENDOR WHERE UserID = ?";
@@ -97,7 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user']['role'] = 'customer';
                 $_SESSION['user']['CustomerID'] = $customer['CustomerID'];
                 
-                echo json_encode(["success" => true, "role" => "customer", "message" => "User login successfully"]); //Redirection will happen in frontend
+                $transport = array("success" => true, "role" => "customer", "message" => "User login successfully");
+                echo json_encode($transport); //Redirection will happen in frontend
                 exit;
             }
 
