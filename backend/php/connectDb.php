@@ -10,7 +10,7 @@ $conn = new mysqli($DB_HOST,$DB_USER, $DB_PASSWORD,$DB_NAME, 3306);
 if ($conn ->connect_error){
     echo "failed to connect to db".$conn -> connect_error;
 } else {
-    echo "successful connection!";
+    
 }
 
 

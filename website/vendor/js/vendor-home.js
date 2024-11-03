@@ -10,6 +10,7 @@ function createBooth() {
 //closes popup in creating a booth
 function createBoothFinished() {
     create.classList.remove("open-createBooth");
+    createBoothFunction();
 }
 
 //opens popup in editing a booth
@@ -36,7 +37,7 @@ let box = document.querySelector(".box"); // where the child will be appended
 
 // fetches the data and calls the displaying function
 function getData() {
-    fetch('../../../backend/php/auth/boothRoutes.php', {
+    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ function getData() {
 }
 
 // function in appending values to the booth
-function displayBooths(){
+function displayBooths(booths){
     booths.forEach((value) => { // loops through the array of objects
         let valueDiv = document.createElement('div'); // creates new div
         valueDiv.classList.add('item'); // new class called item
@@ -81,15 +82,15 @@ function displayBooths(){
 
 function createBoothFunction() { //integrate it to create function button
     const formData = {
-        title: document.getElementById('').value,
-        description: document.getElementById('').value,
-        schedules: document.getElementById('').value,
-        location: document.getElementById('').value,
+        title: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        schedules: document.getElementById('schedule').value,
+        location: document.getElementById('location').value,
         boothIcon: null,//document.getElementById('').value, FOR NOW
         status: null, //document.getElementById('').value, FOR NOW
     };
 
-    fetch('../../../backend/php/auth/boothRoutes.php', {
+    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
         method: 'POST',
         body: JSON.stringify(formData), 
         headers: {

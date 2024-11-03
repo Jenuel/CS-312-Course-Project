@@ -1,14 +1,19 @@
 <?php
 session_start(); 
 
-require_once '../connectDb'; 
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
 
 if (!isset($_SESSION['user'])) {
     echo json_encode(["error" => "Unauthorized"]);
     exit();
 }
+
+header('Content-Type: application/json; charset=utf-8');
+
+$test=json_decode(file_get_contents("php://input"), true);
+
 /*this get still not sure if will be working */
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+if ($test['method'] === 'GET') {
 
     if ($_SESSION['user']['role'] === 'vendor') {
        

@@ -35,9 +35,9 @@ function handleLogin(event) {
         if (data.success) {
             console.log("Login successful"); 
             if(data.role == "vendor"){ //checks the role of the newly authenticated user
-                window.location.href = '../CS-312-Course-Project/website/client/html/client-home.html';//redirect to vendor side
+                window.location.href = 'http://localhost/CS-312-Course-Project/website/vendor/html/vendor-home.html';//redirect to vendor side
             } else {
-                window.location.href = '../CS-312-Course-Project/website/vendor/html/vendor-home.html'; //redirect to customer side
+                window.location.href = '../CS-312-Course-Project/website/client/html/client-home.html'; //redirect to customer side
             }                
         } else {
             console.error(data.message);
@@ -47,7 +47,7 @@ function handleLogin(event) {
     }, 
 
 
-    /*
+    
     function (rejectionReason) { // 3
         console.log('Error parsing JSON from response:', rejectionReason, responseClone); // 4
         responseClone.text() // 5
@@ -57,7 +57,7 @@ function handleLogin(event) {
 
     }
 
-    */
+ 
 
     )
     .catch(error => {
