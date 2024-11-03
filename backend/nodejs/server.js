@@ -1,6 +1,7 @@
-import express, { request } from 'express'
+import express from 'express'
 import mysql from 'mysql2'
 import productRoutes from 'routes/productRoutes'
+import orderRoutes from 'routes/orderRoutes'
 
 const app = express()
 const db = mysql.createConnection({
@@ -21,7 +22,12 @@ db.connect((error) => {
 });
 
 //middlewares
+app.use((request, response, next) => {
+    request.db = db;
+    next();
+})
 app.use(express.json())
 
 //routes
-app.use("/products", productRoutes)
+app.use("/products", productRoutes);
+app.use("/orders", orderRoutes);
