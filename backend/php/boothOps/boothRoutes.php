@@ -10,10 +10,10 @@ if (!isset($_SESSION['user'])) {
 
 header('Content-Type: application/json; charset=utf-8');
 
-$test=json_decode(file_get_contents("php://input"), true);
+$input=json_decode(file_get_contents("php://input"), true);
 
 /*this get still not sure if will be working */
-if ($test['method'] === 'GET') {
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if ($_SESSION['user']['role'] === 'vendor') {
        
@@ -55,19 +55,20 @@ if ($test['method'] === 'GET') {
     }
 
 
-$post=json_decode(file_get_contents("php://input"), true);
+
 
 // Handling POST request (e.g., submitting form data or updates)
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orgID = $_SESSION['user']['OrgID'];
-    $title = $post['title'];
-    $description = $post['description'];
-    $schedules = $post['schedules'];
-    $location = $post['location'];
-    $boothIcon = $post['boothIcon'];
-    $status = $post['status'];
+    $title = $input['title'];
+    $description = $input['description'];
+    $schedules = $input['schedules'];
+    $location = $input['location'];
+    $boothIcon = $input['boothIcon'];
+    $status = true;
+    
 
-    $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?)";
+    $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?,?,?)";
     $insertStmt = $conn->prepare($insertQuery);
     $insertStmt->bind_param("ssssbsi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID); //check if the data types are correct
     if ($insertStmt->execute()) {
