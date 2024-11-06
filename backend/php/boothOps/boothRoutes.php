@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($_SESSION['user']['role'] === 'vendor') {
        
         $orgID = $_SESSION['user']['OrgID']; 
-      
+        
         $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
               FROM booth b
               JOIN organization o ON b.OrgID = o.OrgID
@@ -27,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt->bind_param("i", $orgID);
         $stmt->execute();
         $boothResult = $stmt->get_result();
-        
         $booths = [];
         while ($row = $boothResult->fetch_assoc()) {
             $booths[] = $row;
