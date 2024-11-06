@@ -6,7 +6,7 @@ import orderRoutes from 'routes/orderRoutes'
 const app = express()
 const db = mysql.createConnection({
     host: "localhost",
-    user: "username", 
+    user: "root", 
     password: "passsword",
     database: "nameofDatabase"
 });
