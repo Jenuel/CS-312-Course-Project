@@ -84,7 +84,6 @@ function displayBooths(data){
     data.forEach((value) => { // loops through the array of objects
         let valueDiv = document.createElement('div'); // creates new div
         valueDiv.classList.add('item'); // new class called item
-
         // creating the information of the booth
         valueDiv.innerHTML = `
             <div class="booth-header">

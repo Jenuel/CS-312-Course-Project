@@ -2,7 +2,7 @@ let box = document.querySelector(".booth-container"); // where the child will be
 
 //fetches the data and calls the display function when success
 function getData() {
-    fetch('../../../backend/php/auth/boothRoutes.php', {
+    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ function getData() {
     });
 }
 
-function displayBooths(){
+function displayBooths(booths){
     booths.forEach((value) => { 
         let valueDiv = document.createElement('div'); 
         valueDiv.classList.add('item');
@@ -35,23 +35,23 @@ function displayBooths(){
         valueDiv.innerHTML = `
         <div class="box">
             <div class="booth-header">
-                <h2>${value.boothName}</h2>                
+                <h2>${value.Title}</h2>                
             </div>
             <div class="booth status">
                 <p class="label">STATUS</p>
-                <p class="content">:  ${value.status}</p>
+                <p class="content">:  ${value.Status}</p>
             </div>
             <div class="booth schedule">
                 <p class="label">SCHEDULE</p>
-                <p class="content">:  ${value.schedule}</p>
+                <p class="content">:  ${value.Schedule}</p>
             </div>   
             <div class="booth location">
                 <p class="label">LOCATION</p>
-                <p class="content">:  ${value.location}</p>
+                <p class="content">:  ${value.Location}</p>
             </div>     
             <div class="booth description">
                 <p class="label">DESCRIPTION</p>
-                <p class="content">:  ${value.description}</p>
+                <p class="content">:  ${value.Description}</p>
             </div>    
         </div>`;
         box.appendChild(valueDiv); // appending the child to "box"

@@ -37,7 +37,7 @@ function handleLogin(event) {
             if(data.role == "vendor"){ //checks the role of the newly authenticated user
                 window.location.href = 'http://localhost/CS-312-Course-Project/website/vendor/html/vendor-home.html';//redirect to vendor side
             } else {
-                window.location.href = '../CS-312-Course-Project/website/client/html/client-home.html'; //redirect to customer side
+                window.location.href = 'http://localhost/CS-312-Course-Project/website/client/html/client-home.html'; //redirect to customer side
             }                
         } else {
             console.error(data.message);
