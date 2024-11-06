@@ -130,5 +130,25 @@ const approveOrder = async (request, response) => {
     }
 };
 
+const approveCancellation = async (request, response) => {
+    const db = request.db;
+    const { productId } = request.params;
 
-export { getPendingOrders, getCompletedOrders, createOrder, cancelOrder, approveOrder };
+    try {
+        const results = await new Promise((resolve, reject) => {
+            db.query('SELECT * FROM products WHERE boothId = ?', [productId], (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results); 
+                }
+            });
+        });
+
+        response.json(results);
+    } catch (error) {
+        response.status(500).send(error);
+    }
+};
+
+export { getPendingOrders, getCompletedOrders, createOrder, cancelOrder, approveOrder, approveCancellation };
