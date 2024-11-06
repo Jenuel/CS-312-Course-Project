@@ -51,14 +51,14 @@ let formData = {
 
 // fetches the data and calls the displaying function
 function getData() {
-    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
+    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + sessionStorage.getItem('sessionID')  
         },
 
-        body: JSON.stringify(formData)
+
     })
     .then(response => {
         if (!response.ok) {

@@ -16,7 +16,7 @@ function getData() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+
     })
     .then(response => {
         if (!response.ok) {

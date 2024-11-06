@@ -15,10 +15,11 @@ $input=json_decode(file_get_contents("php://input"), true);
 /*this get still not sure if will be working */
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+    
     if ($_SESSION['user']['role'] === 'vendor') {
-       
+
         $orgID = $_SESSION['user']['OrgID']; 
-        
+
         $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
               FROM booth b
               JOIN organization o ON b.OrgID = o.OrgID
@@ -27,46 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt->bind_param("i", $orgID);
         $stmt->execute();
         $boothResult = $stmt->get_result();
+
         $booths = [];
         while ($row = $boothResult->fetch_assoc()) {
             $booths[] = $row;
         }
-        
+
         echo json_encode($booths);
 
-
-        
-
     } elseif ($_SESSION['user']['role'] === 'customer') {
-        #add code for getting the values of $order and $status
-
-        $order = isset($_GET["order"]) ? strtoupper($_GET["order"]) : "ASC"; // Default to 'ASC' if not provided
-        $status = isset($_GET["status"]) ? $_GET["status"] : null;
-
-
-        #query 
-        $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC'; // Ensure $order is safe to use
-
-        if($order === "NULL" || $status === "NULL"){
-            $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, 
-                                    b.Location, b.BoothIcon, b.Status, o.OrgName 
-                            FROM booth b 
-                            JOIN organization o ON b.OrgID = o.OrgID 
-                            ORDER BY b.Title ASC;";
-            $stmt = $conn->prepare($query);
-
-        }else{
-            $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, 
-                        b.Location, b.BoothIcon, b.Status, o.OrgName 
-                        FROM booth b 
-                        JOIN organization o ON b.OrgID = o.OrgID 
-                        WHERE b.Status = ? 
-                        ORDER BY b.Title $order;";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("s", $status); // Bind only the status parameter
-        }
-        
-
+        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
+              FROM booth b
+              JOIN organization o ON b.OrgID = o.OrgID";
+        $stmt = $conn->prepare($query);
         $stmt->execute();
         $boothResult = $stmt->get_result();
 
@@ -76,11 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
 
         echo json_encode($booths);
-        
+
     } else {
         echo json_encode(["error" => "Role not recognized"]);
     }
-
 
 
 
