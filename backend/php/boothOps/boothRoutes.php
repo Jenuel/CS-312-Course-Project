@@ -40,23 +40,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     } elseif ($_SESSION['user']['role'] === 'customer') {
         #add code for getting the values of $order and $status
-        $order = $_GET["order"];
-        $status = $_GET["status"];
+        $order = isset($_GET["order"]) ? strtoupper($_GET["order"]) : "ASC"; // Default to 'ASC' if not provided
+        $status = isset($_GET["status"]) ? $_GET["status"] : null;
 
         #query 
-        #add value of $status, from comboboc from ui
-        #add value of $order, either ASC or DESC
         $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC'; // Ensure $order is safe to use
 
-        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, 
-                        b.Location, b.BoothIcon, b.Status, o.OrgName 
-                FROM booth b 
-                JOIN organization o ON b.OrgID = o.OrgID 
-                WHERE b.Status = ? 
-                ORDER BY b.Title $order;";
+        if($order === "NULL" || $status === "NULL"){
+            $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, 
+                                    b.Location, b.BoothIcon, b.Status, o.OrgName 
+                            FROM booth b 
+                            JOIN organization o ON b.OrgID = o.OrgID 
+                            ORDER BY b.Title ASC;";
+            $stmt = $conn->prepare($query);
 
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $status); // Bind only the status parameter
+        }else{
+            $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, 
+                        b.Location, b.BoothIcon, b.Status, o.OrgName 
+                        FROM booth b 
+                        JOIN organization o ON b.OrgID = o.OrgID 
+                        WHERE b.Status = ? 
+                        ORDER BY b.Title $order;";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("s", $status); // Bind only the status parameter
+        }
+        
 
         $stmt->execute();
         $boothResult = $stmt->get_result();
