@@ -15,6 +15,7 @@ $input=json_decode(file_get_contents("php://input"), true);
 /*this get still not sure if will be working */
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+    /*This checks the user if it is a vendor */
     if ($_SESSION['user']['role'] === 'vendor') {
        
         $orgID = $_SESSION['user']['OrgID']; 
@@ -36,26 +37,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode($booths);
 
     } elseif ($_SESSION['user']['role'] === 'customer') {
-        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
-              FROM booth b
-              JOIN organization o ON b.OrgID = o.OrgID";
-        $stmt = $conn->prepare($query);
-        $stmt->execute();
-        $boothResult = $stmt->get_result();
-        
-        $booths = [];
-        while ($row = $boothResult->fetch_assoc()) {
-            $booths[] = $row;
+        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status
+          FROM booth b";
+
+        // Initialize conditions and bind parameters
+        $conditions = [];
+        $params = [];
+
+        // 1. Filter by Status (OPEN or CLOSE)
+        if (isset($_GET['filter']) && in_array($_GET['filter'], ['OPEN', 'CLOSE'])) {
+            $conditions[] = "b.Status = ?";
+            $params[] = $_GET['filter'];  // Set filter value (OPEN or CLOSE)
         }
 
-        echo json_encode($booths);
-        
+        // 2. Add WHERE clause if there are any conditions
+        if (count($conditions) > 0) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        // 3. Sorting logic (only if 'sort' parameter is provided)
+        if (isset($_GET['sort']) && in_array($_GET['sort'], ['A-Z', 'Z-A'])) {
+            $sortOrder = $_GET['sort'] === 'A-Z' ? 'ASC' : 'DESC';
+            $query .= " ORDER BY b.Title " . $sortOrder;
+        }
+
+        // Prepare and execute the query
+        $stmt = $conn->prepare($query);
+
+        // Bind parameters if needed (for filter)
+        if (!empty($params)) {
+            $types = str_repeat('s', count($params));  // Assuming all filter values are strings
+            $stmt->bind_param($types, ...$params);     // Bind the filter parameter
+        }
+                
     } else {
         echo json_encode(["error" => "Role not recognized"]);
     }
-
-
-
 
 // Handling POST request (e.g., submitting form data or updates)
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
