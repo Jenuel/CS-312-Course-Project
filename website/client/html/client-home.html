@@ -17,7 +17,7 @@
     <section class="booth-container"> 
         <div class="filters-container">
             <div id="filtering">
-                <select name="filter" id="filter">
+                <select name="filter" id="filter" onchange="getData()">
                     <option value="" disabled selected>Filter By Status</option>
                     <option value="all">All</option>
                     <option value="open">Active</option>
@@ -25,7 +25,7 @@
                 </select> 
             </div>
             <div id="sorting">
-                <select name="sort" id="sort">
+                <select name="sort" id="sort" onchange="getData()">
                     <option value="" disabled selected>Sort By</option>
                     <option value="name">Random</option>
                     <option value="name">A-Z</option>

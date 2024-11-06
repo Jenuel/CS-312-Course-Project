@@ -1,12 +1,22 @@
 let box = document.querySelector(".booth-container"); // where the child will be appended
 
+
+let formData = {
+
+    filter: document.getElementById("filter").value,
+    order: document.getElementById("order")
+
+};
+
 //fetches the data and calls the display function when success
 function getData() {
     fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
         method: 'GET',
+        mode: 'no-cors',
         headers: {
             'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify(formData)
     })
     .then(response => {
         if (!response.ok) {

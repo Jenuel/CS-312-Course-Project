@@ -40,6 +40,15 @@ function closeCreateBooth() {
     create.classList.remove("open-createBooth");  
 }
 
+
+let formData = {
+
+    filter: document.getElementById("filter").value,
+    order: document.getElementById("order")
+
+};
+
+
 // fetches the data and calls the displaying function
 function getData() {
     fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
@@ -47,7 +56,9 @@ function getData() {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + sessionStorage.getItem('sessionID')  
-        }
+        },
+
+        body: JSON.stringify(formData)
     })
     .then(response => {
         if (!response.ok) {

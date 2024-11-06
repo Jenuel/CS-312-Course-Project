@@ -39,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     } elseif ($_SESSION['user']['role'] === 'customer') {
         #add code for getting the values of $order and $status
-        $order = $_GET["order"];
-        $status = $_GET["status"];
+        $order = $input['order'];
+        $status = $input['status'];
 
         #query 
         #add value of $status, from comboboc from ui
