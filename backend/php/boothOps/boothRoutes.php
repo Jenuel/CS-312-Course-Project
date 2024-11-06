@@ -35,14 +35,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         
         echo json_encode($booths);
 
+
+        
+
     } elseif ($_SESSION['user']['role'] === 'customer') {
-        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
-              FROM booth b
-              JOIN organization o ON b.OrgID = o.OrgID";
+        #add code for getting the values of $order and $status
+        $order = $_GET["order"];
+        $status = $_GET["status"];
+
+        #query 
+        #add value of $status, from comboboc from ui
+        #add value of $order, either ASC or DESC
+        $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC'; // Ensure $order is safe to use
+
+        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, 
+                        b.Location, b.BoothIcon, b.Status, o.OrgName 
+                FROM booth b 
+                JOIN organization o ON b.OrgID = o.OrgID 
+                WHERE b.Status = ? 
+                ORDER BY b.Title $order;";
+
         $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $status); // Bind only the status parameter
+
         $stmt->execute();
         $boothResult = $stmt->get_result();
-        
+
         $booths = [];
         while ($row = $boothResult->fetch_assoc()) {
             $booths[] = $row;
