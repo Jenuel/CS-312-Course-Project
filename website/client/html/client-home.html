@@ -6,6 +6,7 @@
 <body>
     <nav>
         <button type="button">HOME</button>
+        <button type="button">LOGOUT</button>
     </nav>
 
     <header>
@@ -14,6 +15,22 @@
 
     <!--WHERE THE BOOTHS WILL BE APPENDED -->
     <section class="booth-container"> 
+        <div class="filters-container">
+            <div id="filtering">
+                <select name="filter" id="filter">
+                    <option value="" disabled selected>Filter By Status</option>
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select> 
+            </div>
+            <div id="sorting">
+                <select name="sort" id="sort">
+                    <option value="" disabled selected>Sort By</option>
+                    <option value="name">Name</option>
+                    <option value="schedule">Schedule</option>
+                </select> 
+            </div>
+        </div>
 
     </section>
 

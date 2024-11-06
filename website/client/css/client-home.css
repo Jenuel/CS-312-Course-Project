@@ -5,14 +5,17 @@ body{
 
 /**NAVBAR*/
 nav {
-    background-color: red;
+    background-color: #003DA5;
     display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 nav button{
     padding: 10px;
     margin: 10px;
 }
+
 
 /**BOOTH CONTAINER*/
 .booth-container{
@@ -21,6 +24,14 @@ nav button{
     margin: 30px;
     justify-content: center; 
     align-items: center; 
+}
+
+.filters-container {
+    display: flex; 
+    justify-content: flex-end; 
+    gap: 20px; 
+    align-items: center; 
+    width: 100%;
 }
 
 /**BOOTH BOX*/

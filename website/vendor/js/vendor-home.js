@@ -36,6 +36,10 @@ inputFile.onchange = function() {
 //for creating and appending values of a booth
 let box = document.querySelector(".box"); // where the child will be appended
 
+function closeCreateBooth() {
+    create.classList.remove("open-createBooth");  
+}
+
 // fetches the data and calls the displaying function
 function getData() {
     fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
@@ -102,8 +106,6 @@ function displayBooths(data){
     })
 
 }
-
-
 
 var responseClone; // 1
 

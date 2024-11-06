@@ -5,8 +5,10 @@ body{
 
 /**NAVBAR*/
 nav {
-    background-color: red;
+    background-color: #003DA5;
     display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 nav button{
@@ -32,15 +34,23 @@ section {
     align-items: center; 
 }
 
+.filters-container {
+    display: flex; 
+    justify-content: flex-end; 
+    gap: 20px; 
+    align-items: center; 
+    width: 100%;
+}
+
 .box {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between; /* or space-around/space-evenly depending on your preference */
-    gap: 20px; /* This will handle both row and column gaps */
+    justify-content: space-between; 
+    gap: 20px;
 }
 
 .box > * {
-    flex: 1 1 calc(33.33% - 20px); /* Three equal columns with 20px space */
+    flex: 1 1 calc(33.33% - 20px); 
     box-sizing: border-box;
     border: 2px solid black; 
     padding: 10px; 
@@ -166,6 +176,7 @@ textarea{
     width: 800px;
     height: 530px;
     position: absolute;
+    position: relative;
     background-color: white;
     top: 50%;
     left: 50%;
@@ -173,6 +184,26 @@ textarea{
     visibility: hidden;
     text-align: center;
 }
+
+.exit-btn {
+    position: absolute;
+    top: 10px;  
+    right: 10px; 
+    background-color: red;
+    color: white;
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.exit-btn:hover {
+    background-color: darkred;
+}
+
 
 #finish-create, #finish-edit{
     width: 80%;
