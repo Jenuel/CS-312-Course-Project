@@ -9,7 +9,7 @@ const getProducts = async (request, response) => {
 
     try {
         const results = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM products WHERE boothId = ?', [boothId], (error, results) => {
+            db.query('SELECT * FROM product WHERE boothId = ?', [boothId], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -30,10 +30,10 @@ const getProducts = async (request, response) => {
 const getProductDetails = async (request, response) => {
     const db = request.db;
     const { productId } = request.params;
-
+    
     try {
         const results = await new Promise((resolve, reject) => {
-            db.query('THIS IS WHERE THE QUERY FOR GETTING THE PRODUCT DETAILS', [productId], (error, results) => {
+            db.query('SELECT ProductID, CategoryID, Name, Price FROM `product` WHERE BoothID = ?', [productId], (error, results) => {
                 if (error) {
                     reject(error);
                 } else {
