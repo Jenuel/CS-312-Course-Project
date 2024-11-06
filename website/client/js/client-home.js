@@ -38,6 +38,7 @@ function getData() {
 }
 
 function displayBooths(booths){
+    box.innerHTML = "";
     booths.forEach((value) => { 
         let valueDiv = document.createElement('div'); 
         valueDiv.classList.add('item');
