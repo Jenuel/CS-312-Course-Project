@@ -50,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Hash the password using MD5
         $hashedPassword = md5($password);
 
-        
         $sql = "SELECT * FROM users WHERE SchoolEmail = ? AND Password = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $email, $password);
