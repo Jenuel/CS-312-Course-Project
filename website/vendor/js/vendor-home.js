@@ -81,6 +81,10 @@ function getData() {
 
 // function in appending values to the booth
 function displayBooths(data){
+    let value = document.createElement('div'); // creates new div
+    value.classList.add('item'); // new class called item
+    box.appendChild(value); // appending the child to "box"
+    
     document.querySelectorAll('item').forEach(element => element.remove());
     data.forEach((value) => { // loops through the array of objects
         let valueDiv = document.createElement('div'); // creates new div
