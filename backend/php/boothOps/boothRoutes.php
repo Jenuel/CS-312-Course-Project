@@ -19,14 +19,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
        
         $orgID = $_SESSION['user']['OrgID']; 
       
-        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, b.Location, b.BoothIcon, b.Status, o.OrgName
-              FROM booth b
-              JOIN organization o ON b.OrgID = o.OrgID
-              WHERE b.OrgID = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $orgID);
-        $stmt->execute();
-        $boothResult = $stmt->get_result();
+         #add code for getting the values of $order and $status
+         $order = isset($_GET["order"]) ? strtoupper($_GET["order"]) : "ASC"; // Default to 'ASC' if not provided
+         
+         #query 
+         $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC'; // Ensure $order is safe to use
+        
+        $query = "SELECT b.BoothID, b.Title, b.Description, b.Schedules, 
+                    b.Location, b.BoothIcon, b.Status, o.OrgName 
+                    FROM booth b 
+                    JOIN organization o ON b.OrgID = o.OrgID 
+                    WHERE b.Status = ? 
+                    ORDER BY b.Title $order;";
+         $stmt = $conn->prepare($query);
+         $stmt->bind_param("s", $status); // Bind only the status parameter
+         
+         
+ 
+         $stmt->execute();
+         $boothResult = $stmt->get_result();
         
         $booths = [];
         while ($row = $boothResult->fetch_assoc()) {
