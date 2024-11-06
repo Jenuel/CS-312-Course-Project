@@ -4,7 +4,7 @@ function logout() {
     fetch('http://localhost/CS-312-Course-Project/backend/php/auth/logout.php/' + new URLSearchParams({
         logout: 'true',
     }).toString(), {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },

@@ -3,7 +3,7 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
-if(isset($_GET["logout"])){
+if(isset($_POST["logout"])){
     session_destroy();  
     unset($_SESSION['user'] ['userID']);
     unset($_SESSION['user'] ['FirstName']);
