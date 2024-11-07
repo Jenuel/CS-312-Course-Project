@@ -1,6 +1,5 @@
 let box = document.querySelector(".booth-container"); // where the child will be appended
 
-// array values that gives information to the children that will be appended on "box"
 let booths = [
     {
         status: "open",
