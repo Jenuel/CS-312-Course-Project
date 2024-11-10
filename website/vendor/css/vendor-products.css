@@ -190,7 +190,10 @@ header {
 }
 
 .product-list-container .table-head li {
-    
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    position: relative;
     list-style: none;
     background-color: transparent;
 }
