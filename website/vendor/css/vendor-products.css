@@ -222,6 +222,24 @@ header {
     width: 100%;
     list-style: none;
 }
+.product-list-container .table-body .product-detail-container:last-child{
+    justify-content: space-between;
+    gap: 5px;
+}
+/* options tab */
+.product-list-container .table-body .product-detail-container:last-child button
+ {
+    background-color: transparent;
+    font-size: 30px;
+    border-color: transparent;
+    cursor: pointer;
+}
+
+.product-list-container .table-body .product-detail-container:last-child button i {
+    font-size: inherit;
+    background-color: transparent;
+}
+
 
 .product-list-container .table-body {
     
