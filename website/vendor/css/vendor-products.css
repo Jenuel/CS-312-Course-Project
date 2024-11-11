@@ -8,18 +8,18 @@
 }
 
 body {
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 .main-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100vh;
-    max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  max-width: 100%;
 }
 
 nav {
@@ -44,7 +44,6 @@ button {
   list-style: none;
   gap: 38px;
   margin-left: 20px;
-  
 }
 
 header {
@@ -58,197 +57,196 @@ header {
 }
 
 .content-panel {
-    padding: 20px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin: 0 auto;
-    margin-top: 1vh;
-    margin-bottom: 2vh;
-    box-sizing: border-box;
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 1vh;
+  margin-bottom: 2vh;
+  box-sizing: border-box;
 }
 
 .searchbox-wrap {
-    display: flex;
-    gap: 10px;
-    margin: 5px 0;
-    width: 100%;
-    background-color: transparent;
+  display: flex;
+  gap: 10px;
+  margin: 5px 0;
+  width: 100%;
+  background-color: transparent;
 }
 
 .searchbox {
-    /* flex: 1; */
-    padding: 5px;
-    border: 1px solid #e0e0e0;
-    outline: none;
-    background-color: white;
+  /* flex: 1; */
+  padding: 5px;
+  border: 1px solid #e0e0e0;
+  outline: none;
+  background-color: white;
 
-    border-radius: 5px;
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
+  border-radius: 5px;
+  font-size: 16px;
+  font-family: "Poppins", sans-serif;
 }
 
 .searchbox::placeholder {
-    color: #999;
+  color: #999;
 }
 
 .searchBtn {
-    padding: 5px 10px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .searchBtn:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .searchBtn i {
-    /* width: 10px; */
-    /* height: 10px; */
-    background-color: transparent;
-    color: white;
-    
+  /* width: 10px; */
+  /* height: 10px; */
+  background-color: transparent;
+  color: white;
 }
 
 .product-indicators {
-    /* position: absolute; */
-    margin: 50px 0px 20px 0px;
-    font-weight: 5;
-    /* margin: 10px 5px; */
-    font-family: "Poppins", sans-serif;
-    justify-content: space-between ;
-    display: flex;
-    align-items: center;
+  /* position: absolute; */
+  margin: 50px 0px 20px 0px;
+  font-weight: 5;
+  /* margin: 10px 5px; */
+  font-family: "Poppins", sans-serif;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
 }
 
-
 .indicator-left-panel {
-    gap: 5px;
-    display: flex;
-    align-self: flex-start;
+  gap: 5px;
+  display: flex;
+  align-self: flex-start;
 }
 
 .indicator-right-panel {
-    display: flex;
-    align-self: flex-end;
+  display: flex;
+  align-self: flex-end;
 }
 
 .indicator-right-panel button {
-    padding: 10px 40px;
-    border-radius: 5px;
-    background-color: #6439FF;
-    border: none;
-    font-family: "Poppins", sans-serif;
-    cursor: pointer;
-    display: flex;
-    gap: 15px;
-    /* border-color: none; */
-    /* outline: none; */
+  padding: 10px 40px;
+  border-radius: 5px;
+  background-color: #6439ff;
+  border: none;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  display: flex;
+  gap: 15px;
+  /* border-color: none; */
+  /* outline: none; */
 }
 
 .indicator-right-panel button i {
-    font-family: "Poppins", sans-serif;
-    background-color: transparent;
-    color: white;
-    font-size: 25px;
+  font-family: "Poppins", sans-serif;
+  background-color: transparent;
+  color: white;
+  font-size: 25px;
 }
 
 .indicator-right-panel button p {
-    background-color: transparent;
-    color: white;
+  background-color: transparent;
+  color: white;
 }
-
 
 .product-list-container {
-    margin-top: 20px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
-.product-list-container .table-head, 
-.product-list-container .table-body .product-detail-container{
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1fr;
-    width: 100%;
+.product-list-container .table-head,
+.product-list-container .table-body .product-detail-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1fr;
+  width: 100%;
 }
 
 .product-list-container .table-head {
-    padding: 1vw;
-    background-color: #d2e3f6;
+  padding: 1vw;
+  background-color: #d2e3f6;
 }
 
 .product-list-container .table-head li {
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    position: relative;
-    list-style: none;
-    background-color: transparent;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  position: relative;
+  list-style: none;
+  background-color: transparent;
 }
 
 .product-list-container .table-body .product-detail-container {
-    /* display: flex; */
-    /* justify-content: space-between; */
-    position: relative;
-    width: calc(100% - 0.6vw);
-    padding: 6vh 0px;
-    background-color: transparent;
-    margin: 0.3vw;
-    box-sizing: border-box;
-    /* flex-grow: 1; */
-    border-bottom-color:3px #fffafa;
-
+  /* display: flex; */
+  /* justify-content: space-between; */
+  position: relative;
+  width: calc(100% - 0.6vw);
+  padding: 6vh 0px;
+  background-color: transparent;
+  margin: 0.3vw;
+  box-sizing: border-box;
+  /* flex-grow: 1; */
+  border-bottom-color: 3px #fffafa;
 }
 .product-list-container .table-body .product-detail-container li {
-    background-color: transparent;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    position: relative;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    list-style: none;
+  background-color: transparent;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  position: relative;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  list-style: none;
 }
-.product-list-container .table-body .product-detail-container:last-child{
-    justify-content: space-between;
-    gap: 5px;
+.product-list-container .table-body .product-detail-container:last-child {
+  justify-content: space-between;
+  gap: 5px;
 }
 /* options tab */
-.product-list-container .table-body .product-detail-container:last-child button
- {
-    background-color: transparent;
-    font-size: 30px;
-    border-color: transparent;
-    cursor: pointer;
+.product-list-container .table-body .product-detail-container .p-edit-button,
+.product-list-container .table-body .product-detail-container .p-delete-button {
+  background-color: transparent;
+  font-size: 30px;
+  border-color: transparent;
+  cursor: pointer;
 }
 
-.product-list-container .table-body .product-detail-container:last-child button i {
-    font-size: inherit;
-    background-color: transparent;
+.product-list-container .table-body .product-detail-container .p-edit-button i,
+.product-list-container
+  .table-body
+  .product-detail-container
+  .p-delete-button
+  i {
+  font-size: inherit;
+  background-color: transparent;
 }
-
 
 .product-list-container .table-body {
-    
-    display: flex;
-    flex-grow: 1;
-    flex-direction: column;
-    overflow-y: auto;
-    background-color: #8b77771f;
-    padding: 0.5vw; 
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  overflow-y: auto;
+  background-color: #8b77771f;
+  padding: 0.5vw;
 }
 
 /* .modal-container {
@@ -264,87 +262,86 @@ header {
 } */
 
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .add-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 600px;
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    z-index: 1000;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 600px;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  z-index: 1000;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group label {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 4px;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
 }
 
 .form-group input[type="text"],
 .form-group select {
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .form-group input[type="text"]::placeholder {
-    color: #bbb;
+  color: #bbb;
 }
 
-
 .form-group input[type="file"] {
-    padding: 5px;
-    font-size: 14px;
+  padding: 5px;
+  font-size: 14px;
 }
 
 .button-group {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .button-group button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .button-group button[type="submit"] {
-    color: #fff;
-    background-color: #007bff;
+  color: #fff;
+  background-color: #007bff;
 }
 
 .button-group button[type="submit"]:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .cancel-button {
-    background-color: #6c757d;
-    color: #fff;
+  background-color: #6c757d;
+  color: #fff;
 }
 
 .cancel-button:hover {
-    background-color: #5a6268;
+  background-color: #5a6268;
 }
