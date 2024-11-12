@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor-Products</title>
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel='stylesheet' type='text/css' href ="../css/vendor-products.css">
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <nav>
+                <ul class="nav-links">
+
+                    <li><a href="#">All</a></li>
+                    <li><a href="#">Live</a></li>
+                    <li><a href="">Pending</a></li>
+                    <li><a href="#">Sold Out</a></li>
+                </ul>
+            </nav>
+        </header>
+    
+
+        <div class="content-panel">
+            <section class="searchbox-wrap">
+                <input
+                  type="text"
+                  placeholder="Search For a Product"
+                  class="searchbox"
+                />
+                <button class="searchBtn">
+                    <i class='bx bx-search-alt'></i>
+                </button>
+            </section>
+
+            <section class="product-indicators">
+                <div class="indicator-left-panel">
+                    <p>
+                        <h3 id="product-total">0</h3>  <h3>Products</h3>
+                    </p>
+                </div>
+             
+                <div class="indicator-right-panel">
+                    <button type="button" onclick="showAddProductForm()">
+                        <i class='bx bx-add-to-queue'></i> 
+                        <p>Add a New Product</p>
+                    </button>
+                </div>
+
+
+            </section>
+
+            
+            <section class="product-list-container">
+                <div class="table-head">
+                    <li>Product Name</li>
+                    <li>Status</li>
+                    <li>Price</li>
+                    <li>Stock</li>
+                    <li>Sales</li>
+                    <li>Options</li>
+                </div>
+
+                <div class="table-body">
+                    <div class="product-detail-container">
+                        <li>value</li>
+                        <li>value</li>
+                        <li>value</li>
+                        <li>value</li>
+                        <li>value</li>
+                        <li>
+
+                                <button type="button" class="p-edit-button">
+                                    <i class='bx bx-edit'></i>
+                                </button>
+                      
+                                <button type="button" class="p-delete-button">         
+                                    <i class='bx bx-trash-alt' ></i></button>
+               
+                        </li>
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="../js/vendor-product.js"></script>
+</body>
+</html>
