@@ -25,12 +25,12 @@ app.use(async (request, response, next) => {
 });
 
 //middlewares
-app.use((request, response, next) => {
-    request.db = db;
-    next();
-})
 app.use(express.json())
 
 //routes
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
+
+app.listen(process.env.PORT, () => {
+    console.log("Listening on port", process.env.PORT || 3000)
+})
