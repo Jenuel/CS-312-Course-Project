@@ -4,20 +4,21 @@ import productRoutes from 'routes/productRoutes'
 import orderRoutes from 'routes/orderRoutes'
 
 const app = express()
-const db = mysql.createConnection({
+const pool = mysql.createPool({
     host: "localhost",
     user: "root", 
     password: "passsword",
     database: "nameofDatabase"
 });
 
-db.connect((error) => {
-    if (error) {
-        console.error('Database connection failed:', error)
-    } else {
-        app.listen(3000, () => {
-            console.log("Listening to port 3000")
-        });
+app.use(async (request, response, next) => {
+    try {
+        request.db = await pool.getConnection();
+        next();
+        response.on('finish', () => request.db.release());
+    } catch (error) {
+        console.error('Error getting database connection:', error);
+        response.status(500).send('Internal Server Error');
     }
 });
 
