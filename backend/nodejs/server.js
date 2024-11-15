@@ -1,14 +1,16 @@
 import express from 'express'
 import mysql from 'mysql2'
+import dotenv from 'dotenv';
 import productRoutes from 'routes/productRoutes'
 import orderRoutes from 'routes/orderRoutes'
 
+dotenv.config();
 const app = express()
 const pool = mysql.createPool({
-    host: "localhost",
-    user: "root", 
-    password: "passsword",
-    database: "nameofDatabase"
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER, 
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DB
 });
 
 app.use(async (request, response, next) => {
