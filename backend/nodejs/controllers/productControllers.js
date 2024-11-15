@@ -8,19 +8,11 @@ const getProducts = async (request, response) => {
     const { boothId } = request.params;
 
     try {
-        const results = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM product WHERE boothId = ?', [boothId], (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results); 
-                }
-            });
-        });
-
-        response.json(results);
+        const [rows] = await db.query('SELECT * FROM products');
+        res.json(rows);
     } catch (error) {
-        response.status(500).send(error);
+        console.error('Error fetching products:', error);
+        res.status(500).send('Failed to fetch products');
     }
 };
 
@@ -32,19 +24,11 @@ const getProductDetails = async (request, response) => {
     const { productId } = request.params;
     
     try {
-        const results = await new Promise((resolve, reject) => {
-            db.query('SELECT ProductID, CategoryID, Name, Price FROM `product` WHERE BoothID = ?', [productId], (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results); 
-                }
-            });
-        });
-
-        response.status(200).json(results);
+        const [rows] = await db.query('SELECT * FROM products');
+        res.json(rows);
     } catch (error) {
-        response.status(500).send(error);
+        console.error('Error fetching products:', error);
+        res.status(500).send('Failed to fetch products');
     }
 };
 
@@ -56,19 +40,11 @@ const buyProduct = async (request, response) => {
     const { productId } = request.params;
 
     try {
-        const results = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM products WHERE boothId = ?', [productId], (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results); 
-                }
-            });
-        });
-
-        response.json(results);
+        const [rows] = await db.query('SELECT * FROM products');
+        res.json(rows);
     } catch (error) {
-        response.status(500).send(error);
+        console.error('Error fetching products:', error);
+        res.status(500).send('Failed to fetch products');
     }
 };
 
@@ -80,19 +56,11 @@ const createProduct = async (request, response) => {
     const { productId } = request.params;
 
     try {
-        const results = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM products WHERE boothId = ?', [productId], (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results); 
-                }
-            });
-        });
-
-        response.json(results);
+        const [rows] = await db.query('SELECT * FROM products');
+        res.json(rows);
     } catch (error) {
-        response.status(500).send(error);
+        console.error('Error fetching products:', error);
+        res.status(500).send('Failed to fetch products');
     }
 };
 
@@ -101,19 +69,11 @@ const editProduct = async (request, response) => {
     const { productId } = request.params;
 
     try {
-        const results = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM products WHERE boothId = ?', [productId], (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results); 
-                }
-            });
-        });
-
-        response.json(results);
+        const [rows] = await db.query('SELECT * FROM products');
+        res.json(rows);
     } catch (error) {
-        response.status(500).send(error);
+        console.error('Error fetching products:', error);
+        res.status(500).send('Failed to fetch products');
     }
 };
 
@@ -122,19 +82,11 @@ const changeStatusProduct = async (request, response) => {
     const { productId } = request.params;
 
     try {
-        const results = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM products WHERE boothId = ?', [productId], (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results); 
-                }
-            });
-        });
-
-        response.json(results);
+        const [rows] = await db.query('SELECT * FROM products');
+        res.json(rows);
     } catch (error) {
-        response.status(500).send(error);
+        console.error('Error fetching products:', error);
+        res.status(500).send('Failed to fetch products');
     }
 };
 
