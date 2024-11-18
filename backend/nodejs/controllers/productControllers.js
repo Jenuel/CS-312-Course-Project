@@ -9,10 +9,10 @@ const getProducts = async (request, response) => {
 
     try {
         const [rows] = await db.query('SELECT * FROM products');
-        res.json(rows);
+        response.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).send('Failed to fetch products');
+        response.status(500).send('Failed to fetch products');
     }
 };
 
@@ -25,10 +25,10 @@ const getProductDetails = async (request, response) => {
     
     try {
         const [rows] = await db.query('SELECT * FROM products');
-        res.json(rows);
+        response.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).send('Failed to fetch products');
+        response.status(500).send('Failed to fetch products');
     }
 };
 
@@ -41,10 +41,10 @@ const buyProduct = async (request, response) => {
 
     try {
         const [rows] = await db.query('SELECT * FROM products');
-        res.json(rows);
+        response.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).send('Failed to fetch products');
+        response.status(500).send('Failed to fetch products');
     }
 };
 
@@ -57,10 +57,10 @@ const createProduct = async (request, response) => {
 
     try {
         const [rows] = await db.query('SELECT * FROM products');
-        res.json(rows);
+        response.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).send('Failed to fetch products');
+        response.status(500).send('Failed to fetch products');
     }
 };
 
@@ -70,10 +70,10 @@ const editProduct = async (request, response) => {
 
     try {
         const [rows] = await db.query('SELECT * FROM products');
-        res.json(rows);
+        response.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).send('Failed to fetch products');
+        response.status(500).send('Failed to fetch products');
     }
 };
 
@@ -83,10 +83,10 @@ const changeStatusProduct = async (request, response) => {
 
     try {
         const [rows] = await db.query('SELECT * FROM products');
-        res.json(rows);
+        response.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).send('Failed to fetch products');
+        response.status(500).send('Failed to fetch products');
     }
 };
 
