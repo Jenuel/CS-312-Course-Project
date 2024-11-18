@@ -8,11 +8,21 @@
         <button type="button">HOME</button>
         <button type="button">PURCHASES</button>
         <button type="button" onclick="logout()">LOGOUT</button>
+        <button type="button" class="cart-button" onclick="toggleCart()">CART</button>
     </nav>
-
-    <section class="specific-product-container"> 
-
-    </section>
+    
+    <section class="specific-product-container"></section>
+    
+    <div class="cart-container hidden">
+        <button class="close-cart" onclick="toggleCart()">X</button>
+        <h2>Cart</h2>
+        <div class="cart-items"></div>
+        <div class="cart-summary">
+            <p>Total: $<span id="cart-total">0.00</span></p>
+            <button type="button" onclick="checkout()">CHECKOUT</button>
+        </div>
+    </div>
+    
 
     <script src="..\js\client-specific-products.js"></script>
     <script src="..\js\logout.js"></script>
