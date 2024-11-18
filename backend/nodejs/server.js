@@ -1,8 +1,8 @@
 import express from 'express'
 import mysql from 'mysql2'
 import dotenv from 'dotenv';
-import productRoutes from 'routes/productRoutes'
-import orderRoutes from 'routes/orderRoutes'
+import productRoutes from './routes/productRoutes.js'
+import orderRoutes from './routes/orderRoutes.js'
 
 dotenv.config();
 const app = express()
@@ -15,9 +15,12 @@ const pool = mysql.createPool({
 
 app.use(async (request, response, next) => {
     try {
-        request.db = await pool.getConnection();
+        const connection = await pool.promise().getConnection(); 
+        request.db = connection; 
+        response.on('finish', () => {
+            if (request.db) request.db.release(); 
+        });
         next();
-        response.on('finish', () => request.db.release());
     } catch (error) {
         console.error('Error getting database connection:', error);
         response.status(500).send('Internal Server Error');
