@@ -10,7 +10,7 @@ const getPendingOrders = async (request, response) => {
     const { boothId } = request.params;
 
     try {
-        const [rows] = await db.query('SELECT * FROM product');
+        const [rows] = await db.query('SELECT * FROM `order`');
         response.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
