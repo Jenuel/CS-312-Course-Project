@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 18, 2024 at 05:13 PM
+-- Generation Time: Nov 19, 2024 at 11:40 PM
 -- Server version: 8.2.0
 -- PHP Version: 8.2.13
 
@@ -222,13 +222,28 @@ DROP TABLE IF EXISTS `order`;
 CREATE TABLE IF NOT EXISTS `order` (
   `OrderID` int NOT NULL AUTO_INCREMENT,
   `BoothID` int NOT NULL,
-  `Status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Status` enum('Pending','Complete','','') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `DateOrdered` datetime DEFAULT NULL,
   `DatePaid` datetime DEFAULT NULL,
   `Price` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`OrderID`),
   KEY `fk_booth` (`BoothID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order`
+--
+
+INSERT INTO `order` (`OrderID`, `BoothID`, `Status`, `DateOrdered`, `DatePaid`, `Price`) VALUES
+(1, 13, 'Pending', '2024-11-19 10:31:54', NULL, 120.00),
+(2, 13, 'Pending', '2024-11-19 10:31:54', NULL, 209.89),
+(3, 14, 'Pending', '2024-11-19 10:31:54', NULL, 2405.50),
+(4, 14, 'Pending', '2024-11-19 10:31:54', NULL, 599.94),
+(5, 15, 'Pending', '2024-11-19 10:31:54', NULL, 80.00),
+(6, 15, 'Pending', '2024-11-19 10:31:54', NULL, 290.00),
+(7, 15, 'Pending', '2024-11-19 10:31:54', NULL, 115.00),
+(8, 13, 'Complete', '2024-11-19 10:31:54', NULL, 479.20),
+(9, 15, 'Complete', '2024-11-19 10:31:54', NULL, 198.00);
 
 -- --------------------------------------------------------
 
@@ -245,6 +260,25 @@ CREATE TABLE IF NOT EXISTS `order_products` (
   PRIMARY KEY (`ProductID`,`OrderID`),
   KEY `fk_order` (`OrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_products`
+--
+
+INSERT INTO `order_products` (`ProductID`, `OrderID`, `Quantity`, `Total`) VALUES
+(1, 2, 1, 59.90),
+(1, 8, 8, 59.90),
+(107, 3, 2, 1200.00),
+(108, 7, 3, 30.00),
+(118, 9, 20, 9.90),
+(128, 1, 1, 120.00),
+(129, 3, 1, 5.50),
+(130, 5, 10, 8.00),
+(130, 6, 5, 8.00),
+(139, 2, 1, 149.99),
+(141, 4, 6, 99.99),
+(152, 7, 1, 25.00),
+(153, 6, 5, 50.00);
 
 -- --------------------------------------------------------
 
@@ -287,14 +321,14 @@ CREATE TABLE IF NOT EXISTS `product` (
   `Image` blob,
   PRIMARY KEY (`ProductID`),
   KEY `BoothID` (`BoothID`)
-) ENGINE=InnoDB AUTO_INCREMENT=159 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=161 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `product`
 --
 
 INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES
-(1, 13, 100, 59.90, 'Burger', 'active', NULL),
+(1, 13, 101, 59.90, 'Burger', 'active', NULL),
 (107, 14, 50, 1200.00, 'Laptop', 'active', NULL),
 (108, 15, 150, 30.00, 'Art Supplies', 'active', NULL),
 (109, 16, 200, 45.50, 'Basketball', 'active', NULL),
