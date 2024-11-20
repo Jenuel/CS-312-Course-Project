@@ -27,13 +27,15 @@ const getProductDetails = async (request, response) => {//GOOD
         const [rows] = await db.query('SELECT p.name,p.StocksRemaining AS Stocks , p.Price , p.status ,p.Image FROM `product` p WHERE p.ProductID = ?',[productId]);
         response.json(rows);
     } catch (error) {
-        console.error('Error fetching products:', error);
-        response.status(500).send('Failed to fetch products');
+        console.error('Error fetching product details:', error);
+        response.status(500).send('Failed to fetch product details');
     }
 };
 
 /*
  * Decrements the stock of the product given.
+directlty from the store 
+already paid
  */
 const buyProduct = async (request, response) => {//GOOD KINDA
     const db = request.db;
@@ -67,8 +69,8 @@ const buyProduct = async (request, response) => {//GOOD KINDA
          response.json({ message: 'Product purchased successfully', updatedRows: updateResult.affectedRows });
    
     } catch (error) {
-        console.error('Error fetching products:', error);
-        response.status(500).send('Failed to fetch products');
+        console.error('Error buying products:', error);
+        response.status(500).send('Failed to buy products');
     }
 };
 
@@ -87,16 +89,67 @@ const createProduct = async (request, response) => {//GOOD KINDA
         const [rows] = await db.query('INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES (NULL, ?,?, ?, ?, ?, ?)',[boothID,stocks,price,name,status,image]);
         response.json(rows);
     } catch (error) {
-        console.error('Error fetching products:', error);
-        response.status(500).send('Failed to fetch products');
+        console.error('Error creating products:', error);
+        response.status(500).send('Failed to create products');
     }
 };
 
 /**
  * edit a product
+ * for product details
  */
-const editProduct = async (request, response) => {
+ 
+/* SAMPLE REQUEST: 
+ HTTP PUT /products/1
+ { // body
+  "name": "myName",
+  "price": 150
+ } 
+*/
+
+const editProduct = async (request, response) => {//GOOD 
+
     const db = request.db;
+    const { productId } = request.params; // productId is now from request.params
+    const fields = request.body; // fields to be updated are in request.body
+
+    try {
+        if (!fields || typeof fields !== 'object') {
+            return response.status(400).send('Invalid request body format');
+        }
+
+        const keys = Object.keys(fields); // arraylist for keys from body
+        const values = Object.values(fields); // arraylist for values from body
+
+        const setClause = keys.map(key => `\`${key}\` = ?`).join(', '); // setting clause for query 
+        // EX: `name` = ?, `price` = ?
+
+       
+        values.push(productId);//add id to the values
+
+        const query = `UPDATE \`product\` SET ${setClause} WHERE \`ProductID\` = ?`;
+
+        // Execute the query to update the product
+        const [updateResult] = await db.query(query, values);
+
+        if (updateResult.affectedRows === 0) {
+            return response.status(404).send(`Product with ID ${productId} not found or not updated`);
+        }
+
+        response.json({ message: 'Product updated successfully', updatedRows: updateResult.affectedRows });
+    } catch (error) {
+        console.error('Error updating product:', error);
+        response.status(500).send('Failed to update product');
+    }
+};
+
+/**
+ * edit a product status
+ * for market publish
+ */
+const changeStatusProduct = async (request, response) => {//GOOD KINDA
+    const db = request.db;
+    const { productId } = request.params;
     const { status } = request.body; // please check if this is right
 
     try {
@@ -106,24 +159,9 @@ const editProduct = async (request, response) => {
          response.json({ message: 'Product purchased successfully', updatedRows: updateResult.affectedRows });
    
     } catch (error) {
-        console.error('Error fetching products:', error);
-        response.status(500).send('Failed to fetch products');
+        console.error('Error updating product status:', error);
+        response.status(500).send('Failed to update product status');
     } 
-};
-/**
- * edit a product status
- */
-const changeStatusProduct = async (request, response) => {//GOOD KINDA
-    const db = request.db;
-    const { productId } = request.params;
-
-    try {
-        const [rows] = await db.query('SELECT * FROM products');
-        response.json(rows);
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        response.status(500).send('Failed to fetch products');
-    }
 };
 
 export { getProducts, getProductDetails, buyProduct, createProduct, editProduct, changeStatusProduct };
