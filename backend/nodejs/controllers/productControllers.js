@@ -2,6 +2,10 @@
 
 /*
  * Gets the product for a certain booth
+
+INPUT:
+HTTP PUT /<productRoutes>/<boothId>
+
  */
 const getProducts = async (request, response) => {//GOOD
     const db = request.db;
@@ -18,6 +22,10 @@ const getProducts = async (request, response) => {//GOOD
 
 /*
  * Gets the detailed version of the product 
+
+INPUT:
+HTTP PUT /<productRoutes>/<productId>
+
  */
 const getProductDetails = async (request, response) => {//GOOD
     const db = request.db;
@@ -36,8 +44,14 @@ const getProductDetails = async (request, response) => {//GOOD
  * Decrements the stock of the product given.
 directlty from the store 
 already paid
+
+INPUT:
+HTTP PUT /<productRoutes>/<productId>
+{
+"numberOfProductSold":value
+}
  */
-const buyProduct = async (request, response) => {//GOOD KINDA
+const buyProduct = async (request, response) => {//PLEASE DOUBLE CHECK LOGIC
     const db = request.db;
     const { productId } = request.params;
     const { numberOfProductsSold } = request.body; // please check if this is right
@@ -76,6 +90,17 @@ const buyProduct = async (request, response) => {//GOOD KINDA
 
 /**
  * Create product
+
+INPUT:
+{
+"boothID": 
+"stocks":
+"price":
+"name":
+"status":
+"image":
+} 
+
  */
 const createProduct = async (request, response) => {//GOOD KINDA
     const db = request.db;
@@ -97,13 +122,11 @@ const createProduct = async (request, response) => {//GOOD KINDA
 /**
  * edit a product
  * for product details
- */
  
-/* SAMPLE REQUEST: 
- HTTP PUT /products/1
+INPUT:
+ HTTP PUT /<productRoutes>/<productId>
  { // body
-  "name": "myName",
-  "price": 150
+  "product": ["name": "myName","price": 150]
  } 
 */
 
@@ -111,15 +134,19 @@ const editProduct = async (request, response) => {//GOOD
 
     const db = request.db;
     const { productId } = request.params; // productId is now from request.params
-    const fields = request.body; // fields to be updated are in request.body
+    const {product} = request.body; // fields to be updated are in request.body
 
     try {
+        /*
         if (!fields || typeof fields !== 'object') {
             return response.status(400).send('Invalid request body format');
         }
+        */
+        
 
-        const keys = Object.keys(fields); // arraylist for keys from body
-        const values = Object.values(fields); // arraylist for values from body
+        for (const[fields] in product) {
+        const keys = Object.keys(fields); // arraylist for keys from body, [name, price]
+        const values = Object.values(fields); // arraylist for values from body, [myName,150]
 
         const setClause = keys.map(key => `\`${key}\` = ?`).join(', '); // setting clause for query 
         // EX: `name` = ?, `price` = ?
@@ -137,6 +164,9 @@ const editProduct = async (request, response) => {//GOOD
         }
 
         response.json({ message: 'Product updated successfully', updatedRows: updateResult.affectedRows });
+        }
+
+        
     } catch (error) {
         console.error('Error updating product:', error);
         response.status(500).send('Failed to update product');
@@ -146,6 +176,12 @@ const editProduct = async (request, response) => {//GOOD
 /**
  * edit a product status
  * for market publish
+
+INPUT:
+HTTP PUT /<productRoutes>/<productId>
+{
+"status": value
+}
  */
 const changeStatusProduct = async (request, response) => {//GOOD KINDA
     const db = request.db;
