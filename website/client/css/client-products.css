@@ -31,7 +31,7 @@ body{
     margin-left: 30px;
     margin-right: 30px;
     display: flex;    
-    background-color: #8fa2c0;
+    background-image: linear-gradient(to top, #f4c842 0%, #fffacd 100%);  
     border-radius: 5px;
     justify-content: flex-start;
     align-items: center;

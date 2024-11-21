@@ -13,6 +13,7 @@ body{
     border-radius: 5px;
     justify-content: flex-start;
     align-items: center;
+    background-image: linear-gradient(to top, #f4c842 0%, #fffacd 100%);  
 }
 
 .navbar-button{
