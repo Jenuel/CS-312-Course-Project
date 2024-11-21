@@ -7,9 +7,17 @@ function displayBooths() {
     const valueDiv = document.createElement('div');
     valueDiv.classList.add('box');
 
+    var img= new Image();
+
+
     valueDiv.innerHTML = `
-        <div class="image"></div>
-        <div class="title">
+        <div class="image">
+        
+        </div>
+        <div class="right-side">
+            <button type="button" class="filter-button back-button"><img src="'+img.src+'"></button>
+            <button type="button" class="filter-button cart-button" onclick="toggleCart()"><img src="..\res\cart_icon.png"></button>
+            <div class="title">
             <p>Product Name</p>
         </div>
         <div class="description">
@@ -21,16 +29,19 @@ function displayBooths() {
                 PRE-ORDER
             </button>
             <div class="quantity-container">
-                <button onclick="minusQuantity()" id="minus-button">-</button>
+                    <button onclick="minusQuantity()" id="minus-button">-</button>
                 <span class="quantity-text">1</span>
                 <button onclick="addQuantity()" id="add-button">+</button>
             </div>
+        </div>
         </div>`;
     
+    img.src = '..\res\back.png';
     box.appendChild(valueDiv);
 }
 
 function preorderItem(name, price, image) {
+    alert("Added to cart!");
     const cartContainer = document.querySelector(".cart-container");
     cartContainer.classList.remove("hidden");
 

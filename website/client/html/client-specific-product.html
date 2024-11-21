@@ -4,12 +4,12 @@
     <link rel='stylesheet' type='text/css' href="../css/client-specific-product.css">
 </head>
 <body>
-    <nav>
-        <button type="button">HOME</button>
-        <button type="button">PURCHASES</button>
-        <button type="button" onclick="logout()">LOGOUT</button>
-        <button type="button" class="cart-button" onclick="toggleCart()">CART</button>
-    </nav>
+    <section class="navbar">
+        <button type="button" class="navbar-button home-button"><img src="..\res\home.png"></button>
+        <button type="button" class="navbar-button profile-button"><img src="..\res\profile.png"></button>
+        <button type="button" class="navbar-button purchase-button"><img src="..\res\purchase.png"></button>
+        <button type="button" class="navbar-button logout-button" onclick="logout()"><img src="..\res\logout.png"></button>
+    </section>
     
     <section class="specific-product-container"></section>
     

@@ -16,6 +16,17 @@ function displayBooths(){
             <div class="product">
                 <p id="price">316 Pesos</p>
             </div>     
+        </div>
+        <div class="box">
+            <div class="image">
+                               
+            </div>
+            <div class="product">
+                <p id="title">Yves Product</p>
+            </div>
+            <div class="product">
+                <p id="price">316 Pesos</p>
+            </div>     
         </div>`;
         box.appendChild(valueDiv); // appending the child to "box"
 }

@@ -4,26 +4,22 @@
     <link rel='stylesheet' type='text/css' href="../css/client-purchases.css">
 </head>
 <body>
-    <nav>
-        <input type="text" id="search-bar" placeholder="Search booths..." onkeyup="searchBooths()">
-        <button type="button">HOME</button>
-        <button type="button">PURCHASES</button>
-        <button type="button" onclick="logout()">LOGOUT</button>
-    </nav>
-
-    <header>
-        <h1>LIST OF PURCHASES</h1>
-    </header>
+    <section class="navbar">
+        <button type="button" class="navbar-button home-button"><img src="..\res\home.png"></button>
+        <button type="button" class="navbar-button profile-button"><img src="..\res\profile.png"></button>
+        <button type="button" class="navbar-button purchase-button"><img src="..\res\purchase.png"></button>
+        <button type="button" class="navbar-button logout-button" onclick="logout()"><img src="..\res\logout.png"></button>
+    </section>
 
     <!--WHERE THE PURCHASES WILL BE APPENDED -->
     <section class="purchases-container"> 
         <div class="filters-container">
-            <div id="filtering">
-                <select name="filter" id="filter" onchange="getData()">
-                    <option value="" disabled selected>Sort By Booth</option>
-                        <!--WHERE THE BOOTH OPTIONS WILL BE APPENDED -->
-                </select> 
-            </div>
+            <button type="button" class="filter-button back-button"><img src="..\res\back.png"></button>
+            <button type="button" class="filter-button cart-button" onclick="toggleCart()"><img src="..\res\cart_icon.png"></button>
+            <input type="text" id="search-bar" placeholder="Search booths..." onkeyup="searchBooths()">
+            <button class="filter-button">All</button>
+            <button class="filter-button">Paid</button>
+            <button class="filter-button">Unpaid</button>
         </div>
         <div class="purchase-list">
 

@@ -4,32 +4,26 @@
     <link rel='stylesheet' type='text/css' href="../css/client-products.css">
 </head>
 <body>
-    <nav>
-        <input type="text" id="search-bar" placeholder="Search booths..." onkeyup="searchBooths()">
-        <button type="button">HOME</button>
-        <button type="button">PURCHASES</button>
-        <button type="button" onclick="logout()">LOGOUT</button>
-    </nav>
+    <section class="navbar">
+        <button type="button" class="navbar-button home-button"><img src="..\res\home.png"></button>
+        <button type="button" class="navbar-button profile-button"><img src="..\res\profile.png"></button>
+        <button type="button" class="navbar-button purchase-button"><img src="..\res\purchase.png"></button>
+        <button type="button" class="navbar-button logout-button" onclick="logout()"><img src="..\res\logout.png"></button>
+    </section>
 
-    <header>
-        <h1>LIST OF PRODUCTS</h1>
-    </header>
-
-    <!--WHERE THE PRODUCTS WILL BE APPENDED -->
+        <!--WHERE THE PRODUCTS WILL BE APPENDED -->
     <section class="product-container"> 
         <div class="filters-container">
-            <div id="filtering">
-                <select name="filter" id="filter" onchange="getData()">
-                    <option value="" disabled selected>Filter By Category</option>
-                    <option value="product">Product</option>
-                    <option value="service">Service</option>
-                </select> 
-            </div>
+            <button type="button" class="filter-button back-button"><img src="..\res\back.png"></button>
+            <button type="button" class="filter-button cart-button" onclick="toggleCart()"><img src="..\res\cart_icon.png"></button>
+            <input type="text" id="search-bar" placeholder="Search booths..." onkeyup="searchBooths()">
+            <button class="filter-button">All</button>
+            <button class="filter-button">Products</button>
+            <button class="filter-button">Services</button>
         </div>
         <div class="product-list">
-
+    
         </div>
-
     </section>
 
     <script src="..\js\client-products.js"></script>
