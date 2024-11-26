@@ -1,0 +1,92 @@
+body {
+    background-color: aliceblue;
+    font-family: "Poppins", sans-serif;
+}
+
+.main-container {
+    min-height: 100vh;
+}
+
+.nav-tabs .nav-link {
+    color: rgb(98, 97, 97);
+    border: none;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    background: transparent;
+    border-bottom: 2px solid #0d6efd;
+}
+
+.searchbox-wrap .form-control {
+    background-color: white;
+}
+
+.indicator-right-panel .btn {
+    background-color: #6439ff;
+    color: white;
+    padding: 10px 40px;
+}
+
+.indicator-right-panel .btn i {
+    font-size: 25px;
+    color: white;
+    background: transparent;
+}
+
+.indicator-right-panel .btn p {
+    margin: 0;
+    color: white;
+    background: transparent;
+}
+
+.table-head {
+    background-color: #d2e3f6;
+    padding: 1vw;
+}
+
+.product-detail-container {
+    background-color: transparent;
+    padding: 2vh 0;
+    margin: 0.3vw;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.table-body {
+    background-color: #8b77771f;
+}
+
+.p-edit-button,
+.p-delete-button {
+    background: transparent;
+    border: none;
+    font-size: 30px;
+    color: #6c757d;
+}
+
+.p-edit-button:hover {
+    color: #0d6efd;
+}
+
+.p-delete-button:hover {
+    color: #dc3545;
+}
+
+.product-thumbnail {
+    max-width: 50px;
+    height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.add-container {
+    background-color: white;
+}
+
+.form-control, .form-select {
+    background-color: white;
+}

@@ -2,20 +2,40 @@
 <html>
 
 <head>
-    <link rel='stylesheet' type='text/css' href ="../css/vendorhome.css">
+    <link rel='stylesheet' type='text/css' href ="../css/vendor-home.css">
 </head>
 <body>
     <nav>
         <button type="button">HOME</button>
         <button type="button">ORDERS</button>
         <button type="button" onclick="createBooth()">CREATE BOOTH</button>
+        <button type="button" onclick="logout()">LOGOUT</button>
     </nav>
 
     <header>
         <h1>YOUR BOOTHS</h1>
     </header>
 
+    <!--This is where we will display the booths-->
     <section class="booth-container">
+        <div class="filters-container">
+            <div id="filtering">
+                <select name="filter" id="filter" onchange="getData()">
+                    <option value="" disabled selected>Filter By Status</option>
+                    <option value="all">All</option>
+                    <option value="open">Active</option>
+                    <option value="closed">Inactive</option>
+                </select> 
+            </div>
+            <div id="sorting">
+                <select name="sort" id="sort" onchange="getData()">
+                    <option value="" disabled selected>Sort By</option>
+                    <option value="name">Random</option>
+                    <option value="name">A-Z</option>
+                    <option value="schedule">Z-A</option>
+                </select> 
+            </div>
+        </div>
         <div class="box">
             
         </div>
@@ -24,6 +44,8 @@
     <!--POPUP CREATING BOOTH-->
     <section>
         <div class="create-booth" id="create">
+
+            <button class="exit-btn" onclick="closeCreateBooth()">X</button>
 
             <h2>CREATE YOUR BOOTH</h2>
 
@@ -107,7 +129,8 @@
         </div>
     </section>
 
-    <script src="..\js\vendorhome.js"></script>
+    <script src="..\js\vendor-home.js"></script>
+    <script src="..\js\logout.js"></script>
     
 </body>
 </html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/vandor-sales.css" />
+    <title>Sales</title>
+  </head>
+  <body>
+    <div class="sales-container">
+      <section class="first-section">
+        <div class="total-sales-panel">
+          <div class="card-header">
+            <p>
+              <b> Sales </b>
+              | Today
+            </p>
+          </div>
+          <div class="card-data">
+            <p>
+              <i class="bx bx-cart"></i>
+              <b id="data-value">000</b>
+            </p>
+          </div>
+        </div>
+        <div class="total-revenue-panel">
+          <div class="card-header">
+            <p>
+              <b> Revenue </b>
+              | This Month
+            </p>
+          </div>
+          <div class="card-data">
+            <p>
+              <i class="bx bx-coin-stack"></i>
+              <b id="data-value">000</b>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="second-section">
+        <div class="card-header">
+          <p>
+            <b> Customers </b>
+            | Today
+          </p>
+        </div>
+        <div class="card-data">
+          <p>
+            <i class="bx bx-user"></i>
+            <b id="data-value">000</b>
+          </p>
+        </div>
+      </section>
+
+      <section class="third-section">
+        <div class="card-header">
+          <p>
+            <b> Reports </b>
+            | Today
+          </p>
+        </div>
+        <div class="card-data-chart">
+          <div id="linechart_material" ></div>
+          <script src="../js/vendor-sales.js">
+            
+          </script>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
