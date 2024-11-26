@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <link rel="stylesheet" href="../css/register-style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h2>Register</h2>
+        <form id="registrationForm">
+            <!--(First Name)-->
+            <div class="form-group"> 
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required>
+                <div id="firstNameError" class="error"></div>
+            </div>
+
+            <!--(Last Name)-->
+            <div class="form-group">
+                <label for="lastName">Last Name:</label> 
+                <input type="text" id="lastName" name="lastName" required>
+                <div id="lastNameError" class="error"></div>
+            </div>
+
+            <!--(Email)-->
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <div id="emailError" class="error"></div>
+            </div>
+
+            <!--(Password)-->
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <div id="passwordError" class="error"></div>
+            </div>
+
+            <!--(Confirm Password)-->
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <div id="confirmPasswordError" class="error"></div>
+            </div>
+
+            <input type="submit" value="Register">
+        </form>
+    </div>
+
+    <script src="../js/register-script.js"></script>
+
+</body>
+</html>

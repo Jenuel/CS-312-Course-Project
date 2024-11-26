@@ -1,17 +1,19 @@
 <?php
 
-require_once '../connectDb';
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
+
+$test=json_decode(file_get_contents("php://input"), true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'];
+    $action = $test['action'];
     
     // Sign-Up
     if ($action === 'signUp') {
     
-        $firstName = $_POST['fName'];
-        $lastName = $_POST['lName'];
+        $firstName = $_POST['firstName'];
+        $lastName = $_POST['lastName'];
         $email = $_POST['email'];
         $password = $_POST['password'];
 
@@ -25,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {    
-            echo json_encode(["error" => "Email already in use"]);
+            echo json_encode(["success" => false, "error" => "Email already in use"]);
         } else {
             $insertQuery = "INSERT INTO users (FirstName, LastName, SchoolEmail, Password) 
                             VALUES (?, ?, ?, ?)";
@@ -42,16 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Login
     } elseif ($action === 'signIn') {
 
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+        $email = $test['email'];
+        $password = $test['password'];
 
         // Hash the password using MD5
         $hashedPassword = md5($password);
 
-        
         $sql = "SELECT * FROM users WHERE SchoolEmail = ? AND Password = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $email, $hashedPassword);
+        $stmt->bind_param("ss", $email, $password);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -60,12 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             session_start();
             $_SESSION['user'] = [
-                'id' => $user['id'],
+                'UserID' => $user['UserID'],
                 'FirstName' => $user['FirstName'],
                 'LastName' => $user['LastName']
             ];
 
-            $userID = $user['id'];
+            $userID = $user['UserID'];
 
             // Check if the user is a vendor
             $vendorQuery = "SELECT VendorID, OrgID FROM VENDOR WHERE UserID = ?";
@@ -79,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user']['role'] = 'vendor';
                 $_SESSION['user']['VendorID'] = $vendor['VendorID'];
                 $_SESSION['user']['OrgID'] = $vendor['OrgID'];
-                echo json_encode(["success" => true, "message" => "User login successfully"]); //Redirection will happen in frontend
+                echo json_encode(["success" => true, "role" => "vendor", "message" => "User login successfully"]); //Redirection will happen in frontend
                 exit;
             }
 
@@ -95,7 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user']['role'] = 'customer';
                 $_SESSION['user']['CustomerID'] = $customer['CustomerID'];
                 
-                echo json_encode(["success" => true, "message" => "User login successfully"]); //Redirection will happen in frontend
+                $transport = array("success" => true, "role" => "customer", "message" => "User login successfully");
+                echo json_encode($transport); //Redirection will happen in frontend
                 exit;
             }
 
