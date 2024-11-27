@@ -3,11 +3,11 @@ import { getProducts, getProductDetails, buyProduct, createProduct, editProduct,
 
 const router = express.Router();
 
-router.get("/:boothId", getProducts);
-router.get("details/:productId", getProductDetails);
-router.patch("/buy/:productId", buyProduct);
-router.post("/create", createProduct)
-router.patch("/edit/:productId", editProduct);
-router.patch("/status/:productId", changeStatusProduct);
+router.get("/:boothId", getProducts);// customer *
+router.get("/details/:productId", getProductDetails); // vendor /customer * ??
+router.patch("/buy/:productId", buyProduct);// customer *
+router.post("/create", createProduct)// vendor
+router.patch("/edit/:productId", editProduct);// vendor
+router.patch("/status/:productId", changeStatusProduct);// vendor
 
 export default router;

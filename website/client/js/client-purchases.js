@@ -30,4 +30,76 @@ function displayBooths(){
         box.appendChild(valueDiv); // appending the child to "box"
 }
 
+/*
+format of line in data[] :
+"<productID> , <quantity> , <totalPricePerProduct>"
+*/
+
+//PLEASE FIX THIS
+function createOrder (boothID, Data, totalPriceInput, dateInput){ 
+    const products = dataArray.map(line => {// NOT SURE HERE
+        const [productID, quantity, totalPricePerProduct] = line.split(',');
+        return {
+            productID: productID.trim(),
+            quantity: parseInt(quantity.trim(), 10),
+            totalPricePerProduct: parseFloat(totalPricePerProduct.trim()),
+        };
+    });
+   
+    const data = {
+        products: products,
+        totalPrice : totalPriceInput,
+        date:dateInput 
+    }
+   
+    fetch(`https://<sample/com>/details/${boothID}`,{// change this one
+        method: 'POST', // PATCH is appropriate for partial updates like changing an order's status
+        headers: {
+            'Content-Type': 'application/json', // Ensure headers are set
+        },
+        body: JSON.stringify(data), // Send the status change in the body
+   
+    })
+    .then(response => {
+     if (!response.ok) {
+         throw new Error(`HTTP error! status: ${response.status}`);
+     }
+     return response.json();
+     })
+     .then(data => {
+         console.log("Products fetched successfully:", data);
+     })
+     .catch(error => {
+         console.error("Error fetching products:", error);
+     });
+ }
+
+
+ /*
+
+*/
+function cancelOrder(orderId) {
+    fetch(`https://<your-domain>/cancel/${orderId}`, { // Use a meaningful endpoint
+        method: 'PATCH', // PATCH is appropriate for partial updates like changing an order's status
+        headers: {
+            'Content-Type': 'application/json', // Ensure headers are set
+        },
+        body: JSON.stringify({ status: 'cancelled' }), // Send the status change in the body
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Order cancelled successfully:", data);
+    })
+    .catch(error => {
+        console.error("Error cancelling order:", error);
+    });
+}
+
+
+
 displayBooths();

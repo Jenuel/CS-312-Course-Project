@@ -41,7 +41,7 @@ This function is for finalizing an order and sends it to the specific booth
 
 HTTP PUT /<orderRoutes>/<boothId>
 {
-  "products": [
+  "products":[
     ["productID":value, "quantity": value,  "totalPricePerProduct":value ], FOLLOW THE FORMAT HERE SA PAG COMPOSE NG BODY
     ["productID":100, "quantity": 100,  "totalPricePerProduct":100.00 ] MAKE SURE DECIMAL SIYA
     ],
