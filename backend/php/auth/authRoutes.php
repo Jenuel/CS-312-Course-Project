@@ -1,6 +1,21 @@
 <?php
+// Allow requests from any origin (use a specific origin instead of * in production)
+header("Access-Control-Allow-Origin: *");
 
-require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8080/connectDb.php');
+// Allow the necessary HTTP methods (e.g., POST, GET, OPTIONS)
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+
+// Allow the necessary headers (e.g., Content-Type)
+header("Access-Control-Allow-Headers: Content-Type");
+
+// If it's a preflight request, terminate early with a 200 response
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    exit(0);  // End the request early
+}
+//require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8080/connectDb.php');
+
+require_once('/usr/share/nginx/html/connectDb.php');
+
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -32,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $insertQuery = "INSERT INTO users (FirstName, LastName, SchoolEmail, Password) 
                             VALUES (?, ?, ?, ?)";
             $insertStmt = $conn->prepare($insertQuery);
-            $insertStmt->bind_param($firstName, $lastName, $email, $hashedPassword);
+            $insertStmt->bind_param("ssss",$firstName, $lastName, $email, $hashedPassword);
 
             if ($insertStmt->execute()) {
                 echo json_encode(["success" => true, "message" => "User registered successfully"]); //Redirection will happen in the frontend
@@ -47,14 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $test['email'];
         $password = $test['password'];
         
-        echo "nigger $password" // kakagawa
 
         // Hash the password using MD5
-        $hashedPassword = md5($password);
+        //$hashedPassword = md5($password);
 
         $sql = "SELECT * FROM users WHERE SchoolEmail = ? AND Password = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param( $email, $password);
+        $stmt->bind_param("ss", $email, $password);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -71,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userID = $user['UserID'];
 
             // Check if the user is a vendor
-            $vendorQuery = "SELECT VendorID, OrgID FROM VENDOR WHERE UserID = ?";
+            $vendorQuery = "SELECT VendorID, OrgID FROM vendor WHERE UserID = ?";
             $vendorStmt = $conn->prepare($vendorQuery);
             $vendorStmt->bind_param("i", $userID);
             $vendorStmt->execute();
@@ -87,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Check if the user is a customer
-            $customerQuery = "SELECT CustomerID FROM CUSTOMER WHERE UserID = ?";
+            $customerQuery = "SELECT CustomerID FROM customer WHERE UserID = ?";
             $customerStmt = $conn->prepare($customerQuery);
             $customerStmt->bind_param("i", $userID);
             $customerStmt->execute();

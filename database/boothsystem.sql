@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Nov 19, 2024 at 11:40 PM
--- Server version: 8.2.0
--- PHP Version: 8.2.13
+-- Host: database:3306
+-- Generation Time: Nov 29, 2024 at 05:39 PM
+-- Server version: 8.0.40
+-- PHP Version: 8.2.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,20 +27,17 @@ SET time_zone = "+00:00";
 -- Table structure for table `booth`
 --
 
-DROP TABLE IF EXISTS `booth`;
-CREATE TABLE IF NOT EXISTS `booth` (
-  `BoothID` int NOT NULL AUTO_INCREMENT,
-  `Title` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `Description` text COLLATE utf8mb4_general_ci,
-  `Schedules` text COLLATE utf8mb4_general_ci,
-  `Location` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+CREATE TABLE `booth` (
+  `BoothID` int NOT NULL,
+  `Title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `Schedules` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `Location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `BoothIcon` blob,
-  `Status` enum('open','not') COLLATE utf8mb4_general_ci NOT NULL,
+  `Status` enum('open','not') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `OrgID` int DEFAULT NULL,
-  `Image` int DEFAULT NULL,
-  PRIMARY KEY (`BoothID`),
-  KEY `fk_org` (`OrgID`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `Image` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `booth`
@@ -65,12 +62,9 @@ INSERT INTO `booth` (`BoothID`, `Title`, `Description`, `Schedules`, `Location`,
 -- Table structure for table `booth_members`
 --
 
-DROP TABLE IF EXISTS `booth_members`;
-CREATE TABLE IF NOT EXISTS `booth_members` (
+CREATE TABLE `booth_members` (
   `BoothID` int NOT NULL,
-  `VendorID` int NOT NULL,
-  PRIMARY KEY (`BoothID`,`VendorID`),
-  KEY `VendorID` (`VendorID`)
+  `VendorID` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -113,13 +107,10 @@ INSERT INTO `booth_members` (`BoothID`, `VendorID`) VALUES
 -- Table structure for table `customer`
 --
 
-DROP TABLE IF EXISTS `customer`;
-CREATE TABLE IF NOT EXISTS `customer` (
-  `CustomerID` int NOT NULL AUTO_INCREMENT,
-  `UserID` int NOT NULL,
-  PRIMARY KEY (`CustomerID`),
-  KEY `UserID` (`UserID`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE `customer` (
+  `CustomerID` int NOT NULL,
+  `UserID` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `customer`
@@ -142,16 +133,13 @@ INSERT INTO `customer` (`CustomerID`, `UserID`) VALUES
 -- Table structure for table `inventory`
 --
 
-DROP TABLE IF EXISTS `inventory`;
-CREATE TABLE IF NOT EXISTS `inventory` (
-  `InventoryID` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `inventory` (
+  `InventoryID` int NOT NULL,
   `ProductID` int NOT NULL,
   `Date` datetime NOT NULL,
-  `Type` enum('in','out') COLLATE utf8mb4_general_ci NOT NULL,
-  `Quantity` int NOT NULL,
-  PRIMARY KEY (`InventoryID`),
-  KEY `ProductID` (`ProductID`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `Type` enum('in','out') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Quantity` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `inventory`
@@ -218,17 +206,14 @@ INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`)
 -- Table structure for table `order`
 --
 
-DROP TABLE IF EXISTS `order`;
-CREATE TABLE IF NOT EXISTS `order` (
-  `OrderID` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `order` (
+  `OrderID` int NOT NULL,
   `BoothID` int NOT NULL,
   `Status` enum('Pending','Complete','','') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `DateOrdered` datetime DEFAULT NULL,
   `DatePaid` datetime DEFAULT NULL,
-  `Price` decimal(10,2) DEFAULT NULL,
-  PRIMARY KEY (`OrderID`),
-  KEY `fk_booth` (`BoothID`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `Price` decimal(10,2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `order`
@@ -251,14 +236,11 @@ INSERT INTO `order` (`OrderID`, `BoothID`, `Status`, `DateOrdered`, `DatePaid`, 
 -- Table structure for table `order_products`
 --
 
-DROP TABLE IF EXISTS `order_products`;
-CREATE TABLE IF NOT EXISTS `order_products` (
+CREATE TABLE `order_products` (
   `ProductID` int NOT NULL,
   `OrderID` int NOT NULL,
   `Quantity` int DEFAULT NULL,
-  `Total` decimal(10,2) DEFAULT NULL,
-  PRIMARY KEY (`ProductID`,`OrderID`),
-  KEY `fk_order` (`OrderID`)
+  `Total` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -286,12 +268,10 @@ INSERT INTO `order_products` (`ProductID`, `OrderID`, `Quantity`, `Total`) VALUE
 -- Table structure for table `organization`
 --
 
-DROP TABLE IF EXISTS `organization`;
-CREATE TABLE IF NOT EXISTS `organization` (
-  `OrgID` int NOT NULL AUTO_INCREMENT,
-  `OrgName` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`OrgID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE `organization` (
+  `OrgID` int NOT NULL,
+  `OrgName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `organization`
@@ -310,18 +290,15 @@ INSERT INTO `organization` (`OrgID`, `OrgName`) VALUES
 -- Table structure for table `product`
 --
 
-DROP TABLE IF EXISTS `product`;
-CREATE TABLE IF NOT EXISTS `product` (
-  `ProductID` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `product` (
+  `ProductID` int NOT NULL,
   `BoothID` int NOT NULL,
   `StocksRemaining` int NOT NULL,
   `Price` decimal(10,2) NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `status` enum('active','inactive') COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `Image` blob,
-  PRIMARY KEY (`ProductID`),
-  KEY `BoothID` (`BoothID`)
-) ENGINE=InnoDB AUTO_INCREMENT=161 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Image` blob
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `product`
@@ -388,11 +365,9 @@ INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name
 -- Table structure for table `service`
 --
 
-DROP TABLE IF EXISTS `service`;
-CREATE TABLE IF NOT EXISTS `service` (
+CREATE TABLE `service` (
   `ProductID` int NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  PRIMARY KEY (`ProductID`)
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -427,44 +402,41 @@ INSERT INTO `service` (`ProductID`, `description`) VALUES
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `UserID` int NOT NULL AUTO_INCREMENT,
-  `FirstName` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `LastName` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `SchoolEmail` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `Password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `Image` blob,
-  PRIMARY KEY (`UserID`),
-  UNIQUE KEY `SchoolEmail` (`SchoolEmail`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE `users` (
+  `UserID` int NOT NULL,
+  `FirstName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `LastName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `SchoolEmail` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Image` blob
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`UserID`, `FirstName`, `LastName`, `SchoolEmail`, `Password`, `Image`) VALUES
-(1, 'John', 'Doe', 'jdoe@school.com', '41b8b7a48c3de54b3f5f5128da80541c', NULL),
-(2, 'Jane', 'Smith', 'jane.smith@school.edu', '2b8a0b1e3e63f1b8d3f083650b7a276d', NULL),
-(3, 'Alice', 'Brown', 'alice.brown@school.edu', '8faaf8fa92f06f41c1e9281e0bdf2c96', NULL),
-(4, 'Bob', 'Johnson', 'bob.johnson@school.edu', '0fbad15f90f1d270d7a9adca9f7f1c8c', NULL),
-(5, 'Chris', 'Evans', 'chris.evans@school.edu', '3c62e7c1098a12713b54c8b2d8d00b0f', NULL),
-(6, 'Diana', 'Prince', 'diana.prince@school.edu', '9263c14e4551139161d0d159d8ba44a1', NULL),
-(7, 'Peter', 'Parker', 'peter.parker@school.edu', 'f9a0374f3a7c97b5e2011df17b7fa2e0', NULL),
-(8, 'Bruce', 'Wayne', 'bruce.wayne@school.edu', '2b0b0d55c3deed69512567f06fe7c86a', NULL),
-(9, 'Clark', 'Kent', 'clark.kent@school.edu', '3a429f80b85f4b09723b3201f8f2f00c', NULL),
-(10, 'Natasha', 'Romanoff', 'natasha.romanoff@school.edu', '3255be53b1a4824d7f65edc75df6a219', NULL),
-(11, 'Steve', 'Rogers', 'steve.rogers@school.edu', 'f60f579cb5afc7b5e7df6ff28952955a', NULL),
-(12, 'Emily', 'Clark', 'emily.clark@school.edu', '58cb31b9c8f5f35a70acb72b60e217bb', NULL),
-(13, 'Michael', 'Green', 'michael.green@school.edu', 'e74f00d2fbc084e7e86f953f7a43d6dc', NULL),
-(14, 'Sarah', 'Adams', 'sarah.adams@school.edu', '54f5e6e1e7ed3a20e9f6a3d9927efdae', NULL),
-(15, 'David', 'Wilson', 'david.wilson@school.edu', '3bafe73c5155e3d42a2ad0d1b5ef3c37', NULL),
-(16, 'Olivia', 'Taylor', 'olivia.taylor@school.edu', '2d4a439107b6bdfa587a7f75a30e94b3', NULL),
-(17, 'James', 'Brown', 'james.brown@school.edu', '1f3870be274f6c49b3e31a0c6728957f', NULL),
-(18, 'Sophia', 'Miller', 'sophia.miller@school.edu', 'd8578edf8458ce06fbc5bb76a58c5ca4', NULL),
-(19, 'Liam', 'Davis', 'liam.davis@school.edu', '5f4dcc3b5aa765d61d8327deb882cf99', NULL),
-(20, 'Ava', 'Martinez', 'ava.martinez@school.edu', '098f6bcd4621d373cade4e832627b4f6', NULL),
-(21, 'Noah', 'Garcia', 'noah.garcia@school.edu', '25d55ad283aa400af464c76d713c07ad', NULL);
+(1, 'John', 'Doe', 'jdoe@school.com', 'jdoe', NULL),
+(2, 'Jane', 'Smith', 'jane.smith@school.edu', 'jane', NULL),
+(3, 'Alice', 'Brown', 'alice.brown@school.edu', 'alice', NULL),
+(4, 'Bob', 'Johnson', 'bob.johnson@school.edu', 'bob', NULL),
+(5, 'Chris', 'Evans', 'chris.evans@school.edu', 'chris', NULL),
+(6, 'Diana', 'Prince', 'diana.prince@school.edu', 'diana', NULL),
+(7, 'Peter', 'Parker', 'peter.parker@school.edu', 'peter', NULL),
+(8, 'Bruce', 'Wayne', 'bruce.wayne@school.edu', 'bruce', NULL),
+(9, 'Clark', 'Kent', 'clark.kent@school.edu', 'clark', NULL),
+(10, 'Natasha', 'Romanoff', 'natasha.romanoff@school.edu', 'natasha', NULL),
+(11, 'Steve', 'Rogers', 'steve.rogers@school.edu', 'steve', NULL),
+(12, 'Emily', 'Clark', 'emily.clark@school.edu', 'emily\r\n', NULL),
+(13, 'Michael', 'Green', 'michael.green@school.edu', 'michael', NULL),
+(14, 'Sarah', 'Adams', 'sarah.adams@school.edu', 'sarah', NULL),
+(15, 'David', 'Wilson', 'david.wilson@school.edu', 'david', NULL),
+(16, 'Olivia', 'Taylor', 'olivia.taylor@school.edu', 'olivia', NULL),
+(17, 'James', 'Brown', 'james.brown@school.edu', 'james', NULL),
+(18, 'Sophia', 'Miller', 'sophia.miller@school.edu', 'sophia', NULL),
+(19, 'Liam', 'Davis', 'liam.davis@school.edu', 'liam', NULL),
+(20, 'Ava', 'Martinez', 'ava.martinez@school.edu', 'ava', NULL),
+(21, 'Noah', 'Garcia', 'noah.garcia@school.edu', 'noah', NULL);
 
 -- --------------------------------------------------------
 
@@ -472,15 +444,11 @@ INSERT INTO `users` (`UserID`, `FirstName`, `LastName`, `SchoolEmail`, `Password
 -- Table structure for table `vendor`
 --
 
-DROP TABLE IF EXISTS `vendor`;
-CREATE TABLE IF NOT EXISTS `vendor` (
-  `VendorID` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `vendor` (
+  `VendorID` int NOT NULL,
   `UserID` int NOT NULL,
-  `OrgID` int NOT NULL,
-  PRIMARY KEY (`VendorID`),
-  KEY `UserID` (`UserID`),
-  KEY `fk_organization` (`OrgID`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `OrgID` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `vendor`
@@ -499,6 +467,138 @@ INSERT INTO `vendor` (`VendorID`, `UserID`, `OrgID`) VALUES
 (10, 15, 3),
 (11, 16, 4),
 (12, 17, 5);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `booth`
+--
+ALTER TABLE `booth`
+  ADD PRIMARY KEY (`BoothID`),
+  ADD KEY `fk_org` (`OrgID`);
+
+--
+-- Indexes for table `booth_members`
+--
+ALTER TABLE `booth_members`
+  ADD PRIMARY KEY (`BoothID`,`VendorID`),
+  ADD KEY `VendorID` (`VendorID`);
+
+--
+-- Indexes for table `customer`
+--
+ALTER TABLE `customer`
+  ADD PRIMARY KEY (`CustomerID`),
+  ADD KEY `UserID` (`UserID`);
+
+--
+-- Indexes for table `inventory`
+--
+ALTER TABLE `inventory`
+  ADD PRIMARY KEY (`InventoryID`),
+  ADD KEY `ProductID` (`ProductID`);
+
+--
+-- Indexes for table `order`
+--
+ALTER TABLE `order`
+  ADD PRIMARY KEY (`OrderID`),
+  ADD KEY `fk_booth` (`BoothID`);
+
+--
+-- Indexes for table `order_products`
+--
+ALTER TABLE `order_products`
+  ADD PRIMARY KEY (`ProductID`,`OrderID`),
+  ADD KEY `fk_order` (`OrderID`);
+
+--
+-- Indexes for table `organization`
+--
+ALTER TABLE `organization`
+  ADD PRIMARY KEY (`OrgID`);
+
+--
+-- Indexes for table `product`
+--
+ALTER TABLE `product`
+  ADD PRIMARY KEY (`ProductID`),
+  ADD KEY `BoothID` (`BoothID`);
+
+--
+-- Indexes for table `service`
+--
+ALTER TABLE `service`
+  ADD PRIMARY KEY (`ProductID`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`UserID`),
+  ADD UNIQUE KEY `SchoolEmail` (`SchoolEmail`);
+
+--
+-- Indexes for table `vendor`
+--
+ALTER TABLE `vendor`
+  ADD PRIMARY KEY (`VendorID`),
+  ADD KEY `UserID` (`UserID`),
+  ADD KEY `fk_organization` (`OrgID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `booth`
+--
+ALTER TABLE `booth`
+  MODIFY `BoothID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `customer`
+--
+ALTER TABLE `customer`
+  MODIFY `CustomerID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `inventory`
+--
+ALTER TABLE `inventory`
+  MODIFY `InventoryID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+
+--
+-- AUTO_INCREMENT for table `order`
+--
+ALTER TABLE `order`
+  MODIFY `OrderID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `organization`
+--
+ALTER TABLE `organization`
+  MODIFY `OrgID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `product`
+--
+ALTER TABLE `product`
+  MODIFY `ProductID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `UserID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `vendor`
+--
+ALTER TABLE `vendor`
+  MODIFY `VendorID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables

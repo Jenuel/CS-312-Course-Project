@@ -13,14 +13,13 @@ function handleLogin(event) {
 
     fetch('http://localhost:8080/auth/authRoutes.php', {
         method: 'POST',
-        mode: 'no-cors',
+        //mode: 'no-cors',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData), 
     })
     .then(response => {
-        
         
         if (!response.ok) {
             console.log("failure")
