@@ -38,7 +38,7 @@ RUN a2enmod rewrite
 # Stage 3: Frontend (Nginx) Build
 FROM nginx:alpine AS frontend-build
 # Copy website files
-COPY website/ /auth/html/
+COPY website/ /usr/share/nginx/html/
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -61,7 +61,7 @@ WORKDIR /app
 # Copy built artifacts from previous stages
 COPY --from=nodejs-backend-build /app/backend/nodejs /app/backend/nodejs
 COPY --from=php-backend-build /var/www/html /var/www/html
-COPY --from=frontend-build /website/auth/html /app/website
+COPY --from=frontend-build /usr/share/nginx/html/ /app/website
 COPY --from=frontend-build /etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Configure Apache to serve both PHP backend and static files
