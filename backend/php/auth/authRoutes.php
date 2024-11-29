@@ -46,13 +46,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $email = $test['email'];
         $password = $test['password'];
+        
+        echo "nigger $password" // kakagawa
 
         // Hash the password using MD5
         $hashedPassword = md5($password);
 
         $sql = "SELECT * FROM users WHERE SchoolEmail = ? AND Password = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param( $email, $hashedPassword);
+        $stmt->bind_param( $email, $password);
         $stmt->execute();
         $result = $stmt->get_result();
 
