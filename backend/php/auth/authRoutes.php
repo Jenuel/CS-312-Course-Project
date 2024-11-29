@@ -1,6 +1,6 @@
 <?php
 
-require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/auth/connectDb.php');
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8081/auth/authRoutes.php');
 
 header('Content-Type: application/json; charset=utf-8');
 

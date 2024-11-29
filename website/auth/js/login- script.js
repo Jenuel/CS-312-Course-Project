@@ -10,7 +10,7 @@ function handleLogin(event) {
 
     var responseClone; // 1
    
-    fetch('/backend/php/auth/authRoutes.php', {
+    fetch('http://localhost:8081/auth/authRoutes.php', {
         method: 'POST',
         mode: 'no-cors',
         headers: {
