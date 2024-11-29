@@ -44,34 +44,54 @@ COPY website/ /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Stage 4: Final Production Image
-FROM node:20-alpine AS production
+FROM php:8.2-apache AS production
 
-# Install necessary utilities
-RUN apk add --no-cache \
+# Install additional utilities
+RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
-    php \
-    apache2 \
     nginx
+
+# Clean up apt cache
+RUN rm -rf /var/lib/apt/lists/*
 
 # Create application directory
 WORKDIR /app
 
 # Copy built artifacts from previous stages
 COPY --from=nodejs-backend-build /app/backend/nodejs /app/backend/nodejs
-COPY --from=php-backend-build /var/www/html /app/backend/php
+COPY --from=php-backend-build /var/www/html /var/www/html
 COPY --from=frontend-build /usr/share/nginx/html /app/website
 COPY --from=frontend-build /etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
+# Configure Apache to serve both PHP backend and static files
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html\n\
+    <Directory /var/www/html>\n\
+        Options Indexes FollowSymLinks\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+</VirtualHost>\n\
+\n\
+<VirtualHost *:8080>\n\
+    DocumentRoot /app/website\n\
+    <Directory /app/website>\n\
+        Options Indexes FollowSymLinks\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
 # Expose ports for different services
-EXPOSE 3000 80 8080
+EXPOSE 80 8080 3000
 
 # Create startup script
-RUN echo '#!/bin/sh' > /start.sh && \
-    echo 'nginx -g "daemon off;" &' >> /start.sh && \
-    echo 'cd /app/backend/nodejs && node server.js &' >> /start.sh && \
-    echo 'php -S 0.0.0.0:8080 -t /app/backend/php &' >> /start.sh && \
-    echo 'wait -n' >> /start.sh && \
+RUN echo '#!/bin/bash\n\
+service nginx start\n\
+cd /app/backend/nodejs && node server.js &\n\
+apache2ctl -D FOREGROUND\n\
+' > /start.sh && \
     chmod +x /start.sh
 
 # Default command to start all services

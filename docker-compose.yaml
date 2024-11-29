@@ -1,10 +1,11 @@
-
+version: '3.8'
 services:
-  # Node.js Backend Service
+  # Full-Stack Application Services
   nodejs-backend:
     build:
       context: .
       dockerfile: Dockerfile
+      target: nodejs-backend-build
     container_name: nodejs-backend
     ports:
       - "3000:3000"
@@ -14,12 +15,13 @@ services:
       - app-network
     depends_on:
       - database
+    command: node server.js
 
-  # PHP Backend Service
   php-backend:
     build:
       context: .
       dockerfile: Dockerfile
+      target: php-backend-build
     container_name: php-backend
     ports:
       - "8080:80"
@@ -30,11 +32,11 @@ services:
     depends_on:
       - database
 
-  # Frontend Service (Nginx)
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
+      target: frontend-build
     container_name: frontend
     ports:
       - "80:80"
