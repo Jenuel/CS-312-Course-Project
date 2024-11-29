@@ -461,3 +461,94 @@ function createProduct(data) {
   filterProducts(getCurrentFilter());
 }
 
+function createProductToNode( boothIdInput,stocksInput,priceInput,nameInput,statusInput,imageInput){
+  const data = {
+    boothID: boothIdInput,
+    stocks:stocksInput,
+    price:priceInput,
+    name:nameInput,
+    status:statusInput,
+    image:imageInput
+  }
+  fetch(`https://<your-domain>/create`, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify(data),
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      console.log("retrived pending orders successfully:", data);
+  })
+  .catch(error => {
+      console.error("Error retrivieng pending orders:", error);
+  });
+
+}
+/*
+details [] should contain
+"<title>:<value>",
+"name:Burger",
+"price:100.00"
+*/
+
+function editProduct(details,productID){
+  const dataDetails = {
+    // to do
+  }
+  const data = {
+    datePaid:dataDetails
+  }
+  fetch(`https://<your-domain>/edit/:${productID}`, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify(data),
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      console.log("retrived pending orders successfully:", data);
+  })
+  .catch(error => {
+      console.error("Error retrivieng pending orders:", error);
+  });
+  
+}
+
+function changeStatusProduct(statusInput,productID){
+  const data = {
+    status : statusInput
+  }
+  fetch(`https://<your-domain>/edit/:${productID}`, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify(data),
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      console.log("retrived pending orders successfully:", data);
+  })
+  .catch(error => {
+      console.error("Error retrivieng pending orders:", error);
+  });
+  
+}

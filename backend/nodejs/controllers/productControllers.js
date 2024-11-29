@@ -109,7 +109,6 @@ const createProduct = async (request, response) => {//GOOD KINDA
     if (status !== 'active' && status !== 'inactive') {
         return response.status(400).send('Invalid status. It must be either "active" or "inactive".');
     }
-
     try {
         const [rows] = await db.query('INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES (NULL, ?,?, ?, ?, ?, ?)',[boothID,stocks,price,name,status,image]);
         response.json(rows);

@@ -32,25 +32,51 @@ function displayBooths(){
 
 /*
 format of line in data[] :
+"<productID> , <quantity> , <totalPricePerProduct>",
 "<productID> , <quantity> , <totalPricePerProduct>"
 */
 
 //PLEASE FIX THIS
 function createOrder (boothID, Data, totalPriceInput, dateInput){ 
-    const products = dataArray.map(line => {// NOT SURE HERE
-        const [productID, quantity, totalPricePerProduct] = line.split(',');
+   /*
+     const products = dataArray.map(Data => {// NOT SURE HERE
+        const [productID, quantity, totalPricePerProduct] = Data.split(',');
         return {
             productID: productID.trim(),
             quantity: parseInt(quantity.trim(), 10),
             totalPricePerProduct: parseFloat(totalPricePerProduct.trim()),
         };
     });
-   
+
     const data = {
         products: products,
         totalPrice : totalPriceInput,
         date:dateInput 
     }
+
+    */
+    let details = "";
+
+   for(let i = 0; i< Data.length ; i++ ){
+    const temp = Data[i].split(",");
+    if(i == Data.length -1){
+        details =details ,`[productID:${temp[0]}, quantity:${temp[1]}, totalPricePerProduct:${temp[2]}]`;
+    }else{
+        details =details ,`[productID:${temp[0]}, quantity:${temp[1]}, totalPricePerProduct:${temp[2]}],\n`;
+    }
+      
+   }
+   
+    const data = {
+        products: details,
+        totalPrice : totalPriceInput,
+        date:dateInput 
+    }
+    
+    
+   
+   
+  
    
     fetch(`https://<sample/com>/details/${boothID}`,{// change this one
         method: 'POST', // PATCH is appropriate for partial updates like changing an order's status

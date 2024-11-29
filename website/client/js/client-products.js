@@ -37,7 +37,7 @@ use getProducts method in productController.js
 */
 function viewProducts(boothID){
  
-    fetch(`https://<sample/com>/${boothID}`,{// change this one
+    fetch(`https://<sample/com>/:${boothID}`,{// change this one
         method: 'GET', 
         headers: {
             'Content-Type': 'application/json', 
@@ -66,7 +66,7 @@ function buyProduct(productID, value){
     const data = {
         numberOfProductSold : value
    }
-   fetch(`https://<sample/com>/buy/${productID}`,{// change this one
+   fetch(`https://<sample/com>/buy/:${productID}`,{// change this one
        method: 'PATCH',
        headers: {
            "Content-type":'application/json'

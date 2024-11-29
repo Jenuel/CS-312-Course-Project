@@ -118,7 +118,7 @@ use get details of a specific Product method in productController.js
 */
 function getSpecificProduct(productId){
   
-   fetch(`https://<sample/com>/details/${productId}`,{// change this one
+   fetch(`https://<sample/com>/details/:${productId}`,{// change this one
     method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 

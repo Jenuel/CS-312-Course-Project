@@ -6,6 +6,6 @@ router.get("/pending", getPendingOrders);// vendor
 router.get("/complete/:boothId", getCompletedOrders);// vendor
 router.post("/create", createOrder);// customer
 router.patch("/cancel/:orderId", cancelOrder);// customer
-router.patch("/approve/:id", approveOrder);// vendor
+router.patch("/approve/:orderId", approveOrder);// vendor
 
 export default router;
