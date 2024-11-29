@@ -10,7 +10,7 @@ function handleLogin(event) {
 
     var responseClone; // 1
    
-    fetch('http://localhost/CS-312-Course-Project/backend/php/auth/authRoutes.php', {
+    fetch('http://localhost/frontend/php-backend/auth/authRoutes.php', {
         method: 'POST',
         mode: 'no-cors',
         headers: {
@@ -35,9 +35,9 @@ function handleLogin(event) {
         if (data.success) {
             console.log("Login successful"); 
             if(data.role == "vendor"){ //checks the role of the newly authenticated user
-                window.location.href = 'http://localhost/CS-312-Course-Project/website/vendor/html/vendor-home.html';//redirect to vendor side
+                window.location.href = 'http://localhost/frontend/website/vendor/html/vendor-home.html';//redirect to vendor side
             } else {
-                window.location.href = 'http://localhost/CS-312-Course-Project/website/client/html/client-home.html'; //redirect to customer side
+                window.location.href = 'http://localhost/frontend/website/client/html/client-home.html'; //redirect to customer side
             }                
         } else {
             console.error(data.message);
