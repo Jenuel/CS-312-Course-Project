@@ -1,0 +1,85 @@
+
+services:
+  # Node.js Backend Service
+  nodejs-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nodejs-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/nodejs:/app/backend/nodejs
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+  # PHP Backend Service
+  php-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php-backend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend/php:/var/www/html
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+  # Frontend Service (Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./website:/usr/share/nginx/html
+    networks:
+      - app-network
+
+  # Database Service
+  database:
+    image: mysql:8.0
+    container_name: mysql-database
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: devuser
+      MYSQL_PASSWORD: devpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+  # PhpMyAdmin for Database Management
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+    ports:
+      - "8081:80"
+    depends_on:
+      - database
+    networks:
+      - app-network
+
+# Volume Definitions
+volumes:
+  mysql-data:
+    driver: local
+
+# Network Configuration
+networks:
+  app-network:
+    driver: bridge
