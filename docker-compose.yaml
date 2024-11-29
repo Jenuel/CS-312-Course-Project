@@ -41,7 +41,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./website:/usr/share/nginx/html
+      - ./website:/auth/html
     networks:
       - app-network
 
