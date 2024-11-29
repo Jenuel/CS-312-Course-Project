@@ -2,10 +2,8 @@ let box = document.querySelector(".booth-container"); // where the child will be
 
 
 let formData = {
-
     filter: document.getElementById("filter").value,
     order: document.getElementById("order")
-
 };
 
 //fetches the data and calls the display function when success
@@ -65,6 +63,11 @@ function displayBooths(booths){
                 <p class="content">:  ${value.Description}</p>
             </div>    
         </div>`;
+
+        valueDiv.addEventListener('click', function() {
+            window.location.href = `boothDetails.html?id=${value.id}`;
+        });
+
         box.appendChild(valueDiv); // appending the child to "box"
     })
 }
