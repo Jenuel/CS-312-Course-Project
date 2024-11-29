@@ -51,7 +51,7 @@ let formData = {
 
 // fetches the data and calls the displaying function
 function getData() {
-    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php/', {
+    fetch('http://frontend/backend/php/boothOps/boothRoutes.php/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ function createBoothFunction() { //integrate it to create function button
 
     var responseClone; // 1
 
-    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
+    fetch('http://frontend/backend/php/boothOps/boothRoutes.php', {
         method: 'POST',
         body: JSON.stringify(formData), 
         headers: {

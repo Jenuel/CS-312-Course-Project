@@ -10,7 +10,7 @@ let formData = {
 
 //fetches the data and calls the display function when success
 function getData() {
-    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
+    fetch('http://frontend/backend/php/boothOps/boothRoutes.php', {
         method: 'GET',
         mode: 'no-cors',
         headers: {
