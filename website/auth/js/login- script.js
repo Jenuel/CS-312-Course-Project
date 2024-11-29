@@ -23,10 +23,10 @@ function handleLogin(event) {
         
         
         if (!response.ok) {
-            console.log("success")
+            console.log("failure")
             throw new Error('Network response was not ok');
         } else {
-            console.log("failure")
+            console.log("success")
         }
         responseClone = response.clone(); // 2
         return response.json();

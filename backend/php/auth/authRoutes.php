@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $insertQuery = "INSERT INTO users (FirstName, LastName, SchoolEmail, Password) 
                             VALUES (?, ?, ?, ?)";
             $insertStmt = $conn->prepare($insertQuery);
-            $insertStmt->bind_param("ssss", $firstName, $lastName, $email, $hashedPassword);
+            $insertStmt->bind_param($firstName, $lastName, $email, $hashedPassword);
 
             if ($insertStmt->execute()) {
                 echo json_encode(["success" => true, "message" => "User registered successfully"]); //Redirection will happen in the frontend
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $sql = "SELECT * FROM users WHERE SchoolEmail = ? AND Password = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $email, $password);
+        $stmt->bind_param( $email, $hashedPassword);
         $stmt->execute();
         $result = $stmt->get_result();
 
