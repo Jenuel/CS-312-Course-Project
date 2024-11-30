@@ -58,20 +58,31 @@ h1, h2 {
     text-align: center;
 }
 
-.orders-not-prepared th, .unclaimed-orders th, .claimed-orders th {
+.orders-not-prepared th {
     background-color: #333;
     color: #fff;
 }
 
-.orders-not-prepared {
+.unclaimed-orders th {
+    background-color: #b88a01;
+    color: #fff;
+}
+
+.claimed-orders th {
+    background-color: #00751c;
+    color: #fff;
+}
+
+.orders-not-prepared, .table-container.left h2 {
     background-color: #d6d6d6;
 }
 
-.unclaimed-orders {
+.unclaimed-orders, .table-container.right-top h2 {
     background-color: #ffc107;
+    color: #fff;
 }
 
-.claimed-orders {
+.claimed-orders, .table-container.right-bottom h2 {
     background-color: #28a745;
     color: #fff;
 }
