@@ -143,7 +143,7 @@ function filterProducts(filterType) {
             case 'Sold Out':
                 return product.ProductStatus === 'Sold Out';
             default:
-                return true; // 'All' case
+                return true; 
         }
     });
 
@@ -240,7 +240,7 @@ function showProductDetail(dataForm) {
             </div>
         </div>`;
 
-    // Rest of the event listeners remain the same
+    // Rest of the event remain 
     const thumbnail = productDetailContainer.querySelector('.product-thumbnail');
     if (thumbnail) {
         thumbnail.addEventListener('click', () => showImageModal(dataForm.ProductImage));
@@ -260,49 +260,7 @@ function showProductDetail(dataForm) {
     tableBody.appendChild(productDetailContainer);
 }
 
-// function showProductDetail(dataForm) {
-//   const productDetailContainer = document.createElement("div");
-//   productDetailContainer.className = "product-detail-container";
-//   productDetailContainer.innerHTML = `
-//     <div class="row text-center align-items-center">
-//       <div class="col">
-//         <div>${dataForm.ProductName}</div>
-//         <small class="text-muted">${dataForm.ProductDescription || ''}</small>
-//       </div>
-//       <div class="col">
-//         <span class="badge ${dataForm.ProductStatus === 'Live' ? 'bg-success' : 'bg-warning'}">${dataForm.ProductStatus}</span>
-//       </div>
-//       <div class="col">${dataForm.ProductPrice}</div>
-//       <div class="col">${dataForm.ProductStock}</div>
-//       <div class="col">${dataForm.ProductSales || '0'}</div>
-//       <div class="col">
-//         ${dataForm.ProductImage ? 
-//           `<img src="${dataForm.ProductImage}" alt="Product" class="product-thumbnail rounded">` : 
-//           'No Image'}
-//       </div>
-//       <div class="col">
-//         <button type="button" class="p-edit-button">
-//           <i class='bx bx-edit'></i>
-//         </button>
-//         <button type="button" class="p-delete-button">
-//           <i class='bx bx-trash-alt'></i>
-//         </button>
-//       </div>
-//     </div>`;
 
-//   const thumbnail = productDetailContainer.querySelector('.product-thumbnail');
-//   if (thumbnail) {
-//     thumbnail.addEventListener('click', () => showImageModal(dataForm.ProductImage));
-//   }
-
-//   const editBtn = productDetailContainer.querySelector(".p-edit-button");
-//   editBtn.addEventListener("click", () => editProductData(dataForm, productDetailContainer));
-
-//   const deleteBtn = productDetailContainer.querySelector(".p-delete-button");
-//   deleteBtn.addEventListener("click", () => productDetailContainer.remove());
-
-//   tableBody.appendChild(productDetailContainer);
-// }
 
 
 function editProductData(data, productContainer) {

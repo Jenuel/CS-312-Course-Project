@@ -176,5 +176,49 @@ function createBoothFunction() { //integrate it to create function button
     });
 }
 
+// for changing pages in navigation
+const pageFrame = document.getElementById('page-frame');
+const boothContent = document.getElementById('booth-content');
+const pageHeader = document.querySelector('header h1');
+
+function loadPage(page) {
+    switch(page) {
+        case 'home':
+            // Show booth content, hide frame
+            boothContent.classList.add('active');
+            pageFrame.style.display = 'none';
+            pageHeader.textContent = 'YOUR BOOTHS';
+            getData(); // Refresh  
+            break;
+            
+        case 'products':
+            boothContent.classList.remove('active');
+            pageFrame.style.display = 'block';
+            pageFrame.src = '../html/vendor-product.html';
+            pageHeader.textContent = 'YOUR PRODUCTS';
+            break;
+            
+        case 'orders':
+            boothContent.classList.remove('active');
+            pageFrame.style.display = 'block';
+            pageFrame.src = 'vendor-orders.html'; // wala pa
+            pageHeader.textContent = 'YOUR ORDERS';
+            break;
+
+        case 'sales':
+            boothContent.classList.remove('active');
+            pageFrame.style.display = 'block';
+            pageFrame.src = '../html/vendor-sales.html'; // wala pa
+            pageHeader.textContent = 'YOUR SALES';
+            break;
+        
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadPage('home');
+});
+
+
 
 getData();
