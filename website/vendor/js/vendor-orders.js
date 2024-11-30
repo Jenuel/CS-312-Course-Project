@@ -37,12 +37,13 @@
     }
 ];
 
+const notPreparedOrdersTable = document.getElementById("notPreparedOrders");
 const unclaimedOrdersTable = document.getElementById("unclaimedOrders");
 const claimedOrdersTable = document.getElementById("claimedOrders");
 
-// populate unclaimed orders
-function populateUnclaimedOrders() {
-    unclaimedOrdersTable.innerHTML = "";
+// Populate orders not prepared
+function populateNotPreparedOrders() {
+    notPreparedOrdersTable.innerHTML = "";
     orders.forEach(order => {
         const row = document.createElement("tr");
 
@@ -52,14 +53,33 @@ function populateUnclaimedOrders() {
             <td>${order.productName}</td>
             <td>${order.quantity}</td>
             <td>₱${order.total}</td>
-            <td><button onclick="claimOrder('${order.orderId}')">Claimed</button></td>
-            `;
+            <td><button onclick="markAsPrepared('${order.orderId}')">Mark as Prepared</button></td>
+        `;
+
+        notPreparedOrdersTable.appendChild(row);
+    });
+}
+
+// Populate unclaimed orders
+function populateUnclaimedOrders(unclaimedOrders) {
+    unclaimedOrdersTable.innerHTML = "";
+    unclaimedOrders.forEach(order => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${order.orderId}</td>
+            <td>${order.customerName}</td>
+            <td>${order.productName}</td>
+            <td>${order.quantity}</td>
+            <td>₱${order.total}</td>
+            <td><button onclick="claimOrder('${order.orderId}')">Claim</button></td>
+        `;
 
         unclaimedOrdersTable.appendChild(row);
     });
 }
 
-// populate claimed orders
+// Populate claimed orders
 function populateClaimedOrders(claimedOrders) {
     claimedOrdersTable.innerHTML = "";
     claimedOrders.forEach(order => {
@@ -74,25 +94,41 @@ function populateClaimedOrders(claimedOrders) {
             <td><button onclick="removeClaimedOrder('${order.orderId}')">Remove</button></td>
         `;
 
-        claimedOrdersTable.appendChild(row);
+            claimedOrdersTable.appendChild(row);
     });
 }
 
-// move unclaimed to claimed orders
+// Move order to unclaimed orders
+function markAsPrepared(orderId) {
+    const confirmPrepare = confirm("Are you sure this order was prepared?");
+    if (!confirmPrepare) return;
+
+
+    const orderIndex = orders.findIndex(order => order.orderId === orderId);
+    if (orderIndex !== -1) {
+        const unclaimedOrder = orders.splice(orderIndex, 1)[0];
+        unclaimedOrders.push(unclaimedOrder);
+        updateTables();
+    }
+}
+
+// Move order to claimed orders
 function claimOrder(orderId) {
     const confirmation = confirm("Are you sure this order was claimed?");
     if (!confirmation) return;
 
-    const orderIndex = orders.findIndex(order => order.orderId === orderId);
+    const orderIndex = unclaimedOrders.findIndex(order => order.orderId === orderId);
     if (orderIndex !== -1) {
-        const claimedOrder = orders.splice(orderIndex, 1)[0];
+        const claimedOrder = unclaimedOrders.splice(orderIndex, 1)[0];
         claimedOrders.push(claimedOrder);
         updateTables();
     }
 }
 
-// remove claimed order
+// Remove claimed order
+const unclaimedOrders = [];
 const claimedOrders = [];
+
 function removeClaimedOrder(orderId) {
     const orderIndex = claimedOrders.findIndex(order => order.orderId === orderId);
     if (orderIndex !== -1) {
@@ -101,11 +137,12 @@ function removeClaimedOrder(orderId) {
     }
 }
 
-// update both tables
+// Update all tables
 function updateTables() {
-    populateUnclaimedOrders();
+    populateNotPreparedOrders();
+    populateUnclaimedOrders(unclaimedOrders);
     populateClaimedOrders(claimedOrders);
 }
 
-// initialize tables
+// Initialize tables
 updateTables();
