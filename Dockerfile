@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring
+RUN docker-php-ext-install mysqli
 
 # Set working directory
 WORKDIR /var/www/html

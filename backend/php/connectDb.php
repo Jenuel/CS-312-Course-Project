@@ -1,6 +1,6 @@
 <?php
 
-$DB_HOST = "localhost";
+$DB_HOST = "mysql-database";
 $DB_USER = "root";
 $DB_PASSWORD = "rootpassword";
 $DB_NAME = "boothsystem";

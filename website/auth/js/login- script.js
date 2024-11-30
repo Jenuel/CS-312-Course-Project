@@ -10,9 +10,10 @@ function handleLogin(event) {
 
     var responseClone; // 1
    
-    fetch('http://localhost:8081/auth/authRoutes.php', {
+
+    fetch('http://localhost:8080/auth/authRoutes.php', {
         method: 'POST',
-        mode: 'no-cors',
+        //mode: 'no-cors',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -20,12 +21,11 @@ function handleLogin(event) {
     })
     .then(response => {
         
-        
         if (!response.ok) {
-            console.log("success")
+            console.log("failure")
             throw new Error('Network response was not ok');
         } else {
-            console.log("failure")
+            console.log("success")
         }
         responseClone = response.clone(); // 2
         return response.json();
@@ -35,9 +35,9 @@ function handleLogin(event) {
         if (data.success) {
             console.log("Login successful"); 
             if(data.role == "vendor"){ //checks the role of the newly authenticated user
-                window.location.href = '/vendor/html/vendor-home.html';//redirect to vendor side
+                window.location.href = '../vendor/html/vendor-home.html';//redirect to vendor side
             } else {
-                window.location.href = '/client/html/client-home.html'; //redirect to customer side
+                window.location.href = '../client/html/client-home.html'; //redirect to customer side
             }                
         } else {
             console.error(data.message);

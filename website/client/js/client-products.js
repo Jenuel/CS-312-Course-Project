@@ -31,4 +31,5 @@ function displayBooths(){
         box.appendChild(valueDiv); // appending the child to "box"
 }
 
+
 displayBooths();

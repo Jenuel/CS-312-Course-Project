@@ -1,6 +1,6 @@
 <?php
 
-require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8081/auth/connectDb.php');
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8081/auth/authRoutes.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $insertQuery = "INSERT INTO users (FirstName, LastName, SchoolEmail, Password) 
                             VALUES (?, ?, ?, ?)";
             $insertStmt = $conn->prepare($insertQuery);
-            $insertStmt->bind_param("ssss", $firstName, $lastName, $email, $hashedPassword);
+            $insertStmt->bind_param("ssss",$firstName, $lastName, $email, $hashedPassword);
 
             if ($insertStmt->execute()) {
                 echo json_encode(["success" => true, "message" => "User registered successfully"]); //Redirection will happen in the frontend
@@ -46,9 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $email = $test['email'];
         $password = $test['password'];
+        
 
         // Hash the password using MD5
-        $hashedPassword = md5($password);
+        //$hashedPassword = md5($password);
 
         $sql = "SELECT * FROM users WHERE SchoolEmail = ? AND Password = ?";
         $stmt = $conn->prepare($sql);
@@ -69,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userID = $user['UserID'];
 
             // Check if the user is a vendor
-            $vendorQuery = "SELECT VendorID, OrgID FROM VENDOR WHERE UserID = ?";
+            $vendorQuery = "SELECT VendorID, OrgID FROM vendor WHERE UserID = ?";
             $vendorStmt = $conn->prepare($vendorQuery);
             $vendorStmt->bind_param("i", $userID);
             $vendorStmt->execute();
@@ -85,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Check if the user is a customer
-            $customerQuery = "SELECT CustomerID FROM CUSTOMER WHERE UserID = ?";
+            $customerQuery = "SELECT CustomerID FROM customer WHERE UserID = ?";
             $customerStmt = $conn->prepare($customerQuery);
             $customerStmt->bind_param("i", $userID);
             $customerStmt->execute();
