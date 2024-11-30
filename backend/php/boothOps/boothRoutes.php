@@ -1,29 +1,26 @@
 <?php
-session_start(); 
+session_start();
 
 header("Access-Control-Allow-Origin: *");
-
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-
 header("Access-Control-Allow-Headers: Content-Type,");
+header('Content-Type: application/json; charset=utf-8');
 
 // If it's a preflight request, terminate early with a 200 response
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);  // End the request early
 }
-//require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8080/connectDb.php');
 
 require_once('/usr/share/nginx/html/connectDb.php');
 
+//require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8080/connectDb.php');
 
-//require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
-
-if (!isset($_SESSION['user'])) {
-    echo json_encode(["error" => "Unauthorized"]);
+if (!isset($_SESSION['user']['role']) || !isset($_SESSION['user']['OrgID'])) {
+    echo json_encode(["error" => "Invalid session data"]);
     exit();
 }
 
-header('Content-Type: application/json; charset=utf-8');
+
 
 $input=json_decode(file_get_contents("php://input"), true);
 

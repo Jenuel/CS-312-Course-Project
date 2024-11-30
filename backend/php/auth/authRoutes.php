@@ -1,4 +1,5 @@
 <?php
+ session_start();
 // Allow requests from any origin (use a specific origin instead of * in production)
 header("Access-Control-Allow-Origin: *");
 
@@ -20,6 +21,8 @@ require_once('/usr/share/nginx/html/connectDb.php');
 header('Content-Type: application/json; charset=utf-8');
 
 $test=json_decode(file_get_contents("php://input"), true);
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $test['action'];
@@ -66,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Hash the password using MD5
         //$hashedPassword = md5($password);
 
-        $sql = "SELECT * FROM users WHERE SchoolEmail = ? AND Password = ?";
+        $sql = "SELECT * FROM users u WHERE SchoolEmail = ? AND Password = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $email, $password);
         $stmt->execute();
@@ -75,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
 
-            session_start();
             $_SESSION['user'] = [
                 'UserID' => $user['UserID'],
                 'FirstName' => $user['FirstName'],
@@ -116,8 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode($transport); //Redirection will happen in frontend
                 exit;
             }
-
-            exit();
             
         } else {
             echo json_encode(["error" => "Incorrect email or password"]);
