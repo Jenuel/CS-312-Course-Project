@@ -1,52 +1,24 @@
- // sample test data only, to do fetch from db
- const orders = [
-    {
-        orderId: "O001",
-        customerName: "Jeremi Daks",
-        productName: "Product A",
-        quantity: 2,
-        total: 200,
-    },
-    {
-        orderId: "O002",
-        customerName: "Jeremi Daks",
-        productName: "Product B",
-        quantity: 1,
-        total: 150,
-    },
-    {
-        orderId: "O003",
-        customerName: "Neil Clarance Magsakay",
-        productName: "Product C",
-        quantity: 3,
-        total: 450,
-    },
-    {
-        orderId: "O004",
-        customerName: "Liam Crushiecakes",
-        productName: "Product D",
-        quantity: 1,
-        total: 300,
-    },
-    {
-        orderId: "O005",
-        customerName: "Melmar Frederick Bautista",
-        productName: "Product E",
-        quantity: 4,
-        total: 400,
-    }
+// Sample test data only; to be replaced with actual data fetched from a database
+const orders = [
+    { orderId: "O001", customerName: "Jeremi Daks", productName: "Product A", quantity: 2, total: 200 },
+    { orderId: "O002", customerName: "Jeremi Daks", productName: "Product B", quantity: 1, total: 150 },
+    { orderId: "O003", customerName: "Neil Clarance Magsakay", productName: "Product C", quantity: 3, total: 450 },
+    { orderId: "O004", customerName: "Liam Crushiecakes", productName: "Product D", quantity: 1, total: 300 },
+    { orderId: "O005", customerName: "Melmar Frederick Bautista", productName: "Product E", quantity: 4, total: 400 }
 ];
 
 const notPreparedOrdersTable = document.getElementById("notPreparedOrders");
 const unclaimedOrdersTable = document.getElementById("unclaimedOrders");
 const claimedOrdersTable = document.getElementById("claimedOrders");
 
+const unclaimedOrders = [];
+const claimedOrders = [];
+
 // Populate orders not prepared
 function populateNotPreparedOrders() {
     notPreparedOrdersTable.innerHTML = "";
     orders.forEach(order => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
             <td>${order.orderId}</td>
             <td>${order.customerName}</td>
@@ -55,7 +27,6 @@ function populateNotPreparedOrders() {
             <td>₱${order.total}</td>
             <td><button onclick="markAsPrepared('${order.orderId}')">Mark as Prepared</button></td>
         `;
-
         notPreparedOrdersTable.appendChild(row);
     });
 }
@@ -65,7 +36,6 @@ function populateUnclaimedOrders(unclaimedOrders) {
     unclaimedOrdersTable.innerHTML = "";
     unclaimedOrders.forEach(order => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
             <td>${order.orderId}</td>
             <td>${order.customerName}</td>
@@ -74,7 +44,6 @@ function populateUnclaimedOrders(unclaimedOrders) {
             <td>₱${order.total}</td>
             <td><button onclick="claimOrder('${order.orderId}')">Claim</button></td>
         `;
-
         unclaimedOrdersTable.appendChild(row);
     });
 }
@@ -84,7 +53,6 @@ function populateClaimedOrders(claimedOrders) {
     claimedOrdersTable.innerHTML = "";
     claimedOrders.forEach(order => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
             <td>${order.orderId}</td>
             <td>${order.customerName}</td>
@@ -93,8 +61,7 @@ function populateClaimedOrders(claimedOrders) {
             <td>₱${order.total}</td>
             <td><button onclick="removeClaimedOrder('${order.orderId}')">Remove</button></td>
         `;
-
-            claimedOrdersTable.appendChild(row);
+        claimedOrdersTable.appendChild(row);
     });
 }
 
@@ -102,7 +69,6 @@ function populateClaimedOrders(claimedOrders) {
 function markAsPrepared(orderId) {
     const confirmPrepare = confirm("Are you sure this order was prepared?");
     if (!confirmPrepare) return;
-
 
     const orderIndex = orders.findIndex(order => order.orderId === orderId);
     if (orderIndex !== -1) {
@@ -126,9 +92,6 @@ function claimOrder(orderId) {
 }
 
 // Remove claimed order
-const unclaimedOrders = [];
-const claimedOrders = [];
-
 function removeClaimedOrder(orderId) {
     const orderIndex = claimedOrders.findIndex(order => order.orderId === orderId);
     if (orderIndex !== -1) {

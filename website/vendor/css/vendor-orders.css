@@ -1,39 +1,89 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
     background-color: #f9f9f9;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
-h1 {
+
+h1, h2 {
+    font-weight: bold;
     text-align: center;
 }
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    table-layout: fixed;
+
+.orders-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+    grid-template-areas:
+        "Table1 Table2"
+        "Table1 Table3";
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-th, td {
+.orders-container {
+    grid-template-rows: 40vh 40vh;
+}
+
+.table-container {
     border: 1px solid #ccc;
+    background-color: #fff;
     padding: 10px;
-    text-align: left;
+    overflow: auto;
+    box-sizing: border-box;
 }
 
-th {
-    background-color: #f4f4f4;
-    width: 20%;
+.left {
+    grid-area: Table1;
 }
-.status {
-    font-weight: bold;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
+
+.right-top {
+    grid-area: Table2;
 }
+
+.right-bottom {
+    grid-area: Table3;
+}
+
+.orders-not-prepared, .unclaimed-orders, .claimed-orders {
+    width: 100%;    
+    border-collapse: collapse;
+}
+
+.orders-not-prepared th, .unclaimed-orders th, .claimed-orders th,
+.orders-not-prepared td, .unclaimed-orders td, .claimed-orders td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.orders-not-prepared th, .unclaimed-orders th, .claimed-orders th {
+    background-color: #333;
+    color: #fff;
+}
+
+.orders-not-prepared {
+    background-color: #d6d6d6;
+}
+
+.unclaimed-orders {
+    background-color: #ffc107;
+}
+
+.claimed-orders {
+    background-color: #28a745;
+    color: #fff;
+}
+
 button {
     padding: 5px 10px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
 }
-.claimed-table {
-    margin-top: 40px;
+
+button:hover {
+    opacity: 0.8;
 }
