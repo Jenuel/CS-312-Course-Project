@@ -11,14 +11,18 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin: 20px 0;
+    table-layout: fixed;
 }
+
 th, td {
     border: 1px solid #ccc;
     padding: 10px;
     text-align: left;
 }
+
 th {
     background-color: #f4f4f4;
+    width: 20%;
 }
 .status {
     font-weight: bold;
@@ -26,9 +30,10 @@ th {
     padding: 5px 10px;
     border-radius: 5px;
 }
-.claimed {
-    background-color: green;
+button {
+    padding: 5px 10px;
+    cursor: pointer;
 }
-.unclaimed {
-    background-color: red;
+.claimed-table {
+    margin-top: 40px;
 }

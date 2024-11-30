@@ -6,7 +6,6 @@
         productName: "Product A",
         quantity: 2,
         total: 200,
-        status: "claimed"
     },
     {
         orderId: "O002",
@@ -14,7 +13,6 @@
         productName: "Product B",
         quantity: 1,
         total: 150,
-        status: "claimed"
     },
     {
         orderId: "O003",
@@ -22,7 +20,6 @@
         productName: "Product C",
         quantity: 3,
         total: 450,
-        status: "unclaimed"
     },
     {
         orderId: "O004",
@@ -30,7 +27,6 @@
         productName: "Product D",
         quantity: 1,
         total: 300,
-        status: "claimed"
     },
     {
         orderId: "O005",
@@ -38,104 +34,78 @@
         productName: "Product E",
         quantity: 4,
         total: 400,
-        status: "claimed"
     }
 ];
 
-// func to populate the orders table
-function populateOrders() {
-    const tableBody = document.getElementById("orderTableBody");
-    tableBody.innerHTML = ""; // Clear existing rows
+const unclaimedOrdersTable = document.getElementById("unclaimedOrders");
+const claimedOrdersTable = document.getElementById("claimedOrders");
 
+// populate unclaimed orders
+function populateUnclaimedOrders() {
+    unclaimedOrdersTable.innerHTML = "";
     orders.forEach(order => {
         const row = document.createElement("tr");
 
-        // Order ID
-        const orderIdCell = document.createElement("td");
-        orderIdCell.textContent = order.orderId;
-        row.appendChild(orderIdCell);
+        row.innerHTML = `
+            <td>${order.orderId}</td>
+            <td>${order.customerName}</td>
+            <td>${order.productName}</td>
+            <td>${order.quantity}</td>
+            <td>₱${order.total}</td>
+            <td><button onclick="claimOrder('${order.orderId}')">Claimed</button></td>
+            `;
 
-        // Customer Name
-        const customerNameCell = document.createElement("td");
-        customerNameCell.textContent = order.customerName;
-        row.appendChild(customerNameCell);
-
-        // Product Name
-        const productCell = document.createElement("td");
-        productCell.textContent = order.productName;
-        row.appendChild(productCell);
-
-        // Quantity
-        const quantityCell = document.createElement("td");
-        quantityCell.textContent = order.quantity;
-        row.appendChild(quantityCell);
-
-        // Total
-        const totalCell = document.createElement("td");
-        totalCell.textContent = `₱${order.total}`;
-        row.appendChild(totalCell);
-
-        // Status
-        const statusCell = document.createElement("td");
-        const statusSpan = document.createElement("span");
-        statusSpan.textContent = order.status;
-        statusSpan.classList.add("status", order.status);
-        statusCell.appendChild(statusSpan);
-        row.appendChild(statusCell);
-
-        tableBody.appendChild(row);
+        unclaimedOrdersTable.appendChild(row);
     });
 }
- /*
- 
- */
- function getCompletedOrders(boothID,) {
-    fetch(`https://<your-domain>/complete/:${boothID}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json', 
-        },
-        body: JSON.stringify({ status: 'cancelled' }),
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("retrived completed orders successfully:", data);
-    })
-    .catch(error => {
-        console.error("Error retrivieng completed orders:", error);
+
+// populate claimed orders
+function populateClaimedOrders(claimedOrders) {
+    claimedOrdersTable.innerHTML = "";
+    claimedOrders.forEach(order => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${order.orderId}</td>
+            <td>${order.customerName}</td>
+            <td>${order.productName}</td>
+            <td>${order.quantity}</td>
+            <td>₱${order.total}</td>
+            <td><button onclick="removeClaimedOrder('${order.orderId}')">Remove</button></td>
+        `;
+
+        claimedOrdersTable.appendChild(row);
     });
 }
-/*
- 
- */
-function approveOrder(orderId,payementDate) {
-    const data = {
-        datePaid:payementDate 
+
+// move unclaimed to claimed orders
+function claimOrder(orderId) {
+    const confirmation = confirm("Are you sure this order was claimed?");
+    if (!confirmation) return;
+
+    const orderIndex = orders.findIndex(order => order.orderId === orderId);
+    if (orderIndex !== -1) {
+        const claimedOrder = orders.splice(orderIndex, 1)[0];
+        claimedOrders.push(claimedOrder);
+        updateTables();
     }
-    fetch(`https://<your-domain>/approve/:${orderId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json', 
-        },
-        body: JSON.stringify(data),
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("retrived pending orders successfully:", data);
-    })
-    .catch(error => {
-        console.error("Error retrivieng pending orders:", error);
-    });
 }
-// populate orders on load
-populateOrders();
+
+// remove claimed order
+const claimedOrders = [];
+function removeClaimedOrder(orderId) {
+    const orderIndex = claimedOrders.findIndex(order => order.orderId === orderId);
+    if (orderIndex !== -1) {
+        claimedOrders.splice(orderIndex, 1);
+        updateTables();
+    }
+}
+
+// update both tables
+function updateTables() {
+    populateUnclaimedOrders();
+    populateClaimedOrders(claimedOrders);
+}
+
+// initialize tables
+updateTables();
