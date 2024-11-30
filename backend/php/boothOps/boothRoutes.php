@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 //require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8080/connectDb.php');
 
-require_once('/usr/share/nginx/html/connectDb.php');
+require_once('/php/connectDb.php');
 
 
 //require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
