@@ -1,12 +1,35 @@
-let box = document.querySelector(".product-list"); // where the child will be appended
+// let box = document.querySelector(".product-list"); // where the child will be appended
 
-function displayBooths(){
-    box.innerHTML = "";
-        let valueDiv = document.createElement('div'); 
-        valueDiv.classList.add('item');
-        // creating the information of the product
+// function displayBooths(){
+//     box.innerHTML = "";
+//     let valueDiv = document.createElement('div'); 
+//     valueDiv.classList.add('item');
+//     // creating the information of the product
+//     valueDiv.innerHTML = `
+//         <a href="client-specific-product.html" class="box">
+//             <div class="image">
+                               
+//             </div>
+//             <div class="product">
+//                 <p id="title">Yves Product</p>
+//             </div>
+//             <div class="product">
+//                 <p id="price">316 Pesos</p>
+//             </div>     
+//         </a>`;
+//     box.appendChild(valueDiv); // appending the child to "box"
+// }
+
+// displayBooths();
+
+function displayBooths() {
+    const box = document.querySelector(".product-list");
+    box.innerHTML = ""; // Clear existing items
+    for (let i = 0; i < 6; i++) { // Example: Add 6 booths
+        const valueDiv = document.createElement("div");
+        valueDiv.classList.add("box");
         valueDiv.innerHTML = `
-        <div class="box">
+        <a href="client-specific-product.html" class="box">
             <div class="image">
                                
             </div>
@@ -15,20 +38,35 @@ function displayBooths(){
             </div>
             <div class="product">
                 <p id="price">316 Pesos</p>
-            </div>     
-        </div>
-        <div class="box">
-            <div class="image">
-                               
-            </div>
-            <div class="product">
-                <p id="title">Yves Product</p>
-            </div>
-            <div class="product">
-                <p id="price">316 Pesos</p>
-            </div>     
-        </div>`;
-        box.appendChild(valueDiv); // appending the child to "box"
+            </div>   
+        </a>       `;
+        box.appendChild(valueDiv); // Append to the container
+    }
 }
 
 displayBooths();
+
+function openProfile() {
+    const profile = document.getElementById("profile");
+    profile.classList.add("open-profile");
+}
+
+// Close profile form popup
+function closeProfile() {
+    const profile = document.getElementById("profile");
+    profile.classList.remove("open-profile");
+}
+
+// Optionally, handle form submission
+document.getElementById("profile-form").addEventListener("submit", function(e) {
+    e.preventDefault(); // Prevent page reload on form submit
+    const name = document.getElementById("profile-name").value;
+    const email = document.getElementById("profile-email").value;
+    const password = document.getElementById("profile-password").value;
+
+    // Send the updated data to the server or process accordingly
+    console.log("Updated Profile:", name, email, password);
+    // You can implement an API call to save the changes here
+
+    closeProfile(); // Close the profile popup after submission
+});
