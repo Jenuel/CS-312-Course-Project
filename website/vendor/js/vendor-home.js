@@ -24,24 +24,34 @@ function editBoothFinished() {
   edit.classList.remove("open-editBooth");
 }
 
-//for changing image of booth
-let boothImage = document.getElementById("image");
-let inputFile = document.getElementById("input-file");
-
-inputFile.onchange = function () {
-  boothImage.src = URL.createObjectURL(inputFile.files[0]);
-};
-
 //for creating and appending values of a booth
-let box = document.querySelector(".box"); // where the child will be appended
+
+function checkLogin() {
+    fetch("http://localhost/CS-312-Course-Project/backend/php/userOps/checkSession.php", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.loggedIn || data.role !== 'vendor') {
+            window.location.href = '../html/login.html';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        window.location.href = '../html/login.html';
+    });
+}
 
 function closeCreateBooth() {
   create.classList.remove("open-createBooth");
 }
 
 let formData = {
-  filter: document.getElementById("filter").value,
-  order: document.getElementById("order"),
+  filter: document.getElementById("filter")?.value || '',
+  order: document.getElementById("order") || null,
 };
 
 // fetches the data and calls the displaying function
@@ -98,57 +108,74 @@ function getData() {
 }
 
 // function in appending values to the booth
-function displayBooths(data) {
-  box.innerHTML = "";
-  data.forEach((value) => {
-    // loops through the array of objects
-    let valueDiv = document.createElement("div"); // creates new div
+async function displayBooths(data) {
 
-    valueDiv.classList.add("item"); // new class called item
-    // creating the information of the booth
+    const box = document.querySelector(".box"); // where the child will be appended
 
-    value.innerHTML = `<div class="card" style="width: 18rem;">
-  <img class="card-img-top" src="..." alt="Card image cap">
-  <div class="card-body">
-    <h5 class="card-title">value.Title</h5>
-    <p class="card-text">value.Description</p>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">Cras justo odio</li>
-    <li class="list-group-item">Dapibus ac facilisis in</li>
-    <li class="list-group-item">Vestibulum at eros</li>
-  </ul>
-  <div class="card-body">
-    <a href="#" class="card-link">Card link</a>
-    <a href="#" class="card-link">Another link</a>
-  </div>
-</div>`;
+    box.innerHTML = "";
+    data.forEach((value) => {
+        let valueDiv = document.createElement("div");
+        valueDiv.classList.add("item");
 
-    // valueDiv.innerHTML = `
-    //     <div class="booth-header">
-    //         <h2>${value.Title}</h2>
-    //     </div>
-    //     <div class="booth-description">
-    //         <p>${value.Description}</p>
-    //     </div>
-    //     <div class="buttons">
-    //         <button type="button" id="edit-button" onclick="editBooth()">EDIT</button>
-    //         <button type="button" id="delete-button">DELETE</button>
-    //     </div>`;
-    box.appendChild(valueDiv); // appending the child to "box"
-  });
+        
+        
+        const imageSrc = value.BoothIcon ? 
+        `data:image/png;base64,${value.BoothIcon}` : 
+        '../res/1564534_customer_man_user_account_profile_icon.png';
+        
+        valueDiv.innerHTML = `
+        <div class="card" style="width: 18rem;">
+            <img class="card-img-top" src="${imageSrc}" alt="Booth image" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+                <h5 class="card-title">${value.Title}</h5>
+                <p class="card-text">${value.Description}</p>
+                <p class="card-text">
+                    <small class="text-muted">
+                        Location: ${value.Location}<br>
+                        Schedule: ${value.Schedules}
+                    </small>
+                </p>
+            </div>
+            <div class="card-footer">
+                <button class="btn btn-primary btn-sm" onclick="editBooth()">Edit</button>
+                <button class="btn btn-danger btn-sm">Delete</button>
+            </div>
+        </div>`;
+
+        box.appendChild(valueDiv);
+    });
 }
 
 var responseClone; // 1
 
-function createBoothFunction() {
-  //integrate it to create function button
+function getBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+async function createBoothFunction() {
+
+  const imageFile = document.getElementById('input-file').files[0];
+  let imageData = null;
+
+  if (imageFile) {
+    try {
+        const base64Data = await getBase64(imageFile);
+        imageData = base64Data.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+    } catch (error) {
+        console.error('Error reading file:', error);
+    }
+}
   const formData = {
     title: document.getElementById("name").value,
     description: document.getElementById("description").value,
     schedules: document.getElementById("schedule").value,
     location: document.getElementById("location").value,
-    boothIcon: null, //document.getElementById('').value, FOR NOW
+    boothIcon: imageData,
     status: null, //document.getElementById('').value, FOR NOW
   };
 
@@ -207,12 +234,14 @@ function createBoothFunction() {
     });
 }
 
+
+function loadPage(page) {
 // for changing pages in navigation
 const pageFrame = document.getElementById("page-frame");
 const boothContent = document.getElementById("booth-content");
 const pageHeader = document.querySelector("header h1");
 
-function loadPage(page) {
+
   switch (page) {
     case "home":
       boothContent.classList.add("active");
@@ -245,7 +274,18 @@ function loadPage(page) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
+//for changing image of booth
+let boothImage = document.getElementById("image");
+let inputFile = document.getElementById("input-file");
+
+inputFile.onchange = function () {
+  boothImage.src = URL.createObjectURL(inputFile.files[0]);
+};
+
+
+
   loadPage("home");
+  getData();
 });
 
-getData();
