@@ -33,6 +33,8 @@ WORKDIR /var/www/html
 # Copy PHP backend files
 COPY backend/php/ .
 
+RUN echo "session.save_path=\"/tmp\""
+
 # Configure Apache
 RUN a2enmod rewrite
 

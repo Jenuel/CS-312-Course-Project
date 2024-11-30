@@ -1,5 +1,5 @@
 <?php
- session_start();
+if(!isset($_SESSION)) session_start();
 // Allow requests from any origin (use a specific origin instead of * in production)
 header("Access-Control-Allow-Origin: *");
 

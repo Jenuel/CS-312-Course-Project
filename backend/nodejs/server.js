@@ -3,6 +3,7 @@ import mysql from 'mysql2'
 import dotenv from 'dotenv';
 import productRoutes from './routes/productRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
+import cors from 'cors'
 
 dotenv.config();
 const app = express()
@@ -17,10 +18,14 @@ app.use(async (request, response, next) => {
     try {
         const connection = await pool.promise().getConnection(); 
         request.db = connection; 
+        console.log("Connected")
         response.on('finish', () => {
-            if (request.db) request.db.release(); 
+            if (request.db) {
+                request.db.release(); 
+                console.log("exit")
+            } 
         });
-        next();
+        next(); 
     } catch (error) {
         console.error('Error getting database connection:', error);
         response.status(500).send('Internal Server Error');
@@ -29,11 +34,11 @@ app.use(async (request, response, next) => {
 
 //middlewares
 app.use(express.json())
-
+app.use(cors())
 //routes
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 
 app.listen(process.env.PORT, () => {
-    console.log("Listening on port", process.env.PORT || 3000)
+    console.log("Listening on port, testying", process.env.PORT || 3000)
 })

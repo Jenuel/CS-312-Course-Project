@@ -27,6 +27,7 @@ services:
       - "8080:80"
     volumes:
       - ./backend/php:/usr/share/nginx/html/
+      - ./sessions:/var/lib/php/sessions/
     networks:
       - app-network
     depends_on:
