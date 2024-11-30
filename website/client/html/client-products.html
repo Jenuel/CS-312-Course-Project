@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel='stylesheet' type='text/css' href="http://localhost:80/client/css/client-products.css">
+    <link rel='stylesheet' type='text/css' href="../css/client-products.css">
 </head>
 <body>
     <section class="navbar">
-        <button type="button" class="navbar-button home-button"><img src="http://localhost/client/res/home.png"></button>
-        <button type="button" class="navbar-button profile-button"><img src="http://localhost/client/res/profile.png"></button>
-        <button type="button" class="navbar-button purchase-button"><img src="http://localhost/client/res/purchase.png"></button>
-        <button type="button" class="navbar-button logout-button" onclick="logout()"><img src="http://localhost/client/res/logout.png"></button>
+        <button type="button" class="navbar-button home-button"><img src="..\res\home.png"></button>
+        <button type="button" class="navbar-button profile-button"><img src="..\res\profile.png"></button>
+        <button type="button" class="navbar-button purchase-button"><img src="..\res\purchase.png"></button>
+        <button type="button" class="navbar-button logout-button" onclick="logout()"><img src="..\res\logout.png"></button>
     </section>
 
         <!--WHERE THE PRODUCTS WILL BE APPENDED -->
     <section class="product-container"> 
         <div class="filters-container">
-            <button type="button" class="filter-button back-button"><img src="http://localhost/client/res/back.png"></button>
-            <button type="button" class="filter-button cart-button" onclick="toggleCart()"><img src="http://localhost/client/res/cart_icon.png"></button>
+            <button type="button" class="filter-button back-button"><img src="..\res\back.png"></button>
+            <button type="button" class="filter-button cart-button" onclick="toggleCart()"><img src="..\res\cart_icon.png"></button>
             <input type="text" id="search-bar" placeholder="Search booths..." onkeyup="searchBooths()">
             <button class="filter-button">All</button>
             <button class="filter-button">Products</button>
