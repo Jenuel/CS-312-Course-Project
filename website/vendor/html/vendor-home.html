@@ -55,8 +55,7 @@
             <li class="nav-item active">
                 <a class="nav-link" href="#" data-page="sales" onclick="loadPage('sales')">Sales</a>
             </li>
-            
-   
+        
           </ul>
    
         </div>
@@ -67,22 +66,14 @@
       <div id="booth-content" class="page-content active">
         <section class="booth-container">
           <div class="filters-container">
-            <!-- <div id="filtering">
-                        <select name="filter" id="filter" onchange="getData()">
-                            <option value="" disabled selected>Filter By Status</option>
-                            <option value="all">All</option>
-                            <option value="open">Active</option>
-                            <option value="closed">Inactive</option>
-                        </select> 
-                    </div>
-                    <div id="sorting">
-                        <select name="sort" id="sort" onchange="getData()">
-                            <option value="" disabled selected>Sort By</option>
-                            <option value="name">Random</option>
-                            <option value="name">A-Z</option>
-                            <option value="schedule">Z-A</option>
-                        </select> 
-                    </div> -->
+        <div class="mb-3">
+            <button type="button" class="btn d-flex align-items-center gap-2 btn-dark" onclick="createBooth()">
+                <i class='bx bx-plus-circle'></i>
+                <p class="mb-0">Create New Booth</p>
+            </button>
+        </div>
+            
+
             <div class="mb-3">
               <div class="dropdown">
                 <button

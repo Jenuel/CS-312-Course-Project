@@ -44,13 +44,13 @@ body {
     background-color: #d2e3f6;
     padding: 1vw;
 }
-
+/* 
 .product-detail-container {
     background-color: transparent;
     padding: 2vh 0;
     margin: 0.3vw;
     border-bottom: 1px solid rgba(0,0,0,0.1);
-}
+} */
 
 .table-body {
     background-color: #8b77771f;
@@ -79,9 +79,7 @@ body {
     cursor: pointer;
 }
 
-.modal-overlay {
-    background-color: rgba(0, 0, 0, 0.5);
-}
+
 
 .add-container {
     background-color: white;

@@ -204,7 +204,7 @@ searchBox.addEventListener('input', (e) => {
 //  showProductDetail 
 function showProductDetail(dataForm) {
     const productDetailContainer = document.createElement("div");
-    productDetailContainer.className = "product-detail-container";
+    productDetailContainer.className = "product-detail-container mb-4";
 
     let badgeClass = 'bg-warning'; // Default for Pending
     if (dataForm.ProductStatus === 'Live') {
