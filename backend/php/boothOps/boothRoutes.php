@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);  // End the request early
 }
 
-require_once('/usr/share/nginx/html/connectDb.php');
+require_once('/php/connectDb.php');
 
 //require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'http://localhost:8080/connectDb.php');
 
