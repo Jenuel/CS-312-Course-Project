@@ -1,29 +1,38 @@
-let create = document.getElementById("create");
-let edit = document.getElementById("edit");
+let modal, create, edit, boothImage, inputFile;
 
-//opens popup in creating a booth
+
 function createBooth() {
-  create.classList.add("open-createBooth");
-  edit.classList.remove("open-editBooth"); // Ensure edit is hidden
+    modal.classList.add("show");
+    create.classList.add("open-createBooth");
+    edit.classList.remove("open-editBooth");
+    document.body.classList.add('modal-open');
 }
 
-//closes popup in creating a booth
-function createBoothFinished() {
-  createBoothFunction();
-  create.classList.remove("open-createBooth");
+function closeCreateBooth() {
+    modal.classList.remove("show");
+    create.classList.remove("open-createBooth");
+    
 }
 
-//opens popup in editing a booth
 function editBooth() {
-  edit.classList.add("open-editBooth"); // Show edit section
-  create.classList.remove("open-createBooth"); // Ensure create is hidden
+    modal.classList.add("show");
+    edit.classList.add("open-editBooth");
+    create.classList.remove("open-createBooth");
+    document.body.classList.add('modal-open');
 }
 
-//closes popup in editing a booth
 function editBoothFinished() {
-  edit.classList.remove("open-editBooth");
+    modal.classList.remove("show");
+    edit.classList.remove("open-editBooth");
+    document.body.classList.remove('modal-open');
 }
 
+function createBoothFinished() {
+    createBoothFunction();
+    modal.classList.remove("show");
+    create.classList.remove("open-createBooth");
+    document.body.classList.remove('modal-open');
+}
 //for creating and appending values of a booth
 
 function checkLogin() {
@@ -45,9 +54,6 @@ function checkLogin() {
     });
 }
 
-function closeCreateBooth() {
-  create.classList.remove("open-createBooth");
-}
 
 let formData = {
   filter: document.getElementById("filter")?.value || '',
@@ -158,7 +164,6 @@ function getBase64(file) {
 }
 
 async function createBoothFunction() {
-
   const imageFile = document.getElementById('input-file').files[0];
   let imageData = null;
 
@@ -178,8 +183,6 @@ async function createBoothFunction() {
     boothIcon: imageData,
     status: null, //document.getElementById('').value, FOR NOW
   };
-
-  var responseClone; // 1
 
   fetch(
     "http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php",
@@ -246,7 +249,6 @@ const pageHeader = document.querySelector("header h1");
     case "home":
       boothContent.classList.add("active");
       pageFrame.style.display = "none";
-      // pageHeader.textContent = 'YOUR BOOTHS';
       getData(); // Refresh
       break;
 
@@ -254,38 +256,43 @@ const pageHeader = document.querySelector("header h1");
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";
       pageFrame.src = "../html/vendor-product.html";
-      // pageHeader.textContent = 'YOUR PRODUCTS';
       break;
 
     case "orders":
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";
       pageFrame.src = "../htmlvendor-orders.html"; // wala pa
-      // pageHeader.textContent = 'YOUR ORDERS';
       break;
 
     case "sales":
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";
       pageFrame.src = "../html/vendor-sales.html"; // wala pa
-      // pageHeader.textContent = 'YOUR SALES';
       break;
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    modal = document.querySelector(".modal-backdrop");
+    create = document.getElementById("create");
+    edit = document.getElementById("edit");
+    boothImage = document.getElementById("image");
+    inputFile = document.getElementById("input-file");
 
-//for changing image of booth
-let boothImage = document.getElementById("image");
-let inputFile = document.getElementById("input-file");
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.classList.remove('show');
+            create.classList.remove('open-createBooth');
+            edit.classList.remove('open-editBooth');
+        }
+    });
 
-inputFile.onchange = function () {
-  boothImage.src = URL.createObjectURL(inputFile.files[0]);
-};
+    inputFile.onchange = function () {
+    boothImage.src = URL.createObjectURL(inputFile.files[0]);
+    };
 
 
-
-  loadPage("home");
-  getData();
+    loadPage("home");
+    getData();
 });
 

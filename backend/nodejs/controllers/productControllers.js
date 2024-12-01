@@ -20,6 +20,26 @@ const getProducts = async (request, response) => {//GOOD
     }
 };
 
+const getVendorProducts = async (request, response) => {
+    const db = request.db;
+    const vendorId = request.session.vendorId;
+
+    try {
+        const [rows] = await db.query(`
+            SELECT DISTINCT p.ProductID, p.name, p.status, p.Image, p.Price, p.StocksRemaining 
+            FROM product p
+            INNER JOIN booth b ON p.BoothID = b.BoothID
+            INNER JOIN booth_members bm ON b.BoothID = bm.BoothID
+            WHERE bm.VendorID = ?
+        `, [vendorId]);
+
+        response.json(rows);
+    } catch (error) {
+        console.error('Error fetching vendor products:', error);
+        response.status(500).send('Failed to fetch products');
+    }
+};
+
 /*
  * Gets the detailed version of the product 
 
@@ -200,4 +220,4 @@ const changeStatusProduct = async (request, response) => {//GOOD KINDA
     } 
 };
 
-export { getProducts, getProductDetails, buyProduct, createProduct, editProduct, changeStatusProduct };
+export { getProducts, getProductDetails, buyProduct, createProduct, editProduct, changeStatusProduct, getVendorProducts };

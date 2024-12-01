@@ -1,7 +1,171 @@
+const API_BASE_URL = 'http://localhost:3000';
+
 const productTotal = document.getElementById("product-total");
 const tableBody = document.querySelector(".table-body");
 const addProductBtn = document.querySelector(".indicator-right-panel button");
 const searchBox = document.querySelector(".searchbox");
+
+async function fetchAPI(endpoint, options = {}) {
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+async function loadVendorProducts() {
+  try {
+    const products = await fetchAPI('/products/vendor');
+    products.forEach(product => {
+      const formattedProduct = {
+        ProductName: product.name,
+        ProductStatus: product.status,
+        ProductPrice: product.Price,
+        ProductStock: product.StocksRemaining,
+        ProductSales: '0', 
+        ProductImage: product.Image,
+        ProductDescription: '' 
+      };
+      showProductDetail(formattedProduct);
+    });
+    updateProductTotal(products.length);
+  } catch (error) {
+    console.error('Failed to load products:', error);
+    // Show error message to user
+    alert('Failed to load products. Please try again later.');
+  }
+}
+
+async function createProduct(formData) {
+  try {
+    // Convert frontend data format to backend format
+    const backendData = {
+      name: formData.ProductName,
+      status: formData.ProductStatus.toLowerCase(),
+      price: parseFloat(formData.ProductPrice),
+      stocks: parseInt(formData.ProductStock),
+      image: formData.ProductImage,
+      boothID: getCurrentBoothId() 
+    };
+
+    const response = await fetchAPI('/products', {
+      method: 'POST',
+      body: JSON.stringify(backendData)
+    });
+
+    // Update UI with the new product
+    formData.ProductStatus = getProductStatus(formData);
+    products.push(formData);
+    showProductDetail(formData);
+    updateProductTotal();
+    filterProducts(getCurrentFilter());
+
+    return response;
+  } catch (error) {
+    console.error('Failed to create product:', error);
+    throw error;
+  }
+}
+
+
+async function updateProduct(updatedData, productContainer) {
+  try {
+    const productId = productContainer.dataset.productId; 
+    
+    const backendData = {
+      product: {
+        name: updatedData.ProductName,
+        price: parseFloat(updatedData.ProductPrice),
+        status: updatedData.ProductStatus.toLowerCase(),
+        stocks: parseInt(updatedData.ProductStock),
+        image: updatedData.ProductImage
+      }
+    };
+
+    await fetchAPI(`/products/${productId}`, {
+      method: 'PUT',
+      body: JSON.stringify(backendData)
+    });
+
+    const row = productContainer.querySelector('.row');
+    const cols = row.children;
+    
+    cols[0].innerHTML = `
+      <div>${updatedData.ProductName}</div>
+      <small class="text-muted">${updatedData.ProductDescription || ''}</small>
+    `;
+    
+    cols[1].innerHTML = `
+      <span class="badge ${updatedData.ProductStatus === 'Live' ? 'bg-success' : 'bg-warning'}">
+        ${updatedData.ProductStatus}
+      </span>
+    `;
+    
+    cols[2].textContent = updatedData.ProductPrice;
+    cols[3].textContent = updatedData.ProductStock;
+    cols[4].textContent = updatedData.ProductSales;
+    
+    if (updatedData.ProductImage) {
+      cols[5].innerHTML = `
+        <img src="${updatedData.ProductImage}" 
+             alt="Product" 
+             class="product-thumbnail rounded" 
+             style="cursor: pointer;">
+      `;
+      const thumbnail = cols[5].querySelector('.product-thumbnail');
+      thumbnail.addEventListener('click', () => showImageModal(updatedData.ProductImage));
+    } else {
+      cols[5].textContent = 'No Image';
+    }
+  } catch (error) {
+    console.error('Failed to update product:', error);
+    throw error;
+  }
+}
+
+
+async function getCurrentBoothId() {
+  try {
+    const response = await fetchAPI('/booth/current');
+    return response.boothId;
+  } catch (error) {
+    console.error('Failed to get current booth ID:', error);
+    throw error;
+  }
+}
+
+
+function setupEventListeners() {
+  // Search functionality
+  const searchBox = document.querySelector('.searchbox');
+  searchBox.addEventListener('input', (e) => {
+    searchProducts(e.target.value);
+  });
+
+
+  const navLinks = document.querySelectorAll('.nav-links .nav-link');
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      filterProducts(link.textContent);
+    });
+  });
+}
 
 function showAddProductForm(existingData, productContainer) {
   const modalHtml = `
@@ -204,7 +368,8 @@ searchBox.addEventListener('input', (e) => {
 //  showProductDetail 
 function showProductDetail(dataForm) {
     const productDetailContainer = document.createElement("div");
-    productDetailContainer.className = "product-detail-container mb-4";
+    productDetailContainer.className = "product-detail-container mb-4" ;
+    productDetailContainer.id = "${product.ProductID}";
 
     let badgeClass = 'bg-warning'; // Default for Pending
     if (dataForm.ProductStatus === 'Live') {
@@ -419,3 +584,9 @@ function createProduct(data) {
   filterProducts(getCurrentFilter());
 }
 
+
+
+document.addEventListener('DOMContentLoaded', ()=> {
+  loadVendorProducts();
+
+});
