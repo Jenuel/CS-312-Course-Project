@@ -30,13 +30,14 @@ function displayBooths(){
         box.appendChild(valueDiv); // appending the child to "box"
 }
 
+/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+
 /*
 format of line in data[] :
 "<productID> , <quantity> , <totalPricePerProduct>",
 "<productID> , <quantity> , <totalPricePerProduct>"
 */
 
-//PLEASE FIX THIS
 function createOrder (boothID, Data, totalPriceInput, dateInput){ 
    /*
      const products = dataArray.map(Data => {// NOT SURE HERE
@@ -73,12 +74,7 @@ function createOrder (boothID, Data, totalPriceInput, dateInput){
         date:dateInput 
     }
     
-    
-   
-   
-  
-   
-    fetch(`https://<sample/com>/details/${boothID}`,{// change this one
+    fetch(`http://localhost:3000/details/${boothID}`,{// change this one
         method: 'POST', // PATCH is appropriate for partial updates like changing an order's status
         headers: {
             'Content-Type': 'application/json', // Ensure headers are set
@@ -94,6 +90,7 @@ function createOrder (boothID, Data, totalPriceInput, dateInput){
      })
      .then(data => {
          console.log("Products fetched successfully:", data);
+         // add handling of data
      })
      .catch(error => {
          console.error("Error fetching products:", error);
@@ -101,11 +98,9 @@ function createOrder (boothID, Data, totalPriceInput, dateInput){
  }
 
 
- /*
-
-*/
+ 
 function cancelOrder(orderId) {
-    fetch(`https://<your-domain>/cancel/${orderId}`, { // Use a meaningful endpoint
+    fetch(`http://localhost:3000/cancel/${orderId}`, { // Use a meaningful endpoint
         method: 'PATCH', // PATCH is appropriate for partial updates like changing an order's status
         headers: {
             'Content-Type': 'application/json', // Ensure headers are set
@@ -120,6 +115,7 @@ function cancelOrder(orderId) {
     })
     .then(data => {
         console.log("Order cancelled successfully:", data);
+        // add handling of data
     })
     .catch(error => {
         console.error("Error cancelling order:", error);

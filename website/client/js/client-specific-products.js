@@ -113,12 +113,14 @@ function toggleCart() {
     cartContainer.classList.toggle('active'); // Toggle the active class
 }
 
+/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+
 /*
 use get details of a specific Product method in productController.js
 */
 function getSpecificProduct(productId){
   
-   fetch(`https://<sample/com>/details/:${productId}`,{// change this one
+   fetch(`http://localhost:3000/details/:${productId}`,{// change this one
     method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 
@@ -134,6 +136,7 @@ function getSpecificProduct(productId){
     })
     .then(data => {
         console.log("Products fetched successfully:", data);
+        // add handling of data
     })
     .catch(error => {
         console.error("Error fetching products:", error);

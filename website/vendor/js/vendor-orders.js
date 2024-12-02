@@ -107,5 +107,85 @@ function updateTables() {
     populateClaimedOrders(claimedOrders);
 }
 
+/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+
+function getCompletedOrder(boothID){
+  
+    fetch(`http://localhost:3000/complete/:${boothID}`,{// change this one
+     method: 'GET', 
+     headers: {
+         'Content-Type': 'application/json', 
+     },
+     body: JSON.stringify({ status: 'cancelled' }), 
+ 
+    })
+    .then(response => {
+     if (!response.ok) {
+         throw new Error(`HTTP error! status: ${response.status}`);
+     }
+     return response.json();
+     })
+     .then(data => {
+         console.log("Products fetched successfully:", data);
+         // add handling of data
+     })
+     .catch(error => {
+         console.error("Error fetching products:", error);
+     });
+ }
+
+ function getPendingOrder(){
+  
+    fetch(`http://localhost:3000/pending`,{// change this one
+     method: 'GET', 
+     headers: {
+         'Content-Type': 'application/json', 
+     },
+     body: JSON.stringify({ status: 'cancelled' }), 
+ 
+    })
+    .then(response => {
+     if (!response.ok) {
+         throw new Error(`HTTP error! status: ${response.status}`);
+     }
+     return response.json();
+     })
+     .then(data => {
+         console.log("Products fetched successfully:", data);
+         // add handling of data
+     })
+     .catch(error => {
+         console.error("Error fetching products:", error);
+     });
+ }
+
+ function approveOrder(orderId, dateInput){
+    const data = {
+        datePaid:dateInput 
+    }
+    data
+    fetch(`http://localhost:3000/approve/:${orderId}`,{// change this one
+     method: 'GET', 
+     headers: {
+         'Content-Type': 'application/json', 
+     },
+     body: JSON.stringify(data), 
+ 
+    })
+    .then(response => {
+     if (!response.ok) {
+         throw new Error(`HTTP error! status: ${response.status}`);
+     }
+     return response.json();
+     })
+     .then(data => {
+         console.log("Products fetched successfully:", data);
+         // add handling of data
+     })
+     .catch(error => {
+         console.error("Error fetching products:", error);
+     });
+ }
+
 // Initialize tables
 updateTables();

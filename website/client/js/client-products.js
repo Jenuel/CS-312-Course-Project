@@ -25,8 +25,10 @@ function displayProducts(products) {
     });
 }
 
+/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+
 function fetchProducts(boothId) {
-    fetch(`https://<your-domain>/products/${boothId}`, { 
+    fetch(`http://localhost:3000/:${boothId}`, { 
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -52,7 +54,7 @@ function buyProduct(productID, value) {
         numberOfProductSold: value,
     };
 
-    fetch(`https://<your-domain>/buy/${productID}`, { 
+    fetch(`http://localhost:3000/buy/${productID}`, { 
         method: 'PATCH',
         headers: {
             "Content-type": 'application/json',
@@ -67,6 +69,7 @@ function buyProduct(productID, value) {
     })
     .then(data => {
         console.log("Product purchased successfully:", data);
+        // add handling of data
     })
     .catch(error => {
         console.error("Error purchasing product:", error);

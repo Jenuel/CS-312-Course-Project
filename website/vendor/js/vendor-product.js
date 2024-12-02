@@ -461,6 +461,8 @@ function createProduct(data) {
   filterProducts(getCurrentFilter());
 }
 
+/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+
 function createProductToNode( boothIdInput,stocksInput,priceInput,nameInput,statusInput,imageInput){
   const data = {
     boothID: boothIdInput,
@@ -470,7 +472,7 @@ function createProductToNode( boothIdInput,stocksInput,priceInput,nameInput,stat
     status:statusInput,
     image:imageInput
   }
-  fetch(`https://<your-domain>/create`, {
+  fetch(`http://localhost:3000/create`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json', 
@@ -485,12 +487,14 @@ function createProductToNode( boothIdInput,stocksInput,priceInput,nameInput,stat
   })
   .then(data => {
       console.log("retrived pending orders successfully:", data);
+         // add handling of data
   })
   .catch(error => {
       console.error("Error retrivieng pending orders:", error);
   });
 
 }
+
 /*
 details [] should contain
 "<title>:<value>",
@@ -503,9 +507,9 @@ function editProduct(details,productID){
     // to do
   }
   const data = {
-    datePaid:dataDetails
+    product:dataDetails
   }
-  fetch(`https://<your-domain>/edit/:${productID}`, {
+  fetch(`http://localhost:3000/edit/:${productID}`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json', 
@@ -520,6 +524,7 @@ function editProduct(details,productID){
   })
   .then(data => {
       console.log("retrived pending orders successfully:", data);
+         // add handling of data
   })
   .catch(error => {
       console.error("Error retrivieng pending orders:", error);
@@ -531,7 +536,7 @@ function changeStatusProduct(statusInput,productID){
   const data = {
     status : statusInput
   }
-  fetch(`https://<your-domain>/edit/:${productID}`, {
+  fetch(`http://localhost:3000/edit/:${productID}`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json', 
@@ -546,6 +551,8 @@ function changeStatusProduct(statusInput,productID){
   })
   .then(data => {
       console.log("retrived pending orders successfully:", data);
+         // add handling of data
+
   })
   .catch(error => {
       console.error("Error retrivieng pending orders:", error);
