@@ -1,5 +1,8 @@
 // Implementation of the logic
-
+/**
+ * FRONT END HANDLING FOR IMAGE 
+ * <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA" alt="Product Image">
+ */
 /*
  * Gets the product for a certain booth
 
@@ -38,6 +41,24 @@ const getProductDetails = async (request, response) => {//GOOD
         console.error('Error fetching product details:', error);
         response.status(500).send('Failed to fetch product details');
     }
+    /*SAMPLE OUTPUT
+    [
+    {
+        "name": "Handmade Bracelet",
+        "Stocks": 50,
+        "Price": 29.99,
+        "status": "active",
+        "Image": "iVBORw0KGgoAAAANSUhEUgAAAAUA" // Base64 encoded string of the binary BLOB
+    },
+    {
+        "name": "Silver Necklace",
+        "Stocks": 30,
+        "Price": 49.99,
+        "status": "active",
+        "Image": "iVBORw0KGgoAAAANSUhEUgAAAAUA" // Base64 encoded string of another binary BLOB
+    }
+]
+    */
 };
 
 /*
@@ -93,12 +114,12 @@ const buyProduct = async (request, response) => {//PLEASE DOUBLE CHECK LOGIC
 
 INPUT:
 {
-"boothID": 
-"stocks":
-"price":
-"name":
-"status":
-"image":
+    "boothID": 123,
+    "stocks": 50,
+    "price": 29.99,
+    "name": "Handmade Bracelet",
+    "status": "active",
+    "image": "0x89504E470D0A1A0A0000000D49484452" // Hexadecimal image data
 } 
 
  */
