@@ -92,11 +92,11 @@ const createOrder = async (request, response) => {
 /*
 CLIENT CONTROLLER
 
-This function is for cancelling the order and returning the stocks
+This function is for cancelling the order and returning the stocks ADD RETURN STOCKS
 
 HTTP PUT /<orderRoutes>/<orderId>
 */ 
-const cancelOrder = async (request, response) => {
+const cancelOrder = async (request, response) => {// NOT FINISHED // add quaery for returning stocks
     const db = request.db;
     const { orderId } = request.params;
 
@@ -139,5 +139,6 @@ const approveOrder = async (request, response) => {
         response.status(500).send('Failed to approve order');
     }
 };
+
 
 export { getPendingOrders, getCompletedOrders, createOrder, cancelOrder, approveOrder};

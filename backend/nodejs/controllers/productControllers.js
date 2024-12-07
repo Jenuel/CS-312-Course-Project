@@ -7,10 +7,12 @@
  * Gets the product for a certain booth
 
 INPUT:
-HTTP PUT /<productRoutes>/<boothId>
+HTTP PUT /<productRoutes>/<boothId>/filter=?? 
+
+
 
  */
-const getProducts = async (request, response) => {//GOOD
+const getProducts = async (request, response) => {//NOT FINISHED // extra paramter
     const db = request.db;
     const { boothId } = request.params;
 
@@ -42,22 +44,15 @@ const getProductDetails = async (request, response) => {//GOOD
         response.status(500).send('Failed to fetch product details');
     }
     /*SAMPLE OUTPUT
-    [
+    
     {
         "name": "Handmade Bracelet",
         "Stocks": 50,
         "Price": 29.99,
         "status": "active",
         "Image": "iVBORw0KGgoAAAANSUhEUgAAAAUA" // Base64 encoded string of the binary BLOB
-    },
-    {
-        "name": "Silver Necklace",
-        "Stocks": 30,
-        "Price": 49.99,
-        "status": "active",
-        "Image": "iVBORw0KGgoAAAANSUhEUgAAAAUA" // Base64 encoded string of another binary BLOB
     }
-]
+
     */
 };
 
@@ -72,7 +67,7 @@ HTTP PUT /<productRoutes>/<productId>
 "numberOfProductSold":value
 }
  */
-const buyProduct = async (request, response) => {//PLEASE DOUBLE CHECK LOGIC
+const buyProduct = async (request, response) => {//GOOD //try acid kung kaya
     const db = request.db;
     const { productId } = request.params;
     const { numberOfProductsSold } = request.body; // please check if this is right
@@ -123,7 +118,7 @@ INPUT:
 } 
 
  */
-const createProduct = async (request, response) => {//GOOD KINDA
+const createProduct = async (request, response) => {//GOOD
     const db = request.db;
     const { boothID, stocks, price, name, status, image } = request.body; // please check if this is right
 
@@ -203,7 +198,7 @@ HTTP PUT /<productRoutes>/<productId>
 "status": value
 }
  */
-const changeStatusProduct = async (request, response) => {//GOOD KINDA
+const changeStatusProduct = async (request, response) => {//GOOD 
     const db = request.db;
     const { productId } = request.params;
     const { status } = request.body; // please check if this is right
