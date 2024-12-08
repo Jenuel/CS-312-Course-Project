@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:3000/products';
 
 const productTotal = document.getElementById("product-total");
 const tableBody = document.querySelector(".table-body");
@@ -7,146 +7,259 @@ const searchBox = document.querySelector(".searchbox");
 
 async function fetchAPI(endpoint, options = {}) {
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    return await response.json();
+      console.log('Fetching:', `${API_BASE_URL}${endpoint}`);
+      
+      const sessionID = document.cookie
+          .split(';')
+          .find(cookie => cookie.trim().startsWith('PHPSESSID='))
+          ?.split('=')[1];
+
+      console.log('SessionID:', sessionID);
+
+      if (!sessionID) {
+          console.error('No session ID found');
+          window.location.href = '/CS-312-Course-Project/website/auth/html/login.html';
+          return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          ...options,
+          credentials: 'include',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionID}`,
+              ...options.headers,
+          },
+      });
+
+      if (!response.ok) {
+          const errorText = await response.text();
+          console.error('API Error Response:', errorText);
+          if (response.status === 404) {
+              console.log('No products found or vendor not found');
+              return []; // Return empty array instead of throwing error
+          }
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data);
+      return data;
   } catch (error) {
-    console.error('API Error:', error);
-    throw error;
+      console.error('API Error:', error);
+      throw error;
   }
 }
 
 async function loadVendorProducts() {
   try {
-    const products = await fetchAPI('/products/vendor');
-    products.forEach(product => {
-      const formattedProduct = {
-        ProductName: product.name,
-        ProductStatus: product.status,
-        ProductPrice: product.Price,
-        ProductStock: product.StocksRemaining,
-        ProductSales: '0', 
-        ProductImage: product.Image,
-        ProductDescription: '' 
-      };
-      showProductDetail(formattedProduct);
-    });
-    updateProductTotal(products.length);
+      console.log('Loading vendor products...');
+      const products = await fetchAPI('/vendor');
+      console.log('Received products:', products);
+      
+      if (!Array.isArray(products)) {
+          throw new Error('Invalid products data received');
+      }
+
+      tableBody.innerHTML = '';
+      
+      products.forEach(product => {
+          const formattedProduct = {
+              ProductID: product.ProductID,
+              ProductName: product.name,
+              ProductStatus: product.status,
+              ProductPrice: product.Price,
+              ProductStock: product.StocksRemaining,
+              ProductSales: product.total_sales || '0',
+              ProductImage: product.Image,
+              ProductDescription: product.Description || ''
+          };
+          showProductDetail(formattedProduct);
+      });
+      
+      updateProductTotal(products.length);
   } catch (error) {
-    console.error('Failed to load products:', error);
-    // Show error message to user
-    alert('Failed to load products. Please try again later.');
+      console.error('Failed to load products:', error);
+      if (error.message.includes('401')) {
+          window.location.href = '/CS-312-Course-Project/website/auth/html/login.html';
+      } else {
+          alert('Failed to load products. Please try again later.');
+      }
   }
 }
 
 async function createProduct(formData) {
   try {
-    // Convert frontend data format to backend format
-    const backendData = {
-      name: formData.ProductName,
-      status: formData.ProductStatus.toLowerCase(),
-      price: parseFloat(formData.ProductPrice),
-      stocks: parseInt(formData.ProductStock),
-      image: formData.ProductImage,
-      boothID: getCurrentBoothId() 
-    };
+      const sessionID = document.cookie
+          .split(';')
+          .find(cookie => cookie.trim().startsWith('PHPSESSID='))
+          ?.split('=')[1];
 
-    const response = await fetchAPI('/products', {
-      method: 'POST',
-      body: JSON.stringify(backendData)
-    });
+      if (!sessionID) {
+          throw new Error('No session ID found');
+      }
 
-    // Update UI with the new product
-    formData.ProductStatus = getProductStatus(formData);
-    products.push(formData);
-    showProductDetail(formData);
-    updateProductTotal();
-    filterProducts(getCurrentFilter());
+      const response = await fetch(`${API_BASE_URL}/create`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionID}`
+          },
+          body: JSON.stringify({
+              name: formData.ProductName,
+              status: formData.ProductStatus.toLowerCase(),
+              price: parseFloat(formData.ProductPrice),
+              stocks: parseInt(formData.ProductStock),
+              image: formData.ProductImage,
+              description: formData.ProductDescription,
+              boothID: await getCurrentBoothId()
+          })
+      });
 
-    return response;
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.success) {
+          showProductDetail({
+              ...formData,
+              ProductID: result.productId
+          });
+          updateProductTotal();
+          filterProducts(getCurrentFilter());
+      }
   } catch (error) {
-    console.error('Failed to create product:', error);
-    throw error;
+      console.error('Failed to create product:', error);
+      alert('Failed to create product. Please try again.');
   }
 }
 
-
 async function updateProduct(updatedData, productContainer) {
   try {
-    const productId = productContainer.dataset.productId; 
-    
-    const backendData = {
-      product: {
-        name: updatedData.ProductName,
-        price: parseFloat(updatedData.ProductPrice),
-        status: updatedData.ProductStatus.toLowerCase(),
-        stocks: parseInt(updatedData.ProductStock),
-        image: updatedData.ProductImage
+      const productId = productContainer.dataset.productId;
+      if (!productId) {
+          throw new Error('Product ID not found');
       }
-    };
 
-    await fetchAPI(`/products/${productId}`, {
-      method: 'PUT',
-      body: JSON.stringify(backendData)
-    });
+      const sessionID = document.cookie
+          .split(';')
+          .find(cookie => cookie.trim().startsWith('PHPSESSID='))
+          ?.split('=')[1];
 
-    const row = productContainer.querySelector('.row');
-    const cols = row.children;
-    
-    cols[0].innerHTML = `
-      <div>${updatedData.ProductName}</div>
-      <small class="text-muted">${updatedData.ProductDescription || ''}</small>
-    `;
-    
-    cols[1].innerHTML = `
-      <span class="badge ${updatedData.ProductStatus === 'Live' ? 'bg-success' : 'bg-warning'}">
-        ${updatedData.ProductStatus}
-      </span>
-    `;
-    
-    cols[2].textContent = updatedData.ProductPrice;
-    cols[3].textContent = updatedData.ProductStock;
-    cols[4].textContent = updatedData.ProductSales;
-    
-    if (updatedData.ProductImage) {
-      cols[5].innerHTML = `
-        <img src="${updatedData.ProductImage}" 
-             alt="Product" 
-             class="product-thumbnail rounded" 
-             style="cursor: pointer;">
-      `;
-      const thumbnail = cols[5].querySelector('.product-thumbnail');
-      thumbnail.addEventListener('click', () => showImageModal(updatedData.ProductImage));
-    } else {
-      cols[5].textContent = 'No Image';
-    }
+      if (!sessionID) {
+          throw new Error('No session ID found');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/edit/${productId}`, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionID}`
+          },
+          body: JSON.stringify({
+              product: {
+                  name: updatedData.ProductName,
+                  price: parseFloat(updatedData.ProductPrice),
+                  status: updatedData.ProductStatus.toLowerCase(),
+                  stocks: parseInt(updatedData.ProductStock),
+                  image: updatedData.ProductImage,
+                  description: updatedData.ProductDescription
+              }
+          })
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.success) {
+          updateProductUI(updatedData, productContainer);
+      }
   } catch (error) {
-    console.error('Failed to update product:', error);
-    throw error;
+      console.error('Failed to update product:', error);
+      alert('Failed to update product. Please try again.');
+      throw error;
   }
 }
 
 
 async function getCurrentBoothId() {
   try {
-    const response = await fetchAPI('/booth/current');
-    return response.boothId;
+      const response = await fetchAPI('/booth/current');
+      return response.boothId;
   } catch (error) {
-    console.error('Failed to get current booth ID:', error);
-    throw error;
+      console.error('Failed to get booth ID:', error);
+      throw error;
   }
 }
 
+function updateProductUI(updatedData, productContainer) {
+  const row = productContainer.querySelector('.row');
+  const cols = row.children;
+  
+  cols[0].innerHTML = `
+      <div>${updatedData.ProductName}</div>
+      <small class="text-muted">${updatedData.ProductDescription || ''}</small>
+  `;
+  
+  let badgeClass = 'bg-warning';
+  if (updatedData.ProductStatus === 'Live') {
+      badgeClass = 'bg-success';
+  } else if (updatedData.ProductStatus === 'Sold Out') {
+      badgeClass = 'bg-danger';
+  }
+  
+  cols[1].innerHTML = `
+      <span class="badge ${badgeClass}">${updatedData.ProductStatus}</span>
+  `;
+  
+  cols[2].textContent = updatedData.ProductPrice;
+  cols[3].textContent = updatedData.ProductStock;
+  cols[4].textContent = updatedData.ProductSales;
+  
+  if (updatedData.ProductImage) {
+      cols[5].innerHTML = `
+          <img src="${updatedData.ProductImage}" 
+               alt="Product" 
+               class="product-thumbnail rounded" 
+               style="cursor: pointer;">
+      `;
+      const thumbnail = cols[5].querySelector('.product-thumbnail');
+      thumbnail.addEventListener('click', () => showImageModal(updatedData.ProductImage));
+  } else {
+      cols[5].textContent = 'No Image';
+  }
+}
+
+function showImageModal(imageUrl) {
+  const modalHtml = `
+      <div class="modal fade" id="imageModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body text-center">
+                      <img src="${imageUrl}" class="img-fluid" alt="Product Image">
+                  </div>
+              </div>
+          </div>
+      </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  const modalElement = document.getElementById('imageModal');
+  const modal = new bootstrap.Modal(modalElement);
+  
+  modal.show();
+  modalElement.addEventListener('hidden.bs.modal', () => {
+      modalElement.remove();
+  });
+}
 
 function setupEventListeners() {
   // Search functionality
@@ -271,7 +384,6 @@ function showAddProductForm(existingData, productContainer) {
 
 }
 
-const navLinks = document.querySelectorAll('.nav-links .nav-link');
 let products = []; // Array to store all products
 
 function getProductStatus(product) {
@@ -369,7 +481,7 @@ searchBox.addEventListener('input', (e) => {
 function showProductDetail(dataForm) {
     const productDetailContainer = document.createElement("div");
     productDetailContainer.className = "product-detail-container mb-4" ;
-    productDetailContainer.id = "${product.ProductID}";
+    productDetailContainer.id = `product-${dataForm.ProductID}`;
 
     let badgeClass = 'bg-warning'; // Default for Pending
     if (dataForm.ProductStatus === 'Live') {
@@ -539,54 +651,12 @@ function editProductData(data, productContainer) {
   });
 }
 
-function updateProduct(updatedData, productContainer) {
-  const row = productContainer.querySelector('.row');
-  const cols = row.children;
-  
-  
-  cols[0].innerHTML = `
-    <div>${updatedData.ProductName}</div>
-    <small class="text-muted">${updatedData.ProductDescription || ''}</small>
-  `;
-  
-  
-  cols[1].innerHTML = `
-    <span class="badge ${updatedData.ProductStatus === 'Live' ? 'bg-success' : 'bg-warning'}">
-      ${updatedData.ProductStatus}
-    </span>
-  `;
-  
-  
-  cols[2].textContent = updatedData.ProductPrice;
-  cols[3].textContent = updatedData.ProductStock;
-  cols[4].textContent = updatedData.ProductSales;
-  
-  if (updatedData.ProductImage) {
-    cols[5].innerHTML = `
-      <img src="${updatedData.ProductImage}" 
-           alt="Product" 
-           class="product-thumbnail rounded" 
-           style="cursor: pointer;">
-    `;
-    const thumbnail = cols[5].querySelector('.product-thumbnail');
-    thumbnail.addEventListener('click', () => showImageModal(updatedData.ProductImage));
-  } else {
-    cols[5].textContent = 'No Image';
-  }
-}
 
-
-function createProduct(data) {
-  data.ProductStatus = getProductStatus(data);
-  products.push(data);
-  showProductDetail(data);
-  updateProductTotal();
-  filterProducts(getCurrentFilter());
-}
 
 
 
 document.addEventListener('DOMContentLoaded', ()=> {
   loadVendorProducts();
+  setupEventListeners();
 
 });

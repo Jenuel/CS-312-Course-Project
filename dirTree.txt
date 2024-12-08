@@ -1090,7 +1090,6 @@ C:.
 ¦       +---auth
 ¦       ¦       authRoutes.php
 ¦       ¦       logout.php
-¦       ¦       Session.php
 ¦       ¦       
 ¦       +---boothOps
 ¦               boothRoutes.php
