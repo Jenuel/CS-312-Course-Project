@@ -96,11 +96,12 @@ This function is for cancelling the order and returning the stocks ADD RETURN ST
 
 HTTP PUT /<orderRoutes>/<orderId>
 */ 
-const cancelOrder = async (request, response) => {// NOT FINISHED // add quaery for returning stocks
+const cancelOrder = async (request, response) => {// RECENTLY DONE
     const db = request.db;
     const { orderId } = request.params;
 
     try {
+        await returnStocks(orderId, db);
         const [rmOrder] = await db.query('DELETE FROM `order` o WHERE o.OrderID  ?',[orderId]);
         const [rmOrderPrd] = await db.query('DELETE FROM order_products p  WHERE  p.OrderID = ?',[orderId]);
         response.json({ 
@@ -113,6 +114,27 @@ const cancelOrder = async (request, response) => {// NOT FINISHED // add quaery 
         response.status(500).send('Failed to cancel order');
     }
 };
+
+async function returnStocks (orderID , db){
+    try {
+    const [getProduct] = await db.query(
+        `SELECT o.ProductID as productID , o.Quantity as qty FROM order_products o WHERE o.OrderID = ?`,
+         [orderID]
+        );
+    //extract rows and 
+    for(let products of getProduct){
+        const {productID , qty}= products;
+         await db.query(
+            `UPDATE product SET StocksRemaining = ? WHERE product.ProductID = ?`,
+            [qty,productID]
+        );
+    }
+    } catch (error) {
+        console.error('Error returning stocks:', error);
+        throw new Error('Failed to return stocks'); 
+    }
+
+}
 
 /*
 VENDOR CONTROLLER

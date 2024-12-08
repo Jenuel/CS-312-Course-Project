@@ -7,18 +7,28 @@
  * Gets the product for a certain booth
 
 INPUT:
-HTTP PUT /<productRoutes>/<boothId>/filter=?? 
+HTTP PUT /<productRoutes>/:<boothId>?filter=?
 
 
 
  */
-const getProducts = async (request, response) => {//NOT FINISHED // extra paramter
+const getProducts = async (request, response) => {//NOT FINISHED 
     const db = request.db;
     const { boothId } = request.params;
+    const { filter } = request.params;
 
     try {
-        const [rows] = await db.query('SELECT  p.name AS "Name", p.status AS "Status", p.Image AS "Image"  FROM `product` p WHERE p.BoothID = ?', [boothId]);
-        response.json(rows);
+
+        let query = 'SELECT p.name AS "Name", p.status AS "Status", p.Image AS "Image" FROM `product` p WHERE p.BoothID = ?';
+        let params = [boothId];
+        
+       //add cases here for filter
+        if (filter) {
+            query += ' AND p.name LIKE ?';  // You can adjust this based on your filter logic
+            params.push(`%${filter}%`);  // Use LIKE for partial matches
+        }
+
+        const [rows] = await db.query(query, params);response.json(rows);
     } catch (error) {
         console.error('Error fetching products:', error);
         response.status(500).send('Failed to fetch products');
