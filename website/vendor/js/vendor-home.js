@@ -45,10 +45,9 @@ function createBoothFinished() {
 //   pageFrame.src = "../html/vendor-product.html";
 // }
 
-
 function showProducts(boothId) {
-  sessionStorage.setItem('currentBoothId', boothId);
-    window.location.href = 'vendor-product.html';
+  sessionStorage.setItem("currentBoothId", boothId);
+  window.location.href = "vendor-product.html";
 }
 
 //for creating and appending values of a booth
@@ -160,13 +159,13 @@ async function displayBooths(data) {
                 </p>
             </div>
             <div class="card-footer">
-             <button type="button" class="btn btn-outline-primary" onclick="editBooth()">
+             <button type="button" class="btn btn-outline-primary btn-sm px-1 py-1" onclick="editBooth()">
                     <i class="bx bx-edit"></i> EDIT
                 </button>
-                <button type="button" class="btn btn-outline-danger">
+                <button type="button" class="btn btn-outline-danger btn-sm px-1 py-1">
                     <i class="bx bx-trash"></i> DELETE
                 </button>
-                <button type="button" class="btn btn-primary "mt-8 id="products-button" onclick="viewProducts(${value.BoothID})">
+                <button type="button" class="btn btn-primary btn-sm px-1 py-1 mt-12" id="products-button" onclick="viewProducts(${value.BoothID})">
                     <i class="bx bx-store"></i> PRODUCTS
                 </button>
             </div> 
@@ -204,10 +203,9 @@ function showBoothsView() {
 }
 
 function viewProducts(boothId) {
+  sessionStorage.setItem("currentBoothId", boothId);
 
-  sessionStorage.setItem('currentBoothId', boothId);
-  
-  window.location.href = 'vendor-product.html';
+  window.location.href = "vendor-product.html";
 }
 
 var responseClone; // 1
