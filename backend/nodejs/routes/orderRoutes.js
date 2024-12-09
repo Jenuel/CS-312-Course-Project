@@ -1,5 +1,11 @@
 import express from "express";
-import { getPendingOrders, getCompletedOrders, createOrder, cancelOrder, approveOrder} from "../controllers/orderControllers.js";
+import {
+  getPendingOrders,
+  getCompletedOrders,
+  createOrder,
+  cancelOrder,
+  approveOrder,
+} from "../controllers/orderControllers.js";
 const router = express.Router();
 
 router.get("/pending", getPendingOrders);
