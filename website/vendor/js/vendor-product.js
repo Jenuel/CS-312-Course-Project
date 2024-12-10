@@ -171,7 +171,7 @@ async function updateProduct(updatedData, productContainer) {
   }
 }
 
-async function getCurrentBoothId() {
+async function getCurrentBoothId() { // WHAT DOES THIS DO??
   try {
     const response = await fetchAPI("/booth/current");
     return response.boothId;

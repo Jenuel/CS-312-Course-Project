@@ -60,7 +60,7 @@ function createOrder(boothID, Data, totalPriceInput, dateInput) {
     };
 
     // POST request to create an order
-    fetch(`http://localhost:3000/orders/details/${boothID}`, {// URL for creating order
+    fetch(`http://localhost:3000/orders/create/${boothID}`, {// URL for creating order
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
