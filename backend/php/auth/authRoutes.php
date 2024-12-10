@@ -1,6 +1,6 @@
 <?php
 
-require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/php/connectDb.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userID = $user['UserID'];
 
             // Check if the user is a vendor
-            $vendorQuery = "SELECT VendorID, OrgID FROM VENDOR WHERE UserID = ?";
+            $vendorQuery = "SELECT VendorID, OrgID FROM vendor WHERE UserID = ?";
             $vendorStmt = $conn->prepare($vendorQuery);
             $vendorStmt->bind_param("i", $userID);
             $vendorStmt->execute();
