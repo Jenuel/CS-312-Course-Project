@@ -10,28 +10,44 @@ INPUT:
 HTTP PUT /<productRoutes>/<boothId>
 
  */
+
 const getProducts = async (request, response) => {
   const db = request.db;
   const { boothId } = request.params;
-  const { filter } = request.params; // to do here
+  const { 
+      query: { filter, sort } 
+   } = request;
 
   try {
-    const [rows] = await db.query(
-      "SELECT ProductID, name, status, Image, StocksRemaining, Price " +
-        "FROM `product` " +
-        "WHERE BoothID = ?",
-      [boothId]
-    );
+      let query = 'SELECT p.name AS "Name", p.status AS "Status", p.Image AS "Image" FROM `product` p ';
+      let params = [boothId];
+      
 
-    response.json(rows);
+      if (filter) {
+          query += ' WHERE p.BoothID = ?';  
+          params.push(`%${filter}%`);  
+      }
+
+      if (sort) {
+          const allowedSortFields = ['name', 'price']; 
+          const [field, order] = sort.split(':'); 
+          
+          if (allowedSortFields.includes(field) && ['asc', 'desc'].includes(order.toLowerCase())) {
+              query += ` ORDER BY p.${field} ${order.toUpperCase()}`;
+          } else {
+              throw new Error('Invalid sort parameter'); 
+          }
+      }
+
+      const [rows] = await db.query(query, params);
+      
+      response.json(rows);// convert response to json
   } catch (error) {
-    console.error("Error fetching products:", error);
-    response.status(500).json({
-      error: "Failed to fetch products",
-      details: error.message,
-    });
+      console.error('Error fetching products:', error);
+      response.status(500).send('Failed to fetch products');
   }
 };
+
 /*
  * Gets the detailed version of the product 
 
