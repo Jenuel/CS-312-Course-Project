@@ -37,7 +37,7 @@ const getProducts = async (request, response) => {//NOT FINISHED
 
     try {
 
-        let query = 'SELECT p.name AS "Name", p.status AS "Status", p.Image AS "Image" FROM `product` p WHERE p.BoothID = ?';
+        let query = 'SELECT p.name AS "Name", p.status AS "Status",  TO_BASE64(p.Image) AS "Image" FROM `product` p WHERE p.BoothID = ?';
         let params = [boothId];
         
        //add cases here for filter
@@ -67,7 +67,7 @@ const getProductDetails = async (request, response) => {//GOOD
     const { productId } = request.params;
     
     try {
-        const [rows] = await db.query('SELECT p.name,p.StocksRemaining AS Stocks , p.Price , p.status ,p.Image FROM `product` p WHERE p.ProductID = ?',[productId]);
+        const [rows] = await db.query('SELECT p.name,p.StocksRemaining AS Stocks , p.Price , p.status , TO_BASE64(p.Image) FROM `product` p WHERE p.ProductID = ?',[productId]);
         response.json(rows);
     } catch (error) {
         console.error('Error fetching product details:', error);
@@ -80,7 +80,7 @@ const getProductDetails = async (request, response) => {//GOOD
         "Stocks": 50,
         "Price": 29.99,
         "status": "active",
-        "Image": "BLOB"
+        "Image": "base64"
     }
 
     */
