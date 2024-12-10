@@ -114,38 +114,42 @@ const buyProduct = async (request, response) => {
   const { numberOfProductsSold } = request.body; // please check if this is right
 
   try {
-    // Fetch the current stock
-    const [stocks] = await db.query(
-      "SELECT p.StocksRemaining AS Stocks FROM `product` p WHERE p.ProductID = ?",
+    // Step 1: Check current stock
+    const [product] = await db.query(
+      "SELECT StocksRemaining FROM product WHERE ProductID = ?",
       [productId]
     );
 
-    if (stocks.length === 0) {
-      return response.status(404).send("Product not found");
+    if (product.length === 0) {
+      return response.status(404).json({ message: "Product not found" });
     }
 
-    const currentStocks = stocks[0].Stocks;
+    const { StocksRemaining } = product[0];
 
-    if (numberOfProductsSold > currentStocks) {
-      return response.status(400).send("Insufficient stock to sell");
+    // Step 2: Validate stock availability
+    if (numberOfProductsSold > StocksRemaining) {
+      return response.status(400).json({
+        message: "Insufficient stock",
+        availableStock: StocksRemaining,
+      });
     }
 
-    // Calculate the remaining stocks
-    const remainingStocks = currentStocks - numberOfProductsSold;
-
-    if (remainingStocks <= 5) {
-      return response.status(400).send("Insufficient stock remaining");
-    }
-
-    // Update the stock in the database
+    // Step 3: Update the stock
     const [updateResult] = await db.query(
-      "UPDATE `product` SET `StocksRemaining` = ? WHERE `ProductID` = ?",
-      [remainingStocks, productId]
+      "UPDATE product SET StocksRemaining = (StocksRemaining  - ? ) WHERE ProductID = ?",
+      [numberOfProductsSold, productId]
+    );
+
+    // Step 4: Fetch the new stock level
+    const [updatedProduct] = await db.query(
+      "SELECT StocksRemaining FROM product WHERE ProductID = ?",
+      [productId]
     );
 
     response.json({
       message: "Product purchased successfully",
       updatedRows: updateResult.affectedRows,
+      remainingStock: updatedProduct[0].StocksRemaining,
     });
   } catch (error) {
     console.error("Error buying products:", error);
