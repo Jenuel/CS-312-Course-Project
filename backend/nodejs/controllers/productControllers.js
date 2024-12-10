@@ -19,14 +19,8 @@ const getProducts = async (request, response) => {
    } = request;
 
   try {
-      let query = 'SELECT p.name AS "Name", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p ';
+      let query = 'SELECT p.name AS "Name", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p  WHERE p.BoothID = ? ';
       let params = [boothId];
-      
-
-      if (filter) {
-          query += ' WHERE p.BoothID = ?';  
-          params.push(`%${filter}%`);  
-      }
 
       if (sort) {
           const allowedSortFields = ['name', 'price']; 
