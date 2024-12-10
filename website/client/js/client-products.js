@@ -53,7 +53,7 @@ function base64ToImage(base64, mimeType = 'image/png') {
 // Main function to fetch products
 function fetchProducts(boothId) {
 
-    fetch(`http://localhost:3000/${boothId}`, { 
+    fetch(`http://localhost:3000/products/${boothId}`, { 
         method: 'PATCH',
         headers: {
             "Content-type": 'application/json',
