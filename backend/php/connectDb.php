@@ -1,8 +1,8 @@
 <?php
 
-$DB_HOST = "mysql";
-$DB_USER = "pilot";
-$DB_PASSWORD = "pilot";
+$DB_HOST = "localhost";
+$DB_USER = "root";
+$DB_PASSWORD = "";
 $DB_NAME = "boothsystem";
 
 $conn = new mysqli($DB_HOST,$DB_USER, $DB_PASSWORD,$DB_NAME, 3306);
