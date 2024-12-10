@@ -74,12 +74,12 @@ function createOrder (boothID, Data, totalPriceInput, dateInput){
         date:dateInput 
     }
     
-    fetch(`http://localhost:3000/details/${boothID}`,{// change this one
-        method: 'POST', // PATCH is appropriate for partial updates like changing an order's status
+    fetch(`http://localhost:3000/orders/details/${boothID}`,{//  URL for CREATE ORDER
+        method: 'POST', 
         headers: {
-            'Content-Type': 'application/json', // Ensure headers are set
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data), // Send the status change in the body
+        body: JSON.stringify(data),
    
     })
     .then(response => {
@@ -95,17 +95,47 @@ function createOrder (boothID, Data, totalPriceInput, dateInput){
      .catch(error => {
          console.error("Error fetching products:", error);
      });
+
+     details.forEach(product => {
+        const data={
+            numberOfProductsSold: product.quantity
+        }
+
+        fetch(`http://localhost:3000/products/buy/${product.productID}`,{//  URL for BUY PRODUCT
+            method: 'PATCH', 
+            headers: {
+                'Content-Type': 'application/json', // Ensure headers are set
+            },
+            body: JSON.stringify(data), // Send the status change in the body
+       
+        })
+        .then(response => {
+         if (!response.ok) {
+             throw new Error(`HTTP error! status: ${response.status}`);
+         }
+         return response.json();
+         })
+         .then(data => {
+             console.log("Products fetched successfully:", data);
+             // add handling of data
+         })
+         .catch(error => {
+             console.error("Error fetching products:", error);
+         });
+
+        
+     });
  }
 
 
  
 function cancelOrder(orderId) {
-    fetch(`http://localhost:3000/cancel/${orderId}`, { // Use a meaningful endpoint
-        method: 'PATCH', // PATCH is appropriate for partial updates like changing an order's status
+    fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancell order
+        method: 'PATCH', 
         headers: {
-            'Content-Type': 'application/json', // Ensure headers are set
+            'Content-Type': 'application/json', 
         },
-        body: JSON.stringify({ status: 'cancelled' }), // Send the status change in the body
+        body: JSON.stringify({ status: 'cancelled' }), 
     })
     .then(response => {
         if (!response.ok) {
@@ -114,8 +144,8 @@ function cancelOrder(orderId) {
         return response.json();
     })
     .then(data => {
+        // data is a json massgae no parsing needed
         console.log("Order cancelled successfully:", data);
-        // add handling of data
     })
     .catch(error => {
         console.error("Error cancelling order:", error);

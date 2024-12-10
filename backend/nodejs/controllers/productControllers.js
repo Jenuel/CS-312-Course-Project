@@ -19,7 +19,7 @@ const getProducts = async (request, response) => {
    } = request;
 
   try {
-      let query = 'SELECT p.name AS "Name", p.status AS "Status", p.Image AS "Image" FROM `product` p ';
+      let query = 'SELECT p.name AS "Name", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p ';
       let params = [boothId];
       
 
@@ -85,7 +85,7 @@ const getProductDetails = async (request, response) => {
 
   try {
     const [rows] = await db.query(
-      "SELECT p.name,p.StocksRemaining AS Stocks , p.Price , p.status ,p.Image FROM `product` p WHERE p.ProductID = ?",
+      "SELECT p.name AS Name,p.StocksRemaining AS Stocks , p.Price as Price, p.status AS Status,TO_BASE64(p.Image) as Image FROM `product` p WHERE p.ProductID = ?",
       [productId]
     );
     response.json(rows);
