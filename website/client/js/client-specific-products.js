@@ -6,39 +6,62 @@ function displayBooths() {
     box.innerHTML = "";
     const valueDiv = document.createElement('div');
     valueDiv.classList.add('box');
-
-    var img= new Image();
-
-
     valueDiv.innerHTML = `
-        <div class="image">
-        
+    <div class="image">
+    </div>
+    <div class="right-side">
+        <div class="button-container">
+            <button type="button" class="row-button back-button">
+                <img src="back.png" alt="Back">
+            </button>
+            <button type="button" class="row-button cart-button" onclick="toggleCart()">
+                <img src="..\res\cart_icon.png" alt="Cart">
+            </button>
         </div>
-        <div class="right-side">
-            <button type="button" class="filter-button back-button"><img src="'+img.src+'"></button>
-            <button type="button" class="filter-button cart-button" onclick="toggleCart()"><img src="..\res\cart_icon.png"></button>
-            <div class="title">
+        <div class="title">
             <p>Product Name</p>
         </div>
         <div class="description">
-            <h1>DESCRIPTION:</h1>
             <p>Amazing product description here.</p>
-        </div>
+        </div> 
         <div class="buttons">
             <button type="button" onclick="preorderItem('Product Name', 100, 'image/path.jpg')" id="preorder-button">
                 PRE-ORDER
             </button>
             <div class="quantity-container">
-                    <button onclick="minusQuantity()" id="minus-button">-</button>
+                <button onclick="minusQuantity()" id="minus-button">-</button>
                 <span class="quantity-text">1</span>
                 <button onclick="addQuantity()" id="add-button">+</button>
             </div>
         </div>
-        </div>`;
-    
-    img.src = '..\res\back.png';
+    </div>`;
     box.appendChild(valueDiv);
 }
+
+function openProfile() {
+    const profile = document.getElementById("profile");
+    profile.classList.add("open-profile");
+}
+
+// Close profile form popup
+function closeProfile() {
+    const profile = document.getElementById("profile");
+    profile.classList.remove("open-profile");
+}
+
+// Optionally, handle form submission
+document.getElementById("profile-form").addEventListener("submit", function(e) {
+    e.preventDefault(); // Prevent page reload on form submit
+    const name = document.getElementById("profile-name").value;
+    const email = document.getElementById("profile-email").value;
+    const password = document.getElementById("profile-password").value;
+
+    // Send the updated data to the server or process accordingly
+    console.log("Updated Profile:", name, email, password);
+    // You can implement an API call to save the changes here
+
+    closeProfile(); // Close the profile popup after submission
+});
 
 function preorderItem(name, price, image) {
     alert("Added to cart!");

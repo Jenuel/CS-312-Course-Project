@@ -42,22 +42,22 @@ function displayBooths(booths){
         valueDiv.classList.add('item');
         // creating the information of the booth
         valueDiv.innerHTML = `
-        <div class="box">
+        <a href="client-products.html" class="box">
             <div class="booth-header">
-                <h2>${value.Title}</h2>                
+                <h2>Booth ${i + 1} and pic</h2>
             </div>
             <div class="booth status">
                 <p class="label">STATUS</p>
-                <p class="content">:  ${value.Status}</p>
+                <p class="content">Active</p>
             </div>
             <div class="booth schedule">
                 <p class="label">SCHEDULE</p>
-                <p class="content">:  ${value.Schedule}</p>
-            </div>   
+                <p class="content">:  asdasd</p>
+            </div> 
             <div class="booth location">
                 <p class="label">LOCATION</p>
-                <p class="content">:  ${value.Location}</p>
-            </div>     
+                <p class="content">:  asdada</p>
+            </div>
             <div class="booth description">
                 <p class="label">DESCRIPTION</p>
                 <p class="content">:  ${value.Description}</p>

@@ -1,136 +1,421 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
-<head>
-    <link rel='stylesheet' type='text/css' href ="../css/vendor-home.css">
-</head>
-<body>
-    <nav>
-        <button type="button">HOME</button>
-        <button type="button">ORDERS</button>
-        <button type="button" onclick="createBooth()">CREATE BOOTH</button>
-        <button type="button" onclick="logout()">LOGOUT</button>
-    </nav>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <header>
-        <h1>YOUR BOOTHS</h1>
-    </header>
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="../css/vendor-home.css" />
 
-    <!--This is where we will display the booths-->
-    <section class="booth-container">
-        <div class="filters-container">
-            <div id="filtering">
-                <select name="filter" id="filter" onchange="getData()">
-                    <option value="" disabled selected>Filter By Status</option>
-                    <option value="all">All</option>
-                    <option value="open">Active</option>
-                    <option value="closed">Inactive</option>
-                </select> 
-            </div>
-            <div id="sorting">
-                <select name="sort" id="sort" onchange="getData()">
-                    <option value="" disabled selected>Sort By</option>
-                    <option value="name">Random</option>
-                    <option value="name">A-Z</option>
-                    <option value="schedule">Z-A</option>
-                </select> 
-            </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+    <script src="..\js\vendor-home.js"></script>
+  </head>
+  <body>
+    
+    <!-- <nav>
+      <button type="button" data-page="home" onclick="loadPage('home')">
+        HOME
+      </button>
+      <button type="button" data-page="orders" onclick="loadPage('orders')">
+        ORDERS
+      </button>
+      <button type="button" data-page="products" onclick="loadPage('products')">
+        PRODUCTS
+      </button>
+      <button type="button" data-page="sales" onclick="loadPage('sales')">
+        SALES
+      </button>
+      <button type="button" onclick="createBooth()">CREATE BOOTH</button>
+      <button type="button" onclick="logout()">LOGOUT</button>
+    </nav> -->
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand ml-4" href="#">Blietzkrieg</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#" data-page="home" onclick="loadPage('home')">Home </a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#" data-page="orders" onclick="loadPage('orders')">Orders</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#" data-page="sales" onclick="loadPage('sales')">Sales</a>
+            </li>
+        
+          </ul>
+   
         </div>
-        <div class="box">
+      </nav>
+    <!-- <header><h1>YOUR BOOTHS</h1></header> -->
+
+    <div class="content-wrapper">
+      <div id="booth-content" class="page-content active">
+        <section class="booth-container">
+          <div class="filters-container">
+        <div class="mb-3">
+            <button type="button" class="btn d-flex align-items-center gap-2 btn-dark" onclick="createBooth()">
+                <i class='bx bx-plus-circle'></i>
+                <p class="mb-0">Create New Booth</p>
+            </button>
+        </div>
             
-        </div>
-    </section>
 
-    <!--POPUP CREATING BOOTH-->
-    <section>
-        <div class="create-booth" id="create">
+            <div class="mb-3">
+              <div class="dropdown">
+                <button
+                  class="btn btn-outline-secondary dropdown-toggle"
+                  type="button"
+                  id="filterDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Filter By Status
+                </button>
 
-            <button class="exit-btn" onclick="closeCreateBooth()">X</button>
-
-            <h2>CREATE YOUR BOOTH</h2>
-
-            <div class="grid">
-                <div id="image-field">
-                    <img src="../res/1564534_customer_man_user_account_profile_icon.png" id="image" alt="Booth image">
-                    <label for="input-file">CHOOSE BOOTH IMAGE</label>
-                    <input type="file" accept="image/jpeg, image/png" id="input-file" name="input-file">
+                <div class="dropdown-menu" aria-labelledby="filterDropdown">
+                  <h6 class="dropdown-header">Filtering</h6>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onclick="filterBooths('all')"
+                    >All</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onclick="filterBooths('open')"
+                    >Active</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onclick="filterBooths('closed')"
+                    >Inactive</a
+                  >
                 </div>
-
-                <form id="booth-form">
-                    <div class="name field">
-                        <label for="name">BOOTH NAME</label>
-                        <input type="text" placeholder="Enter booth name" id="name" name="name" required>
-                    </div>
-
-                    <div class="schedule field">
-                        <label for="schedule">SCHEDULE</label>
-                        <input type="text" placeholder="Enter schedule" id="schedule" name="schedule" required>
-                    </div>
-
-                    <div class="location field">
-                        <label for="location">LOCATION</label>
-                        <input type="text" placeholder="Enter location" id="location" name="location" required>
-                    </div>
-
-                    <div class="description field">
-                        <label for="description">DESCRIPTION</label>
-                        <textarea placeholder="Enter description" id="description" name="description" rows="5" cols="30" maxlength="150"></textarea>
-                    </div>
-                </form>
+              </div>
             </div>
 
-            <div class="create-button">
-                <button type="button" onclick="createBoothFinished()" id="finish-create">CREATE</button>
+            <div class="mb-3">
+              <div class="dropdown">
+                <button
+                  class="btn btn-outline-secondary dropdown-toggle"
+                  type="button"
+                  id="sortDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Sort By
+                </button>
+                <div class="dropdown-menu" aria-labelledby="sortDropdown">
+                  <h6 class="dropdown-header">Sorting</h6>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onclick="sortBooths('random')"
+                    >Random</a
+                  >
+                  <a class="dropdown-item" href="#" onclick="sortBooths('name')"
+                    >A-Z</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onclick="sortBooths('schedule')"
+                    >Z-A</a
+                  >
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="box"></div>
+        </section>
+      </div>
 
+      <div class="product-view" style="display: none;">
+        
+      </div>
+
+      <iframe id="page-frame" frameborder="0" style="display: none"></iframe>
+    </div>
+
+
+ 
+    <section>
+      <div class="create-booth container py-5" id="create">
+        <div class="position-relative">
+          <button
+            class="btn-close position-absolute top-0 end-0"
+            aria-label="Close"
+            onclick="closeCreateBooth()"
+          ></button>
         </div>
+
+        <h2 class="text-center mb-4">CREATE YOUR BOOTH</h2>
+
+        <div class="d-flex align-items-start">
+          <!-- Booth Image-->
+          <div class="me-4 flex-shrink-0" style="width: 150px; height: 150px">
+            <div class="mb-3 text-center">
+              <img
+                src="../res/1564534_customer_man_user_account_profile_icon.png"
+                id="image"
+                alt="Booth image"
+                class="img-fluid rounded"
+              />
+            </div>
+            <label for="input-file" class="btn btn-outline-primary w-100"
+              >CHOOSE BOOTH IMAGE</label
+            >
+            <input
+              type="file"
+              class="form-control d-none"
+              accept="image/jpeg, image/png"
+              id="input-file"
+              name="input-file"
+            />
+          </div>
+
+          <!-- Booth Form -->
+          <!-- <div class="flex-grow-1">
+            <form id="booth-form">
+              <div class="mb-1">
+                <label for="name" class="form-label">Booth Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter booth name"
+                  id="name"
+                  name="name"
+                  required
+                />
+              </div>
+              <div class="mb-1">
+                <label for="operation-days" class="form-label"
+                  >Operating Days</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter schedule (e.g M.W.F)"
+                  id="schedule"
+                  name="schedule"
+                  required
+                />
+              </div>
+              <div class="mb-1">
+                <label for="location" class="form-label">Location</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter location"
+                  id="location"
+                  name="location"
+                  required
+                />
+              </div>
+              <div>
+                <label for="description" class="form-label">Description</label>
+                <textarea
+                  class="form-control"
+                  placeholder="Enter description"
+                  id="description"
+                  name="description"
+                  rows="2"
+                  maxlength="150"
+                ></textarea>
+              </div>
+            </form>
+          </div> -->
+          <div class="flex-grow-1 mb-4">
+            <form id="booth-form" class="row g-3">
+              <div class="mb-1 row align-items-center">
+                <label for="name" class="col-sm-3 col-form-label text-start">Booth Name</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter booth name"
+                    id="name"
+                    name="name"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-2 row align-items-center">
+                <label for="schedule" class="col-sm-3 col-form-label text-start">Operating Days</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter schedule (e.g. M.W.F)"
+                    id="schedule"
+                    name="schedule"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-2 row align-items-center">
+                <label for="location" class="col-sm-3 col-form-label text-start">Location</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter location"
+                    id="location"
+                    name="location"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-2 row align-items-center">
+                <label for="description" class="col-sm-3 col-form-label text-start">Description</label>
+                <div class="col-sm-9">
+                  <textarea
+                    class="form-control"
+                    placeholder="Enter description"
+                    id="description"
+                    name="description"
+                    rows="2"
+                    maxlength="150"
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+
+        <div class="text-center mt-4">
+          <button
+            type="button"
+            class="btn btn-success btn-block w-100"
+            onclick="createBoothFinished()"
+            id="finish-create"
+          >
+            CREATE
+          </button>
+        </div>
+      </div>
     </section>
 
     <!--POPUP EDITING BOOTH-->
     <section>
-        <div class="edit-booth" id="edit">
-    
-            <h2>EDIT YOUR BOOTH</h2>
-    
-            <div class="grid">
-                <div id="image-field">
-                    <img src="../res/1564534_customer_man_user_account_profile_icon.png" id="image" alt="Booth image">
-                    <label for="input-file">CHOOSE BOOTH IMAGE</label>
-                    <input type="file" accept="image/jpeg, image/png" id="input-file" name="input-file">
+      
+      <div class="edit-booth container py-5" id="edit">
+        <h2 class="mb-4">EDIT YOUR BOOTH</h2>
+
+        <div class="d-flex align-items-start">
+
+          <div class="me-4 flex-shrink-0" style="width: 150px; height: 150px">
+            <div class="mb-3 text-center">
+              <img
+                src="../res/1564534_customer_man_user_account_profile_icon.png"
+                id="image"
+                alt="Booth image"
+                class="img-fluid rounded"
+              />
+            </div>
+            <label for="input-file" class="btn btn-outline-primary w-100"
+              >CHOOSE BOOTH IMAGE</label
+            >
+            <input
+              type="file"
+              class="form-control d-none"
+              accept="image/jpeg, image/png"
+              id="input-file"
+              name="input-file"
+            />
+          </div>
+
+          <!-- Booth Form -->
+
+          <div class="flex-grow-1 mb-4">
+            <form id="booth-form" class="row g-3">
+              <div class="mb-1 row align-items-center">
+                <label for="name" class="col-sm-3 col-form-label text-start">Booth Name</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter booth name"
+                    id="name"
+                    name="name"
+                    required
+                  />
                 </div>
+              </div>
+              <div class="mb-2 row align-items-center">
+                <label for="schedule" class="col-sm-3 col-form-label text-start">Operating Days</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter schedule (e.g. M.W.F)"
+                    id="schedule"
+                    name="schedule"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-2 row align-items-center">
+                <label for="location" class="col-sm-3 col-form-label text-start">Location</label>
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter location"
+                    id="location"
+                    name="location"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-2 row align-items-center">
+                <label for="description" class="col-sm-3 col-form-label text-start">Description</label>
+                <div class="col-sm-9">
+                  <textarea
+                    class="form-control"
+                    placeholder="Enter description"
+                    id="description"
+                    name="description"
+                    rows="2"
+                    maxlength="150"
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
     
-                <form id="booth-form">
-                    <div class="name field">
-                        <label for="name">BOOTH NAME</label>
-                        <input type="text" placeholder="Enter booth name" id="name" name="name" required>
-                    </div>
-    
-                    <div class="schedule field">
-                        <label for="schedule">SCHEDULE</label>
-                        <input type="text" placeholder="Enter schedule" id="schedule" name="schedule" required>
-                    </div>
-    
-                    <div class="location field">
-                        <label for="location">LOCATION</label>
-                        <input type="text" placeholder="Enter location" id="location" name="location" required>
-                    </div>
-    
-                    <div class="description field">
-                        <label for="description">DESCRIPTION</label>
-                        <textarea placeholder="Enter description" id="description" name="description" rows="5" cols="30" maxlength="150"></textarea>
-                    </div>
-                </form>
-            </div>
-    
-            <div class="edit-button">
-                <button type="button" onclick="editBoothFinished()" id="finish-edit">DONE</button>
-            </div>
-    
+        <div class="text-center mt-4">
+          <button
+            type="button"
+            class="btn btn-primary btn-block w-100"
+            onclick="editBoothFinished()"
+            id="finish-edit"
+          >
+            DONE
+          </button>
         </div>
     </section>
 
-    <script src="..\js\vendor-home.js"></script>
+    <div class="modal-backdrop fade "></div>
     <script src="..\js\logout.js"></script>
-    
-</body>
+  </body>
 </html>
