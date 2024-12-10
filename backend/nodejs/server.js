@@ -18,7 +18,7 @@ app.use(async (request, response, next) => {
         const connection = await pool.promise().getConnection(); 
         
         request.db = connection; 
-        console.log("success database connection");
+        console.log("success database connection")
         response.on('finish', () => {
             if (request.db) request.db.release(); 
         });
@@ -36,6 +36,9 @@ app.use(express.json())
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 
-app.listen(process.env.PORT, () => {
-    console.log("Listening on port", process.env.PORT || 3000)
-})
+// app.listen(process.env.PORT, () => {
+//     console.log("Listening on port", process.env.PORT || 3000)
+// })
+app.listen(3000, '127.0.0.1', () => {
+    console.log("Server listening on port 3000");
+});

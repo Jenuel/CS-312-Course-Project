@@ -106,6 +106,72 @@ function updateTables() {
     populateUnclaimedOrders(unclaimedOrders);
     populateClaimedOrders(claimedOrders);
 }
+/*******************************************************************/
+/**
+ * FUNCTIONS IMAGE --> BASE64 --> BLOB
+ * 
+ * sample usage:
+
+const fileInput = document.getElementById('imageInput'); // <input type="file" id="imageInput">
+fileInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        try {
+            const base64 = await imageToBase64(file); // Convert to Base64
+            console.log('Base64:', base64);
+
+            const blob = base64ToBlob(base64, file.type); // Convert Base64 to Blob
+            console.log('Blob:', blob);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+});
+ */
+
+// Function to convert an image file to Base64
+const imageToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]); // Get Base64 string without "data:image/...;base64,"
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file); // Read file as Data URL
+    });
+};
+
+// Function to convert Base64 to a Blob
+const base64ToBlob = (base64, mimeType = 'image/png') => {
+    const binary = atob(base64); // Decode Base64
+    const array = [];
+    for (let i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i));
+    }
+    return new Blob([new Uint8Array(array)], { type: mimeType });
+};
+/**
+ * FUNCTIONS BLOB --> BASE64 --> IMAGE  
+ * 
+ * sample application:
+ * 
+ * 
+ */
+
+// Function to convert a Blob to Base64
+const blobToBase64 = (blob) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]); // Base64 string without prefix
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(blob); // Read Blob as Data URL
+    });
+};
+
+// Function to create an image element from Base64
+const base64ToImage = (base64, mimeType = 'image/png') => {
+    const img = new Image();
+    img.src = `data:${mimeType};base64,${base64}`;
+    return img; // Return the image element
+};
 
 /*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
 

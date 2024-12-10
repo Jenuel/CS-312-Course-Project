@@ -9,13 +9,31 @@
 INPUT:
 HTTP PUT /<productRoutes>/:<boothId>?filter=?
 
+SAMPLE OUTPUT
+[
+{
+        "name": "Handmade Bracelet",
+        "Stocks": 50,
+        "Price": 29.99,
+        "status": "active",
+        "Image": "BLOB"
+    },
+    {
+        "name": "Handmade Bracelet",
+        "Stocks": 50,
+        "Price": 29.99,
+        "status": "active",
+        "Image": "BLOB"
+    }
+]
+    
 
 
  */
 const getProducts = async (request, response) => {//NOT FINISHED 
     const db = request.db;
     const { boothId } = request.params;
-    const { filter } = request.params;
+    const { filter } = request.params;// to do here
 
     try {
 
@@ -28,7 +46,9 @@ const getProducts = async (request, response) => {//NOT FINISHED
             params.push(`%${filter}%`);  // Use LIKE for partial matches
         }
 
-        const [rows] = await db.query(query, params);response.json(rows);
+        const [rows] = await db.query(query, params);
+        
+        response.json(rows);// convert response to json
     } catch (error) {
         console.error('Error fetching products:', error);
         response.status(500).send('Failed to fetch products');
@@ -60,7 +80,7 @@ const getProductDetails = async (request, response) => {//GOOD
         "Stocks": 50,
         "Price": 29.99,
         "status": "active",
-        "Image": "iVBORw0KGgoAAAANSUhEUgAAAAUA" // Base64 encoded string of the binary BLOB
+        "Image": "BLOB"
     }
 
     */

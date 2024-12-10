@@ -460,40 +460,80 @@ function createProduct(data) {
   updateProductTotal();
   filterProducts(getCurrentFilter());
 }
+/****************************************************/
+
+/**
+ * FUNCTIONS  BASE64 --> BLOB
+ * 
+*/
+function base64ToBlob(base64, mimeType = 'image/png') {
+    const binary = atob(base64); // Decode Base64 string
+    const array = [];
+    for (let i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i));
+    }
+    return new Blob([new Uint8Array(array)], { type: mimeType });
+}
+
+
 
 /*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
 
-function createProductToNode( boothIdInput,stocksInput,priceInput,nameInput,statusInput,imageInput){
-  const data = {
-    boothID: boothIdInput,
-    stocks:stocksInput,
-    price:priceInput,
-    name:nameInput,
-    status:statusInput,
-    image:imageInput
+function createProductToNode(boothIdInput, stocksInput, priceInput, nameInput, statusInput, imageInput) {
+  // Ensure `imageInput` is a valid File object
+  if (!(imageInput instanceof File)) {
+      console.error("Invalid image input: must be a File object.");
+      return;
   }
-  fetch(`http://localhost:3000/create`, {
-      method: 'GET',
-      headers: {
-          'Content-Type': 'application/json', 
-      },
-      body: JSON.stringify(data),
-  })
-  .then(response => {
-      if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-  })
-  .then(data => {
-      console.log("retrived pending orders successfully:", data);
-         // add handling of data
-  })
-  .catch(error => {
-      console.error("Error retrivieng pending orders:", error);
-  });
 
+  const reader = new FileReader();
+
+  // Convert the image input to Base64
+  reader.onload = () => {
+      const base64 = reader.result.split(',')[1]; // Extract Base64 string without prefix
+      const blobImage = base64ToBlob(base64, imageInput.type); // Convert Base64 to Blob
+
+      // Construct the data payload
+      const data = {
+          boothID: boothIdInput,
+          stocks: stocksInput,
+          price: priceInput,
+          name: nameInput,
+          status: statusInput,
+          image: blobImage, // Blob for the image
+      };
+
+      // Perform the fetch request
+      fetch(`http://localhost:3000/create`, {
+          method: 'POST', // Use POST for creating resources
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data), // Convert payload to JSON string
+      })
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("Product created successfully:", data);
+          })
+          .catch(error => {
+              console.error("Error creating product:", error);
+          });
+  };
+
+  // Handle errors during file reading
+  reader.onerror = (error) => {
+      console.error("Error reading image input:", error);
+  };
+
+  // Read the file as Base64
+  reader.readAsDataURL(imageInput);
 }
+
 
 /*
 details [] should contain
@@ -509,7 +549,7 @@ function editProduct(details,productID){
   const data = {
     product:dataDetails
   }
-  fetch(`http://localhost:3000/edit/:${productID}`, {
+  fetch(`http://localhost:3000/edit/${productID}`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json', 
@@ -536,7 +576,7 @@ function changeStatusProduct(statusInput,productID){
   const data = {
     status : statusInput
   }
-  fetch(`http://localhost:3000/edit/:${productID}`, {
+  fetch(`http://localhost:3000/edit/${productID}`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json', 
