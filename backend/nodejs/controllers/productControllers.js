@@ -1,5 +1,8 @@
 // Implementation of the logic
-
+/**
+ * FRONT END HANDLING FOR IMAGE
+ * <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA" alt="Product Image">
+ */
 /*
  * Gets the product for a certain booth
 
@@ -8,25 +11,26 @@ HTTP PUT /<productRoutes>/<boothId>
 
  */
 const getProducts = async (request, response) => {
-    const db = request.db;
-    const { boothId } = request.params;
+  const db = request.db;
+  const { boothId } = request.params;
+  const { filter } = request.params; // to do here
 
-    try {
-        const [rows] = await db.query(
-            'SELECT ProductID, name, status, Image, StocksRemaining, Price ' +
-            'FROM `product` ' +
-            'WHERE BoothID = ?',
-            [boothId]
-        );
+  try {
+    const [rows] = await db.query(
+      "SELECT ProductID, name, status, Image, StocksRemaining, Price " +
+        "FROM `product` " +
+        "WHERE BoothID = ?",
+      [boothId]
+    );
 
-        response.json(rows);
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        response.status(500).json({ 
-            error: 'Failed to fetch products',
-            details: error.message 
-        });
-    }
+    response.json(rows);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    response.status(500).json({
+      error: "Failed to fetch products",
+      details: error.message,
+    });
+  }
 };
 /*
  * Gets the detailed version of the product 
@@ -35,6 +39,29 @@ INPUT:
 HTTP PUT /<productRoutes>/<productId>
 
  */
+// const getProductDetails = async (request, response) => {//GOOD
+//     const db = request.db;
+//     const { productId } = request.params;
+
+//     try {
+//         const [rows] = await db.query('SELECT p.name,p.StocksRemaining AS Stocks , p.Price , p.status , TO_BASE64(p.Image) FROM `product` p WHERE p.ProductID = ?',[productId]);
+//         response.json(rows);
+//     } catch (error) {
+//         console.error('Error fetching product details:', error);
+//         response.status(500).send('Failed to fetch product details');
+//     }
+// };
+/*SAMPLE OUTPUT
+    
+    {
+        "name": "Handmade Bracelet",
+        "Stocks": 50,
+        "Price": 29.99,
+        "status": "active",
+        "Image": "base64"
+    }
+
+    */
 const getProductDetails = async (request, response) => {
   //GOOD
   const db = request.db;
@@ -63,6 +90,7 @@ HTTP PUT /<productRoutes>/<productId>
 "numberOfProductSold":value
 }
  */
+
 const buyProduct = async (request, response) => {
   //PLEASE DOUBLE CHECK LOGIC
   const db = request.db;
@@ -114,12 +142,12 @@ const buyProduct = async (request, response) => {
 
 INPUT:
 {
-"boothID": 
-"stocks":
-"price":
-"name":
-"status":
-"image":
+    "boothID": 123,
+    "stocks": 50,
+    "price": 29.99,
+    "name": "Handmade Bracelet",
+    "status": "active",
+    "image": "0x89504E470D0A1A0A0000000D49484452" // Hexadecimal image data
 } 
 
  */
@@ -128,6 +156,21 @@ const createProduct = async (request, response) => {
   const db = request.db;
   const { boothID, stocks, price, name, status, image } = request.body; // please check if this is right
 
+  if (status !== "active" && status !== "inactive") {
+    return response
+      .status(400)
+      .send('Invalid status. It must be either "active" or "inactive".');
+  }
+  try {
+    const [rows] = await db.query(
+      "INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES (NULL, ?,?, ?, ?, ?, ?)",
+      [boothID, stocks, price, name, status, image]
+    );
+    response.json(rows);
+  } catch (error) {
+    console.error("Error creating products:", error);
+    response.status(500).send("Failed to create products");
+  }
   if (status !== "active" && status !== "inactive") {
     return response
       .status(400)
@@ -213,7 +256,7 @@ HTTP PUT /<productRoutes>/<productId>
 }
  */
 const changeStatusProduct = async (request, response) => {
-  //GOOD KINDA
+  //GOOD
   const db = request.db;
   const { productId } = request.params;
   const { status } = request.body; // please check if this is right

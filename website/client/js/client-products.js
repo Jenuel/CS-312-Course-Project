@@ -1,72 +1,147 @@
-// let box = document.querySelector(".product-list"); // where the child will be appended
+const urlParams = new URLSearchParams(window.location.search);
+const boothId = urlParams.get('id'); 
 
-// function displayBooths(){
-//     box.innerHTML = "";
-//     let valueDiv = document.createElement('div'); 
-//     valueDiv.classList.add('item');
-//     // creating the information of the product
-//     valueDiv.innerHTML = `
-//         <a href="client-specific-product.html" class="box">
-//             <div class="image">
-                               
-//             </div>
-//             <div class="product">
-//                 <p id="title">Yves Product</p>
-//             </div>
-//             <div class="product">
-//                 <p id="price">316 Pesos</p>
-//             </div>     
-//         </a>`;
-//     box.appendChild(valueDiv); // appending the child to "box"
-// }
+let box = document.querySelector(".product-list"); 
 
-// displayBooths();
+function displayProducts(products) {
+    box.innerHTML = ""; 
+    products.forEach(product => {
+        const productDiv = document.createElement('div');
+        productDiv.classList.add('item'); 
 
-function displayBooths() {
-    const box = document.querySelector(".product-list");
-    box.innerHTML = ""; // Clear existing items
-    for (let i = 0; i < 6; i++) { // Example: Add 6 booths
-        const valueDiv = document.createElement("div");
-        valueDiv.classList.add("box");
-        valueDiv.innerHTML = `
-        <a href="client-specific-product.html" class="box">
-            <div class="image">
-                               
-            </div>
-            <div class="product">
-                <p id="title">Yves Product</p>
-            </div>
-            <div class="product">
-                <p id="price">316 Pesos</p>
-            </div>   
-        </a>       `;
-        box.appendChild(valueDiv); // Append to the container
-    }
+        productDiv.innerHTML = `
+            <div class="box">
+                <div class="image">
+                    <img src="${product.Image}" alt="${product.Name}">
+                </div>
+                <div class="product">
+                    <p id="title">${product.Name}</p>
+                </div>
+                <div class="product">
+                    <p id="status">${product.Status}</p>
+                </div>
+            </div>`;
+        box.appendChild(productDiv);
+    });
+}
+/*
+function to convert blob --> base64 --> image
+*/
+
+// Function to convert a Blob to Base64
+function blobToBase64(blob, callback, errorCallback) {
+    const reader = new FileReader();
+    reader.onload = () => {
+        const base64 = reader.result.split(',')[1]; // Get Base64 without the prefix
+        callback(base64);
+    };
+    reader.onerror = (error) => {
+        errorCallback(error);
+    };
+    reader.readAsDataURL(blob); // Read Blob as Data URL
 }
 
-displayBooths();
-
-function openProfile() {
-    const profile = document.getElementById("profile");
-    profile.classList.add("open-profile");
+// Function to create an image element from Base64
+function base64ToImage(base64, mimeType = 'image/png') {
+    const img = new Image();
+    img.src = `data:${mimeType};base64,${base64}`;
+    return img; // Return the image element
 }
 
-// Close profile form popup
-function closeProfile() {
-    const profile = document.getElementById("profile");
-    profile.classList.remove("open-profile");
+/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+
+// Main function to fetch products
+function fetchProducts(boothId) {
+
+    fetch(`http://localhost:3000/${boothId}`, { 
+        method: 'PATCH',
+        headers: {
+            "Content-type": 'application/json',
+        },
+        body: JSON.stringify({ status: 'cancelled' }), 
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        /*
+        sample data output
+        [
+            {
+                "name": "Handmade Bracelet",
+                "Stocks": 50,
+                "Price": 29.99,
+                "status": "active",
+                "Image": "BLOB"
+            },
+            {
+                "name": "Handmade Bracelet",
+                "Stocks": 50,
+                "Price": 29.99,
+                "status": "active",
+                "Image": "BLOB"
+            }
+        ]
+        */
+        console.log("Products fetched successfully:", data);
+
+        // Handle the data (convert Blob to Base64 and Base64 to Image)
+        data.forEach(product => {
+            if (product.Image) {
+                // Assuming "Image" is already a Blob; convert it to Base64
+                blobToBase64(
+                    product.Image, // Blob object
+                    (base64) => {
+                        console.log("Base64 String:", base64);
+
+                        // Convert Base64 to an image element
+                        const imgElement = base64ToImage(base64, 'image/png');
+                        document.body.appendChild(imgElement); // Append the image to the body
+                    },
+                    (error) => {
+                        console.error("Error converting Blob to Base64:", error);
+                    }
+                 );
+             }
+        });    
+    })
+    .catch(error => {
+        console.error("Error purchasing product:", error);
+    });
 }
 
-// Optionally, handle form submission
-document.getElementById("profile-form").addEventListener("submit", function(e) {
-    e.preventDefault(); // Prevent page reload on form submit
-    const name = document.getElementById("profile-name").value;
-    const email = document.getElementById("profile-email").value;
-    const password = document.getElementById("profile-password").value;
+function buyProduct(productID, value) {
 
-    // Send the updated data to the server or process accordingly
-    console.log("Updated Profile:", name, email, password);
-    // You can implement an API call to save the changes here
+    const data = {
+        numberOfProductSold: value,
+    };
 
-    closeProfile(); // Close the profile popup after submission
-});
+    fetch(`http://localhost:3000/buy/${productID}`, { 
+        method: 'PATCH',
+        headers: {
+            "Content-type": 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // data is just sa massage in a form of a json
+        console.log("Product purchased successfully:", data);
+        // add handling of data
+    })
+    .catch(error => {
+        console.error("Error purchasing product:", error);
+    });
+}
+
+
+
+fetchProducts(boothId);

@@ -8,10 +8,10 @@ import {
 } from "../controllers/orderControllers.js";
 const router = express.Router();
 
-router.get("/pending", getPendingOrders);
-router.get("/complete/:boothId", getCompletedOrders);
-router.post("/create", createOrder);
-router.patch("/cancel/:orderId", cancelOrder);
-router.patch("/approve/:id", approveOrder);
+router.get("/pending", getPendingOrders); // vendor
+router.get("/complete/:boothId", getCompletedOrders); // vendor
+router.post("/create", createOrder); // customer
+router.patch("/cancel/:orderId", cancelOrder); // customer
+router.patch("/approve/:orderId", approveOrder); // vendor
 
 export default router;
