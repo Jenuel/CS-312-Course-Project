@@ -5,10 +5,44 @@
 </head>
 <body>
     <section class="navbar">
-        <button type="button" class="navbar-button home-button"><img src="..\res\home.png"></button>
-        <button type="button" class="navbar-button profile-button"><img src="..\res\profile.png"></button>
-        <button type="button" class="navbar-button purchase-button"><img src="..\res\purchase.png"></button>
-        <button type="button" class="navbar-button logout-button" onclick="logout()"><img src="..\res\logout.png"></button>
+        <a href="client-home.html">
+            <button type="button" class="navbar-button home-button">
+                <img src="..\res\home.png">
+            </button>
+        </a>
+        <button type="button" class="navbar-button profile-button" onclick="openProfile()">
+            <img src="..\res\profile.png">
+        </button>
+
+        <a href="client-purchases.html">
+            <button type="button" class="navbar-button purchase-button">
+                <img src="..\res\purchase.png">
+            </button>            
+        </a>
+        <button type="button" class="navbar-button logout-button" onclick="logout()">
+            <img src="..\res\logout.png">
+        </button>           
+    </section>
+
+        <!-- Profile Edit Popup -->
+    <section class="profile" id="profile">
+        <button class="exit-btn" onclick="closeProfile()">X</button>
+        <h2>Profile</h2>
+        <form id="profile-form">
+            <div class="name field">
+                <label for="name">Name</label>
+                <input type="text" id="profile-name" name="name" placeholder="Enter your name">
+            </div>
+            <div class="email field">
+                <label for="email">Email</label>
+                <input type="email" id="profile-email" name="email" placeholder="Enter your email">
+            </div>
+            <div class="password field">
+                <label for="password">Password</label>
+                <input type="password" id="profile-password" name="password" placeholder="Enter new password">
+            </div>
+            <button type="submit">Save Changes</button>
+        </form>
     </section>
 
     <!--WHERE THE BOOTHS WILL BE APPENDED -->
@@ -21,6 +55,10 @@
             <button class="filter-button">Inactive</button>
             <button class="filter-button">A-Z</button>
             <button class="filter-button">Z-A</button>
+        </div>
+
+        <div class="booths-container">
+
         </div>
 
     </section>

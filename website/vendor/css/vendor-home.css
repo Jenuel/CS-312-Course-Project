@@ -3,18 +3,6 @@ body{
     text-align: center;
 }
 
-/**NAVBAR*/
-nav {
-    background-color: #003DA5;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-nav button{
-    padding: 10px;
-    margin: 10px;
-}
 
 /**GENERAL*/
 
@@ -25,6 +13,29 @@ section {
 }
 
 /**BOOTH CONTAINERS AND BOOTH CONTAINER ITEMS*/
+
+.content-wrapper {
+    width: 100%;
+    height: calc(100vh - 100px); 
+    position: relative;
+}
+
+#page-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.page-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.page-content.active {
+    display: block;
+}
+
 
 .booth-container{
     display: flex;
@@ -52,173 +63,53 @@ section {
 .box > * {
     flex: 1 1 calc(33.33% - 20px); 
     box-sizing: border-box;
-    border: 2px solid black; 
+    /* border: 2px solid black;  */
     padding: 10px; 
     border-radius: 5px; 
 }
 
-.booth-header{
-    display: flex;
-    justify-content: center; 
-    align-items: center;  
-    height: 80px; 
-    border-bottom: 1px solid black;
-}
-
-.booth-description{
-    width: 90%;
-    height: 130px; 
-    margin: 0 auto;
-    padding: 10px;  
-    word-wrap: break-word; 
-    margin-bottom: 10px;
-}
-
-.buttons {
-    display: flex;
-    justify-content: space-evenly;
-}
-
-.buttons button{
-    width: 180px;
-    height: 40px
-}
-
-/**CSS FOR THE POPUP IN CREATING A BOOTH AND EDITING A BOOTH*/
-
-.create-booth {
-    width: 800px;
-    height: 530px;
-    position: absolute;
-    background-color: white;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    visibility: hidden;
-    text-align: center;
-}
-
-.create-booth form, .edit-booth form {
-    text-align: start;
-}
-
-input, label {
-    display: block;
-}
-
-input, textarea{
-    width: 80%;
-}
-
-::placeholder{
-    color: black;
-}
-
-.grid{
-    padding-top: 20px;
-    display: grid;
-    row-gap: 20px;
-    align-items: start;
-    grid-template-areas: "image name"
-                         "image schedule"
-                         "image location"
-                         "image description";
-}
-
-.grid #image-part{
-    grid-area: image;
-    width: 90%;
-}
-
-.grid #image {
-    width: 230px;
-    height: 230px;
-    border: 1px solid black;
-}
-
-#image-part label{
-    display: block;
-    width: 200px;
-    border: 1px solid black;
-    color: black;
-    padding: 12px;
-    margin: 10px auto;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.grid #input-file{
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.778);
+    z-index: 1040;
     display: none;
 }
 
-#name-part{
-    grid-area: name;
+.modal-backdrop.show {
+    display: block;
 }
 
-#schedule-part{
-    grid-area: schedule;
-}
 
-#location-part{
-    grid-area: location;
+body.modal-open {
+    overflow: hidden;
 }
-
-#description-part{
-    grid-area: description;
-}
-
-textarea{
-    resize: none;
-    border: 2px solid black;
-}
-
-.edit-booth{
-    width: 800px;
-    height: 530px;
-    position: absolute;
-    position: relative;
-    background-color: white;
+.create-booth,
+.edit-booth {
+    display: none;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    visibility: hidden;
-    text-align: center;
-}
-
-.exit-btn {
-    position: absolute;
-    top: 10px;  
-    right: 10px; 
-    background-color: red;
-    color: white;
-    font-size: 20px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.exit-btn:hover {
-    background-color: darkred;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1050;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 90%;
+    max-width: 600px;
 }
 
 
-#finish-create, #finish-edit{
-    width: 80%;
-    height: 40px;
-    cursor: pointer;
-    margin-top: 50px;
-}
 
 /**JAVASCRIPT RELATED CLASSES*/
-.open-editBooth{
-    visibility: visible;
-    border: 5px solid black;
-}
 
-.open-createBooth{
-    visibility: visible;
-    border: 5px solid black;
+.open-createBooth  ,
+.open-editBooth {
+    display: block !important;
+    border-radius: 2px;
 }

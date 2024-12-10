@@ -125,3 +125,28 @@ function cancelOrder(orderId) {
 
 
 displayBooths();
+
+function openProfile() {
+    const profile = document.getElementById("profile");
+    profile.classList.add("open-profile");
+}
+
+// Close profile form popup
+function closeProfile() {
+    const profile = document.getElementById("profile");
+    profile.classList.remove("open-profile");
+}
+
+// Optionally, handle form submission
+document.getElementById("profile-form").addEventListener("submit", function(e) {
+    e.preventDefault(); // Prevent page reload on form submit
+    const name = document.getElementById("profile-name").value;
+    const email = document.getElementById("profile-email").value;
+    const password = document.getElementById("profile-password").value;
+
+    // Send the updated data to the server or process accordingly
+    console.log("Updated Profile:", name, email, password);
+    // You can implement an API call to save the changes here
+
+    closeProfile(); // Close the profile popup after submission
+});

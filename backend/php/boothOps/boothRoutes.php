@@ -31,6 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         
         $booths = [];
         while ($row = $boothResult->fetch_assoc()) {
+
+            if ($row['BoothIcon'] !== null) {
+                $row['BoothIcon'] = base64_encode($row['BoothIcon']);
+            }
             $booths[] = $row;
         }
 
@@ -59,18 +63,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // Handling POST request (e.g., submitting form data or updates)
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents("php://input"), true);
+ 
+
     $orgID = $_SESSION['user']['OrgID'];
     $title = $input['title'];
     $description = $input['description'];
     $schedules = $input['schedules'];
     $location = $input['location'];
-    $boothIcon = $input['boothIcon'];
-    $status = true;
+    $boothIcon = null;
+    $status = 'open';
     
+    if ($input['boothIcon']) {
+        $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $input['boothIcon']));
+        $boothIcon = $imageData;
+    }
+
 
     $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?,?,?)";
     $insertStmt = $conn->prepare($insertQuery);
-    $insertStmt->bind_param("ssssbsi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID); //check if the data types are correct
+    $insertStmt->bind_param("ssssssi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID); //check if the data types are correct
     if ($insertStmt->execute()) {
         http_response_code(201); // Send 201 Created status code
         echo json_encode(["success" => true]); 
