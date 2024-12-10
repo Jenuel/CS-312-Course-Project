@@ -42,3 +42,55 @@ google.charts.load("current", { packages: ["line"] });
 
               chart.draw(data, google.charts.Line.convertOptions(options));
             }
+
+/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+
+function getCompletedOrder(boothID){ // use data to create statisitics
+  
+  fetch(`http://localhost:3000/orders/complete/${boothID}`,{// change this one
+   method: 'GET', 
+   headers: {
+       'Content-Type': 'application/json', 
+   },
+   body: JSON.stringify({ status: 'cancelled' }), 
+
+  })
+  .then(response => {
+   if (!response.ok) {
+       throw new Error(`HTTP error! status: ${response.status}`);
+   }
+   return response.json();
+   })
+   .then(data => {
+    /*
+    sample output of data:[
+  {
+    "order id": 1,
+    "Total Price": 500.00,
+    "Status": "Complete",
+    "Product Quantity": 2,
+    "Product Name": "Apple"
+  },
+  {
+    "order id": 2,
+    "Total Price": 300.00,
+    "Status": "Complete",
+    "Product Quantity": 1,
+    "Product Name": "Orange"
+  }
+]
+
+
+    */
+
+  const orderDetails = data.map((order) => ({
+    orderId: order["order id"],
+    status: order["Status"],
+  }));
+       console.log("Products fetched successfully:", data);
+       // add handling of data
+   })
+   .catch(error => {
+       console.error("Error fetching products:", error);
+   });
+}

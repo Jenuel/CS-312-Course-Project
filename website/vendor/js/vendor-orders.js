@@ -177,7 +177,7 @@ const base64ToImage = (base64, mimeType = 'image/png') => {
 
 function getCompletedOrder(boothID){
   
-    fetch(`http://localhost:3000/complete/:${boothID}`,{// change this one
+    fetch(`http://localhost:3000/orders/complete/${boothID}`,{// change this one
      method: 'GET', 
      headers: {
          'Content-Type': 'application/json', 
@@ -200,9 +200,9 @@ function getCompletedOrder(boothID){
      });
  }
 
- function getPendingOrder(){
+ function getPendingOrder(boothID){
   
-    fetch(`http://localhost:3000/pending`,{// change this one
+    fetch(`http://localhost:3000/orders/pending/${boothID}`,{// change this one
      method: 'GET', 
      headers: {
          'Content-Type': 'application/json', 
