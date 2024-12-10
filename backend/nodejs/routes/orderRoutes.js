@@ -8,7 +8,7 @@ import {
 } from "../controllers/orderControllers.js";
 const router = express.Router();
 
-router.get("/pending", getPendingOrders); // vendor
+router.get("/pending/:boothId", getPendingOrders); // vendor
 router.get("/complete/:boothId", getCompletedOrders); // vendor
 router.post("/create", createOrder); // customer
 router.patch("/cancel/:orderId", cancelOrder); // customer
