@@ -28,10 +28,10 @@ services:
     image: mysql:8.0
     container_name: mysql-container
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: root          
       MYSQL_DATABASE: boothsystem
       MYSQL_USER: pilot
-      MYSQL_PASSWORD: pilot
+      MYSQL_PASSWORD: pilot123          
     ports:
       - "3306:3306"  # Expose MySQL on port 3306
     volumes:
