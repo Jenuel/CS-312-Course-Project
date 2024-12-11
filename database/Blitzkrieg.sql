@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Dec 10, 2024 at 03:29 PM
+-- Generation Time: Dec 11, 2024 at 04:11 PM
 -- Server version: 8.2.0
 -- PHP Version: 8.2.13
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `boothsystem`
+-- Database: `blitzkrieg`
 --
 
 -- --------------------------------------------------------
@@ -30,12 +30,12 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `booth`;
 CREATE TABLE IF NOT EXISTS `booth` (
   `BoothID` int NOT NULL AUTO_INCREMENT,
-  `Title` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `Description` text COLLATE utf8mb4_general_ci,
-  `Schedules` text COLLATE utf8mb4_general_ci,
-  `Location` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `Schedules` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `Location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `BoothIcon` longblob,
-  `Status` enum('open','not') COLLATE utf8mb4_general_ci NOT NULL,
+  `Status` enum('open','not') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `OrgID` int DEFAULT NULL,
   PRIMARY KEY (`BoothID`),
   KEY `fk_org` (`OrgID`)
@@ -155,71 +155,72 @@ DROP TABLE IF EXISTS `inventory`;
 CREATE TABLE IF NOT EXISTS `inventory` (
   `InventoryID` int NOT NULL AUTO_INCREMENT,
   `ProductID` int NOT NULL,
-  `Date` datetime NOT NULL,
-  `Type` enum('in','out') COLLATE utf8mb4_general_ci NOT NULL,
+  `Date` date NOT NULL,
+  `Type` enum('in','out') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `Quantity` int NOT NULL,
   PRIMARY KEY (`InventoryID`),
   KEY `ProductID` (`ProductID`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `inventory`
 --
 
 INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) VALUES
-(2, 1, '2024-11-04 11:27:00', 'in', 100),
-(3, 107, '2024-11-04 11:27:00', 'in', 50),
-(4, 108, '2024-11-04 11:27:00', 'in', 150),
-(5, 109, '2024-11-04 11:27:00', 'in', 200),
-(6, 110, '2024-11-04 11:27:00', 'in', 75),
-(7, 111, '2024-11-04 11:27:00', 'in', 60),
-(8, 112, '2024-11-04 11:27:00', 'in', 40),
-(9, 113, '2024-11-04 11:27:00', 'in', 85),
-(10, 114, '2024-11-04 11:27:00', 'in', 90),
-(11, 115, '2024-11-04 11:27:00', 'in', 100),
-(12, 116, '2024-11-04 11:27:00', 'in', 45),
-(13, 117, '2024-11-04 11:27:00', 'in', 120),
-(14, 118, '2024-11-04 11:27:00', 'in', 110),
-(15, 119, '2024-11-04 11:27:00', 'in', 250),
-(16, 120, '2024-11-04 11:27:00', 'in', 190),
-(17, 121, '2024-11-04 11:27:00', 'in', 60),
-(18, 122, '2024-11-04 11:27:00', 'in', 100),
-(19, 123, '2024-11-04 11:27:00', 'in', 80),
-(20, 124, '2024-11-04 11:27:00', 'in', 90),
-(21, 125, '2024-11-04 11:27:00', 'in', 75),
-(22, 126, '2024-11-04 11:27:00', 'in', 55),
-(23, 127, '2024-11-04 11:27:00', 'in', 45),
-(24, 128, '2024-11-04 11:27:00', 'in', 95),
-(25, 129, '2024-11-04 11:27:00', 'in', 70),
-(26, 130, '2024-11-04 11:27:00', 'in', 130),
-(27, 131, '2024-11-04 11:27:00', 'in', 60),
-(28, 132, '2024-11-04 11:27:00', 'in', 85),
-(29, 133, '2024-11-04 11:27:00', 'in', 120),
-(30, 134, '2024-11-04 11:27:00', 'in', 45),
-(31, 135, '2024-11-04 11:27:00', 'in', 150),
-(32, 136, '2024-11-04 11:27:00', 'in', 100),
-(33, 137, '2024-11-04 11:27:00', 'in', 60),
-(34, 138, '2024-11-04 11:27:00', 'in', 95),
-(35, 139, '2024-11-04 11:27:00', 'in', 50),
-(36, 140, '2024-11-04 11:27:00', 'in', 30),
-(37, 141, '2024-11-04 11:27:00', 'in', 40),
-(38, 142, '2024-11-04 11:27:00', 'in', 20),
-(39, 143, '2024-11-04 11:27:00', 'in', 35),
-(40, 144, '2024-11-04 11:27:00', 'in', 25),
-(41, 145, '2024-11-04 11:27:00', 'in', 60),
-(42, 146, '2024-11-04 11:27:00', 'in', 45),
-(43, 147, '2024-11-04 11:27:00', 'in', 100),
-(44, 148, '2024-11-04 11:27:00', 'in', 15),
-(45, 149, '2024-11-04 11:27:00', 'in', 10),
-(46, 150, '2024-11-04 11:27:00', 'in', 50),
-(47, 151, '2024-11-04 11:27:00', 'in', 30),
-(48, 152, '2024-11-04 11:27:00', 'in', 20),
-(49, 153, '2024-11-04 11:27:00', 'in', 40),
-(50, 154, '2024-11-04 11:27:00', 'in', 35),
-(51, 155, '2024-11-04 11:27:00', 'in', 15),
-(52, 156, '2024-11-04 11:27:00', 'in', 100),
-(53, 157, '2024-11-04 11:27:00', 'in', 25),
-(54, 158, '2024-11-04 11:27:00', 'in', 50);
+(2, 1, '2024-11-04', 'in', 100),
+(3, 107, '2024-11-04', 'in', 50),
+(4, 108, '2024-11-04', 'in', 150),
+(5, 109, '2024-11-04', 'in', 200),
+(6, 110, '2024-11-04', 'in', 75),
+(7, 111, '2024-11-04', 'in', 60),
+(8, 112, '2024-11-04', 'in', 40),
+(9, 113, '2024-11-04', 'in', 85),
+(10, 114, '2024-11-04', 'in', 90),
+(11, 115, '2024-11-04', 'in', 100),
+(12, 116, '2024-11-04', 'in', 45),
+(13, 117, '2024-11-04', 'in', 120),
+(14, 118, '2024-11-04', 'in', 110),
+(15, 119, '2024-11-04', 'in', 250),
+(16, 120, '2024-11-04', 'in', 190),
+(17, 121, '2024-11-04', 'in', 60),
+(18, 122, '2024-11-04', 'in', 100),
+(19, 123, '2024-11-04', 'in', 80),
+(20, 124, '2024-11-04', 'in', 90),
+(21, 125, '2024-11-04', 'in', 75),
+(22, 126, '2024-11-04', 'in', 55),
+(23, 127, '2024-11-04', 'in', 45),
+(24, 128, '2024-11-04', 'in', 95),
+(25, 129, '2024-11-04', 'in', 70),
+(26, 130, '2024-11-04', 'in', 130),
+(27, 131, '2024-11-04', 'in', 60),
+(28, 132, '2024-11-04', 'in', 85),
+(29, 133, '2024-11-04', 'in', 120),
+(30, 134, '2024-11-04', 'in', 45),
+(31, 135, '2024-11-04', 'in', 150),
+(32, 136, '2024-11-04', 'in', 100),
+(33, 137, '2024-11-04', 'in', 60),
+(34, 138, '2024-11-04', 'in', 95),
+(35, 139, '2024-11-04', 'in', 50),
+(36, 140, '2024-11-04', 'in', 30),
+(37, 141, '2024-11-04', 'in', 40),
+(38, 142, '2024-11-04', 'in', 20),
+(39, 143, '2024-11-04', 'in', 35),
+(40, 144, '2024-11-04', 'in', 25),
+(41, 145, '2024-11-04', 'in', 60),
+(42, 146, '2024-11-04', 'in', 45),
+(43, 147, '2024-11-04', 'in', 100),
+(44, 148, '2024-11-04', 'in', 15),
+(45, 149, '2024-11-04', 'in', 10),
+(46, 150, '2024-11-04', 'in', 50),
+(47, 151, '2024-11-04', 'in', 30),
+(48, 152, '2024-11-04', 'in', 20),
+(49, 153, '2024-11-04', 'in', 40),
+(50, 154, '2024-11-04', 'in', 35),
+(51, 155, '2024-11-04', 'in', 15),
+(52, 156, '2024-11-04', 'in', 100),
+(53, 157, '2024-11-04', 'in', 25),
+(54, 158, '2024-11-04', 'in', 50),
+(55, 1, '2024-12-11', 'in', 1);
 
 -- --------------------------------------------------------
 
@@ -244,14 +245,14 @@ CREATE TABLE IF NOT EXISTS `order` (
 --
 
 INSERT INTO `order` (`OrderID`, `BoothID`, `Status`, `DateOrdered`, `DatePaid`, `Price`) VALUES
-(1, 13, 'Pending', '2024-11-19 10:31:54', '0000-00-00 00:00:00', 120.00),
-(2, 13, 'Pending', '2024-11-19 10:31:54', NULL, 209.89),
+(1, 13, 'Complete', '2024-11-19 10:31:54', '2024-11-19 00:09:02', 120.00),
+(2, 13, 'Pending', '2024-11-19 10:31:54', '2024-11-20 00:09:47', 209.89),
 (3, 14, 'Pending', '2024-11-19 10:31:54', NULL, 2405.50),
 (4, 14, 'Pending', '2024-11-19 10:31:54', NULL, 599.94),
 (5, 15, 'Pending', '2024-11-19 10:31:54', NULL, 80.00),
 (6, 15, 'Pending', '2024-11-19 10:31:54', NULL, 290.00),
 (7, 15, 'Complete', '2024-11-19 10:31:54', NULL, 115.00),
-(8, 13, 'Complete', '2024-11-19 10:31:54', NULL, 479.20),
+(8, 13, 'Complete', '2024-11-26 10:31:54', '2024-11-26 00:10:02', 479.20),
 (9, 15, 'Complete', '2024-11-19 10:31:54', NULL, 198.00);
 
 -- --------------------------------------------------------
@@ -298,7 +299,7 @@ INSERT INTO `order_products` (`ProductID`, `OrderID`, `Quantity`, `Total`) VALUE
 DROP TABLE IF EXISTS `organization`;
 CREATE TABLE IF NOT EXISTS `organization` (
   `OrgID` int NOT NULL AUTO_INCREMENT,
-  `OrgName` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `OrgName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`OrgID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -325,8 +326,8 @@ CREATE TABLE IF NOT EXISTS `product` (
   `BoothID` int NOT NULL,
   `StocksRemaining` int NOT NULL,
   `Price` decimal(10,2) NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `status` enum('active','inactive') COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `Image` longblob,
   PRIMARY KEY (`ProductID`),
   KEY `BoothID` (`BoothID`)
@@ -417,7 +418,7 @@ INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name
 DROP TABLE IF EXISTS `service`;
 CREATE TABLE IF NOT EXISTS `service` (
   `ProductID` int NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`ProductID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -456,12 +457,12 @@ INSERT INTO `service` (`ProductID`, `description`) VALUES
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `UserID` int NOT NULL AUTO_INCREMENT,
-  `FirstName` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `LastName` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `SchoolEmail` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `Password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `FirstName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `LastName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `SchoolEmail` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `Image` longblob,
-  `Status` enum('active','inactive') COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`UserID`),
   UNIQUE KEY `SchoolEmail` (`SchoolEmail`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

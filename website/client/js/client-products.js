@@ -31,10 +31,12 @@ function displayProducts(products) {
 /**
  * Fetch for retrieving products (GET)
  * @param {Integer} boothId 
+ * @param {String} type  choices: name || price 
+ * @param {String} order  choices: ASC || DESC
  */
-function fetchProducts(boothId) {
+function fetchProducts(boothId,type, order ) {
 
-    fetch(`http://localhost:3000/products/booth/${boothId}`, { 
+    fetch(`http://localhost:3000/products/booth/${boothId}?filter=active&sort=${type}:${order}`, { 
         method: 'GET',
         headers: {
             "Content-type": 'application/json',
