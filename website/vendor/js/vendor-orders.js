@@ -113,15 +113,15 @@ function loadPage(page) {
     switch (page) {
         case "home":
             // Show the booth content and hide iframe for the "home" page
-            boothContent.style.display = "none";  // Show booth content
-            pageFrame.style.display = "block";      // Hide iframe
+            boothContent.style.display = "none";  // hide booth content
+            pageFrame.style.display = "block";      // show iframe
             pageFrame.src = "../html/vendor-home.html"; // Load vendor-sales.html in iframe
             break;
 
         case "orders":
             // Hide booth content and show iframe for the "orders" page
-            boothContent.style.display = "block";   // Hide booth content
-            pageFrame.style.display = "none";     // Show iframe
+            boothContent.style.display = "block";   // show booth content
+            pageFrame.style.display = "none";     // hide iframe
             break;
 
         case "sales":
