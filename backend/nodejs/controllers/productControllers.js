@@ -296,8 +296,8 @@ export {
   buyProduct,
   createProduct,
   editProduct,
-  //changeStatusProduct,
-  //AddStocks
+  changeStatusProduct,
+  AddStocks
 };
 
 /* ------------------------------------------------------------------------------------- */

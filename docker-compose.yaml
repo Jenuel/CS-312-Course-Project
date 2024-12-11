@@ -1,16 +1,16 @@
-version: '3.8'
+version: "3.8"
 
 services:
   php-apache:
     build:
       context: ./backend/php
     ports:
-      - "8080:80"  # Expose Apache on port 8080
+      - "8080:80" # Expose Apache on port 8080
     volumes:
-      - ./backend/php:/var/www/html/php  # Mount PHP source code
-      - ./website:/var/www/html/  # Mount website static files
+      - ./backend/php:/var/www/html/php # Mount PHP source code
+      - ./website:/var/www/html/ # Mount website static files
     depends_on:
-      - mysql  # Ensure MySQL is running
+      - mysql # Ensure MySQL is running
     networks:
       - app-network
 
@@ -18,9 +18,10 @@ services:
     build:
       context: ./backend/nodejs
     ports:
-      - "3000:3000"  # Expose Node.js app on port 3000
+      - "3000:3000"
     volumes:
-      - ./backend/nodejs:/usr/src/app  # Mount Node.js source code
+      - ./backend/nodejs:/usr/src/app # Mount source code
+      - /usr/src/app/node_modules # Preserve `node_modules` in the container
     networks:
       - app-network
 
@@ -28,15 +29,15 @@ services:
     image: mysql:8.0
     container_name: mysql-container
     environment:
-      MYSQL_ROOT_PASSWORD: root          
-      MYSQL_DATABASE: boothsystem
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: Blitzkrieg
       MYSQL_USER: pilot
-      MYSQL_PASSWORD: pilot123          
+      MYSQL_PASSWORD: pilot123
     ports:
-      - "3306:3306"  # Expose MySQL on port 3306
+      - "3306:3306" # Expose MySQL on port 3306
     volumes:
-      - mysql_data:/var/lib/mysql  # Persistent data storage
-      - ./database:/docker-entrypoint-initdb.d  # Mount initialization scripts
+      - mysql_data:/var/lib/mysql # Persistent data storage
+      - ./database:/docker-entrypoint-initdb.d # Mount initialization scripts
     networks:
       - app-network
 
@@ -45,4 +46,3 @@ volumes:
 
 networks:
   app-network:
-
