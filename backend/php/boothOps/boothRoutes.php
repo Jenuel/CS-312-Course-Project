@@ -1,4 +1,13 @@
 <?php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Origin: http://localhost:8080');
+header('Access-Control-Allow-Credentials: true');
+
+
+ini_set('session.cookie_samesite', 'None');
+ini_set('session.cookie_secure', 'true');
 session_start(); 
 
 require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/php/connectDb.php');
@@ -126,9 +135,9 @@ else {
 
         $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?,?,?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssssssi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID); //check if the data types are correct
+        $insertStmt->bind_param("ssssssi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID);
         if ($insertStmt->execute()) {
-            http_response_code(201); // Send 201 Created status code
+            http_response_code(201); 
             echo json_encode(["success" => true]); 
         } else {
             echo json_encode(["error" => "Error: " . $conn->error]);
@@ -136,41 +145,50 @@ else {
     }
     
 } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    // Get booth ID from URL
-    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $pathSegments = explode('/', $path);
-    $boothId = end($pathSegments);
+    try {
 
-    if (!is_numeric($boothId)) {
-        echo json_encode(["error" => "Invalid booth ID"]);
-        exit();
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $pathSegments = explode('/', $path);
+        $boothId = end($pathSegments);
+
+        if (!is_numeric($boothId)) {
+            http_response_code(400);
+            echo json_encode(["error" => "Invalid booth ID"]);
+            exit();
+        }
+
+        $orgID = $_SESSION['user']['OrgID'];
+        
+        // Check if the booth belongs to the user's organization
+        $checkQuery = "SELECT BoothID FROM booth WHERE BoothID = ? AND OrgID = ?";
+        $checkStmt = $conn->prepare($checkQuery);
+        $checkStmt->bind_param("ii", $boothId, $orgID);
+        $checkStmt->execute();
+        $result = $checkStmt->get_result();
+        
+        if ($result->num_rows === 0) {
+            http_response_code(403);
+            echo json_encode(["error" => "Unauthorized to delete this booth"]);
+            exit();
+        }
+
+        // Delete the booth
+        $deleteQuery = "DELETE FROM booth WHERE BoothID = ? AND OrgID = ?";
+        $deleteStmt = $conn->prepare($deleteQuery);
+        $deleteStmt->bind_param("ii", $boothId, $orgID);
+
+        if ($deleteStmt->execute()) {
+            http_response_code(200);
+            echo json_encode(["success" => true, "message" => "Booth deleted successfully"]);
+        } else {
+            throw new Exception($conn->error);
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Error deleting booth: " . $e->getMessage()]);
     }
-
-    $orgID = $_SESSION['user']['OrgID'];
-    
-    // Check if the booth belongs to the user's organization
-    $checkQuery = "SELECT BoothID FROM booth WHERE BoothID = ? AND OrgID = ?";
-    $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bind_param("ii", $boothId, $orgID);
-    $checkStmt->execute();
-    $result = $checkStmt->get_result();
-    
-    if ($result->num_rows === 0) {
-        echo json_encode(["error" => "Unauthorized to delete this booth"]);
-        exit();
-    }
-
-    // Delete the booth
-    $deleteQuery = "DELETE FROM booth WHERE BoothID = ? AND OrgID = ?";
-    $deleteStmt = $conn->prepare($deleteQuery);
-    $deleteStmt->bind_param("ii", $boothId, $orgID);
-
-    if ($deleteStmt->execute()) {
-        echo json_encode(["success" => true]);
-    } else {
-        echo json_encode(["error" => "Error deleting booth: " . $conn->error]);
-    }
-} 
+    exit(); 
+}
 else {
     echo json_encode(["error" => "Invalid request method"]);
 }
