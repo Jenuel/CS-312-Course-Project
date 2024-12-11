@@ -58,8 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
-
+             
+            if ($user['Status'] == 'inactive') {
             session_start();
+            $sqlStat = "UPDATE users SET Status='active' WHERE SchoolEmail = ? AND Password = ?";
+            $stmtOn = $conn->prepare($sqlStat);
+            $stmtOn->bind_param("ss", $email, $password);
+            $stmtOn->execute();
+
             $_SESSION['user'] = [
                 'UserID' => $user['UserID'],
                 'FirstName' => $user['FirstName'],
@@ -100,6 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode($transport); //Redirection will happen in frontend
                 exit;
             }
+
+        } else {
+            echo json_encode(["error" => "Incorrect email or password"]);
+
+        }
 
             exit();
             
