@@ -551,8 +551,10 @@ function showAddProductFormData(existingData, productContainer) {
       ProductImage: imagePreview.classList.contains("d-none")
         ? null
         : imagePreview.src,
-    };
+    }
+});
   let submitHandled = false;
+  
 
   submitBtn.addEventListener("click", async () => {
     console.log("submit initialized");
@@ -561,37 +563,36 @@ function showAddProductFormData(existingData, productContainer) {
     submitBtn.disabled = true;
 
     try {
-      const formData = {
-        boothID: parseInt(sessionStorage.getItem("currentBoothId")),
-        ProductName: modalElement.querySelector("#product-name").value,
-        ProductStatus: existingData
-          ? modalElement.querySelector("#status").value
-          : "Pending",
-        ProductPrice: modalElement.querySelector("#price").value,
-        ProductStock: modalElement.querySelector("#stock").value || null,
-        ProductImage: imagePreview.classList.contains("d-none")
-          ? null
-          : imagePreview.src,
-      };
+        const formData = {
+          boothID: parseInt(sessionStorage.getItem("currentBoothId")),
+          ProductName: modalElement.querySelector("#product-name").value,
+          ProductStatus: existingData
+            ? modalElement.querySelector("#status").value
+            : "Pending",
+          ProductPrice: modalElement.querySelector("#price").value,
+          ProductStock: modalElement.querySelector("#stock").value || null,
+          ProductImage: imagePreview.classList.contains("d-none")
+            ? null
+            : imagePreview.src,
+        };
 
-    if (existingData && productContainer) {
-      updateProduct(formData, productContainer);
-    } else {
-      createProduct(formData);
-    }
-      if (existingData && productContainer) {
-      } else {
-        await createProduct(formData);
-      }
+        if (existingData && productContainer) {
+          updateProduct(formData, productContainer);
+        } else {
+          createProduct(formData);
+        }
+        if (existingData && productContainer) {
+        } else {
+          await createProduct(formData);
+        }
 
-    modal.hide();
-    modalElement.addEventListener("hidden.bs.modal", () => {
-      modalElement.remove();
-    });
-  });
+        modal.hide();
+        modalElement.addEventListener("hidden.bs.modal", () => {
+          modalElement.remove();
+      });
 
-      modal.hide();
-      modalElement.remove();
+        modal.hide();
+        modalElement.remove();
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to save product. Please try again.");
