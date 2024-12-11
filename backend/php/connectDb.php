@@ -3,7 +3,7 @@
 $DB_HOST = "mysql";
 $DB_USER = "pilot";
 $DB_PASSWORD = "pilot";
-$DB_NAME = "blitzkrieg";
+$DB_NAME = "Blitzkrieg";
 
 $conn = new mysqli($DB_HOST,$DB_USER, $DB_PASSWORD,$DB_NAME, 3306);
 

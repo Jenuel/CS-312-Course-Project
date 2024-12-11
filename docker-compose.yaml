@@ -30,7 +30,7 @@ services:
     container_name: mysql-container
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: boothsystem
+      MYSQL_DATABASE: Blitzkrieg
       MYSQL_USER: pilot
       MYSQL_PASSWORD: pilot
     ports:
