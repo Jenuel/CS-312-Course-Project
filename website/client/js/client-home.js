@@ -13,9 +13,8 @@ let formData = {
  * Fetch for retriveing booths (GET)
  */
 function getData() {
-    fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
+    fetch('http://localhost:8080/php/boothOps/boothRoutes.php', {
         method: 'GET',
-        mode: 'no-cors',
         headers: {
             'Content-Type': 'application/json',
         },
@@ -23,16 +22,26 @@ function getData() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        // Check if there's a response body before parsing
+        if (response.headers.get("content-length") === "0") {
+            return null; // No content
+        }
+
         return response.json();
     })
     .then(data => {
-        if (data.error) {
-            console.error('Error:', data.error);
+        if (data) {
+            if (data.error) {
+                console.error('Error:', data.error);
+            } else {
+                console.log('Booths data:', data);
+                displayBooths(data);
+            }
         } else {
-            console.log('Booths data:', data);
-            displayBooths(data);
+            console.warn('Empty response from server');
         }
     })
     .catch(error => {
