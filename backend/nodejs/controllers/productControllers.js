@@ -32,6 +32,14 @@ const getProducts = async (request, response) => {
       }
     }
 
+    if(filter === "active"){
+      query += `AND p.status = 'active'`
+    }
+
+    if(filter === "inactive"){
+      query += `AND p.status = 'inactive'`
+    }
+
     const [rows] = await db.query(query, params);
 
     response.json(rows); // convert response to json
