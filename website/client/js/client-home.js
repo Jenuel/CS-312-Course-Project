@@ -57,43 +57,33 @@ function getData() {
 
 // Function to display booths dynamically
 function displayBooths(booths) {
-    box.innerHTML = "";  // Clear previous booths
-
-    booths.forEach((booth, index) => { 
-        let valueDiv = document.createElement('div'); 
-        valueDiv.classList.add('item');
-        
-        // Creating the information of the booth
-        valueDiv.innerHTML = `
-            <a href="client-products.html" class="box">
-                <div class="booth-header">
-                    <h2>Booth ${index + 1}</h2>  <!-- Display booth number -->
-                </div>
-                <div class="booth status">
-                    <p class="label">STATUS</p>
-                    <p class="content">${booth.status}</p>  <!-- Dynamically set booth status -->
-                </div>
-                <div class="booth schedule">
-                    <p class="label">SCHEDULE</p>
-                    <p class="content">${booth.schedule}</p>  <!-- Dynamically set booth schedule -->
-                </div> 
-                <div class="booth location">
-                    <p class="label">LOCATION</p>
-                    <p class="content">${booth.location}</p>  <!-- Dynamically set booth location -->
-                </div>
-                <div class="booth description">
-                    <p class="label">DESCRIPTION</p>
-                    <p class="content">${booth.description}</p>  <!-- Dynamically set booth description -->
-                </div>    
-            </a>`;
-
-        // Adding event listener for redirecting to the details page of the booth
-        valueDiv.addEventListener('click', function() {
-            window.location.href = `boothDetails.html?id=${booth.id}`;  // Redirect to booth details page
-        });
-
-        box.appendChild(valueDiv);  // Append the booth to the container
+    const container = document.querySelector("#booth-container"); // Select the container where the cards will go
+    container.innerHTML = ""; // Clear any existing content
+  
+    booths.forEach((booth) => {
+      // Create the card HTML using the booth data
+      const cardHTML = `
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <img src="${booth.BoothIcon ? `data:image/png;base64,${booth.BoothIcon}` : 'https://via.placeholder.com/150'}" 
+                 class="card-img-top" 
+                 alt="Booth ${booth.Title} Image">
+            <div class="card-body">
+              <h5 class="card-title">${booth.Title}</h5>
+              <p class="card-text">Status: ${booth.Status}</p>
+              <p class="card-text">Operating Days: ${booth.Schedules || 'N/A'}</p>
+              <p class="card-text">Location: ${booth.Location || 'N/A'}</p>
+              <p class="card-text">Description: ${booth.Description}</p>
+              <a href="boothDetails.html?id=${booth.BoothID}" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+      `;
+  
+      // Append the card to the container
+      container.innerHTML += cardHTML;
     });
+  
 }
 
 // Call getData to fetch the booth data when the page loads
