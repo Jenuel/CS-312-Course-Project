@@ -172,7 +172,7 @@ const createProduct = async (request, response) => {
 
     await db.query(
       'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) VALUES (NULL, ?, ?, "in", ?)',
-      [newProductID, getCurrentDate(), stocks]
+      [rows.insertId, getCurrentDate(), stocks]
     );// query to add stocks to inventory
 
     response.json(rows);
