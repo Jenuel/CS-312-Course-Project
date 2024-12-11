@@ -21,7 +21,7 @@ function getData() {
         },
         // Pass filter and order in query params or as part of the body, depending on how your server handles them.
         // Assuming the server expects query parameters, you can build a URL with them:
-        body: JSON.stringify(formData),
+
     })
     .then(response => {
         if (!response.ok) {
