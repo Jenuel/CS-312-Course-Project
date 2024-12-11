@@ -54,7 +54,7 @@ function showProducts(boothId) {
 
 function checkLogin() {
   fetch(
-    "http://localhost/CS-312-Course-Project/backend/php/userOps/checkSession.php",
+    "http://localhost:8080/php/userOps/checkSession.php",
     {
       method: "GET",
       headers: {
@@ -81,7 +81,7 @@ let formData = {
 
 // fetches the data and calls the displaying function
 function getData() {
-    fetch('http://localhost/php/boothOps/boothRoutes.php/', {
+    fetch('http://localhost:8080/php/boothOps/boothRoutes.php/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -240,7 +240,7 @@ async function createBoothFunction() {
   };
 
   fetch(
-    "http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php",
+    "http://localhost:8080/php/boothOps/boothRoutes.php",
     {
       method: "POST",
       body: JSON.stringify(formData),
