@@ -345,33 +345,38 @@ function deleteBooth(boothId) {
       return;
   }
 
-  fetch(
-      `http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`,
-      {
-          method: "DELETE",
-          headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + sessionStorage.getItem("sessionID")
-          },
+  fetch(`http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`, {
+      method: "DELETE",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      credentials: 'include'
+  })
+  .then(async response => {
+      const text = await response.text();
+      let data;
+      try {
+          data = JSON.parse(text);
+      } catch (e) {
+          console.error('Server response:', text);
+          throw new Error('Invalid server response');
       }
-  )
-  .then(response => {
+
       if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error(data.error || 'Failed to delete booth');
       }
-      return response.json();
+
+      return data;
   })
   .then(data => {
       if (data.success) {
-          alert("Booth deleted successfully");
+          alert(data.message || "Booth deleted successfully");
           getData(); // Refresh the booth list
-      } else {
-          throw new Error(data.error || "Error deleting booth");
       }
   })
   .catch(error => {
-      console.error("Error:", error);
-      alert(error.message || "An error occurred while deleting the booth");
+      console.error("Delete error:", error);
+      alert(error.message || "Failed to delete booth. Please try again.");
   });
 }
 /**
