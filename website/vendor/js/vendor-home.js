@@ -464,13 +464,7 @@ function loadPage(page) {
       pageFrame.style.display = "none";
       getData(); // Refresh
       break;
-
-    case "products":
-      boothContent.classList.remove("active");
-      pageFrame.style.display = "block";
-      pageFrame.src = "../html/vendor-product.html";
-      break;
-
+      
     case "orders":
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";
@@ -480,7 +474,7 @@ function loadPage(page) {
     case "sales":
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";
-      pageFrame.src = "../html/vendor-sales.html"; // wala pa
+      pageFrame.src = "../html/vendor-sales.html"; 
       break;
   }
 }

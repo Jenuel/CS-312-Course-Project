@@ -32,7 +32,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: Blitzkrieg
       MYSQL_USER: pilot
-      MYSQL_PASSWORD: pilot123
+      MYSQL_PASSWORD: pilot
     ports:
       - "3306:3306" # Expose MySQL on port 3306
     volumes:

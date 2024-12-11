@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import productRoutes from './routes/productRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
+import analyticRoutes from './routes/analyticRoutes.js'
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ const pool = mysql.createPool({
 
 // Add CORS middleware before routes
 app.use(cors({
-    origin: ['http://localhost', 'http://localhost:80', 'http://127.0.0.1', 'http://127.0.0.1:80', 'http://localhost:8080'],
+    origin: ['http://localhost', 'http://localhost:80', 'http://127.0.0.1', 'http://127.0.0.1:80', 'http://localhost:8080','http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -55,6 +56,7 @@ app.use(express.json())
 //routes
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
+app.use("/analytics",analyticRoutes)
 
 
 app.get('/test', (req, res) => {

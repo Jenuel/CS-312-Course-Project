@@ -524,13 +524,12 @@ function showAddProductFormData(existingData, productContainer) {
 });
   let submitHandled = false;
   
-
   submitBtn.addEventListener("click", async () => {
     console.log("submit initialized");
     if (submitHandled) return;
     submitHandled = true;
     submitBtn.disabled = true;
-
+    
     try {
         const formData = {
           boothID: parseInt(sessionStorage.getItem("currentBoothId")),
