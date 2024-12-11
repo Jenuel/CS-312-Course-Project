@@ -24,25 +24,18 @@ function displayProducts(products) {
         box.appendChild(productDiv);
     });
 }
-/*
-function to convert base64 --> image
-*/
 
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
-// Function to create an image element from Base64
-function base64ToImage(base64, mimeType = 'image/png') {
-    const img = new Image();
-    img.src = `data:${mimeType};base64,${base64}`;
-    return img; // Return the image element
-}
-
-/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
-
-// Main function to fetch products
+/**
+ * Fetch for retrieving products (GET)
+ * @param {Integer} boothId 
+ */
 function fetchProducts(boothId) {
 
     fetch(`http://localhost:3000/products/booth/${boothId}`, { 
-        method: 'PATCH',
+        method: 'GET',
         headers: {
             "Content-type": 'application/json',
         },
@@ -86,7 +79,12 @@ function fetchProducts(boothId) {
         console.error("Error purchasing product:", error);
     });
 }
-// make sure value is int
+
+/**
+ * Fetch for purchasing products (PATCH)
+ * @param {Integer} productID 
+ * @param {Integer} value 
+ */
 function buyProduct(productID, value) {
 
     const data = {
@@ -116,6 +114,19 @@ function buyProduct(productID, value) {
     });
 }
 
+//END FOR FETCH FUNCTIONS
+/* ----------------------------------------------------------------------------------------------------- */
 
+/*
+Helper function to convert base64 --> image
+*/
+
+
+// Function to create an image element from Base64
+function base64ToImage(base64, mimeType = 'image/png') {
+    const img = new Image();
+    img.src = `data:${mimeType};base64,${base64}`;
+    return img; // Return the image element
+}
 
 fetchProducts(boothId);

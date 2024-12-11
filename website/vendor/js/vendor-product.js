@@ -110,9 +110,12 @@ function convertImageToBlob(imageFile) {
 /* ==================================================================================================== */
 
 /* ----------------------------------------------------------------------------------------------------- */
-// fetch functions 
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER 
 
-
+/**
+ * fetch for creating a product (POST)
+ * @param {Array} formData 
+ */
 async function createProduct(formData) {
   try {
     const response = await fetch(`${API_BASE_URL}/create`, {
@@ -143,8 +146,9 @@ async function createProduct(formData) {
     alert("Failed to create product. Please try again.");
   }
 }
+
 /**
- * Edit product
+ * Fetch for edditing a product (PATCH)
  * 
  * @param {int} productId 
  * @param {Data[String]} Data 
@@ -152,9 +156,11 @@ async function createProduct(formData) {
  * 
  * here are all the possible values to be changed in a produc
  * Data = {
+ * "StocksRemaining:intValue",
  * "Price:intvalue", 
  * "name:stringvalue", 
  * "Image: file", 
+ * "status:stringValue",
  * }
  */
 async function editProduct(productId,Data) {
@@ -163,14 +169,14 @@ async function editProduct(productId,Data) {
     const [name, value] = item.split(":"); // Split into name and value
     let convertedValue;
 
-    if (name === "Price") {
+    if (name === "Price"|| name === "StocksRemaining" ) {
       convertedValue = parseInt(value);
     } 
-    if (name === "name") {
+    if (name === "name" || name === "status") {
       convertedValue = value;
     } 
     if (name === "Image") {
-      convertedValue = await convertImageToBlob(value); // await inside async function
+      convertedValue = await convertImageToBlob(value); 
     }
 
     return { [name]: convertedValue }; // Create an object with dynamic keys
@@ -204,12 +210,12 @@ async function editProduct(productId,Data) {
 }
 
 /**
- * cayton's  edit product
+ * cayton's  edit product (PATCH)
  * @param {*} updatedData 
  * @param {*} productContainer 
  */
 
-async function updateProduct(updatedData, productContainer) {// please specify what these value would look like
+async function updateProduct(updatedData, productContainer) {// please remove if not needed
   try {
     const productId = productContainer.dataset.productId;
     if (!productId) {
@@ -236,10 +242,10 @@ async function updateProduct(updatedData, productContainer) {// please specify w
         product: {
           name: updatedData.ProductName,
           price: parseFloat(updatedData.ProductPrice),
-          status: updatedData.ProductStatus.toLowerCase(),// remove
-          stocks: parseInt(updatedData.ProductStock),// remove
+          status: updatedData.ProductStatus.toLowerCase(),
+          stocks: parseInt(updatedData.ProductStock),
           image: updatedData.ProductImage,
-          description: updatedData.ProductDescription,// remove
+          description: updatedData.ProductDescription,
         },
       }),
     });

@@ -194,7 +194,6 @@ INPUT:
   ]
 } 
 */
-
 const editProduct = async (request, response) => {
 
   const db = request.db;
@@ -207,6 +206,10 @@ const editProduct = async (request, response) => {
       const key = Object.keys(field)[0];  // arraylist for keys from body, [name, price] 
       const value = Object.values(field)[0]; // arraylist for values from body, [myName,150]
 
+      if (key === "StocksRemaining") {
+        await updateStockInInventory(value, productId , db);
+      }
+
        // Prepare the query
       const query = `UPDATE \`product\` SET \`${key}\` = ? WHERE \`ProductID\` = ?`;
 
@@ -218,17 +221,83 @@ const editProduct = async (request, response) => {
           .status(404)
           .send(`Product with ID ${productId} not found or not updated`);
       }
+    }// end of loop
 
-      response.json({
-        message: "Product updated successfully",
-        updatedRows: updateResult.affectedRows,
-      });
-    }
+    response.json({
+      message: "Product updated successfully",
+    });
   } catch (error) {
     console.error("Error updating product:", error);
     response.status(500).send("Failed to update product");
   }
 };
+
+
+/*
+helper function to retrive current
+*/
+const getCurrentDate = () => {
+  const date = new Date();
+
+  // Get the date in the format 'YYYY-MM-DD'
+  const formattedDate = date.toISOString().slice(0, 10); // Extract the 'YYYY-MM-DD' part
+
+  return formattedDate;
+};
+
+/*
+helper function to updateStocks
+*/
+
+const updateStockInInventory = async (value, productId, db) => {
+  try {
+    // Query to get the current and updated stock values
+    const [difference] = await db.query(
+      'SELECT p.StocksRemaining as "current stocks", ' +
+      '(p.StocksRemaining - ? ) as "updated stocks" ' +
+      'FROM product p WHERE p.ProductID = ?',
+      [value, productId]
+    );
+
+    const { 'current stocks': currentStocks, 'updated stocks': updatedStocks } = difference[0];
+
+    if (currentStocks > updatedStocks) { // stocks decreased
+      const stocks = (updatedStocks * -1);
+      await db.query(
+        'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) ' + 
+        'VALUES (NULL, ?, ?, "out", ?)',
+        [productId, getCurrentDate(), stocks]
+      ); // query to add stocks to inventory when stocks decrease
+
+    } else { // stocks increased
+      const stocks = updatedStocks - currentStocks;
+      await db.query(
+        'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) ' + 
+        'VALUES (NULL, ?, ?, "in", ?)',
+        [productId, getCurrentDate(), stocks]
+      ); // query to add stocks to inventory when stocks increase
+
+    }
+
+  } catch (error) {
+    console.error("Error updating stock information:", error);
+    throw new Error("Error updating stock information.");
+  }
+};
+
+export {
+  getProducts,
+  getProductDetails,
+  buyProduct,
+  createProduct,
+  editProduct,
+  //changeStatusProduct,
+  //AddStocks
+};
+
+/* ------------------------------------------------------------------------------------- */
+
+//THE CODE BELOW ARE NOT BEING USE REMOVE BEFORE SUBMITTING 
 
 /**
  * edit a product status
@@ -297,26 +366,4 @@ const AddStocks = async (request, response) => {
     console.error('Error adding stocks:', error);
     response.status(500).send('Failed to add stocks');
   }
-};
-
-/*
-helper function to retrive current
-*/
-const getCurrentDate = () => {
-  const date = new Date();
-
-  // Get the date in the format 'YYYY-MM-DD'
-  const formattedDate = date.toISOString().slice(0, 10); // Extract the 'YYYY-MM-DD' part
-
-  return formattedDate;
-};
-
-export {
-  getProducts,
-  getProductDetails,
-  buyProduct,
-  createProduct,
-  editProduct,
-  changeStatusProduct,
-  AddStocks
 };

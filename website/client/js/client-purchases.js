@@ -30,19 +30,25 @@ function displayBooths(){
         box.appendChild(valueDiv); // appending the child to "box"
 }
 
-/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
-/*
-format of line in data[] :
-const Data = [
-    "<productID> , <quantity> , <totalPricePerProduct>",
-    "<productID> , <quantity> , <totalPricePerProduct>"
-];
-refer the format of date input to the db
-*/
+/**
+ * Fetch for creating an irder (POST)
+ * @param {Integer} boothID 
+ * @param {Array} Data 
+ * @param {Integer} totalPriceInput 
+ */
 
-function createOrder(boothID, Data, totalPriceInput, dateInput) {
-    // Convert Data array into the required products array format
+function createOrder(boothID, Data, totalPriceInput) {
+   /*
+    format of line in data[] :
+    const Data = [
+        "<productID> , <quantity> , <totalPricePerProduct>",
+        "<productID> , <quantity> , <totalPricePerProduct>"
+    ];
+    refer the format of date input to the db
+    */ 
     const products = Data.map(entry => {
         const [productID, quantity, totalPricePerProduct] = entry.split(',');
         return {
@@ -51,12 +57,11 @@ function createOrder(boothID, Data, totalPriceInput, dateInput) {
             totalPricePerProduct: parseFloat(totalPricePerProduct.trim()).toFixed(2), // Ensure decimal(10,2)
         };
     });
-
-    // Prepare the payload for the order
+    
     const data = {
         products,
         totalPrice: parseFloat(totalPriceInput).toFixed(2), // Ensure decimal(10,2) for totalPrice
-        date: dateInput, // Date must be in the correct format: YYYY-MM-DD HH:MM:SS
+        date:  getCurrentDateWithMicroseconds(), // Date must be in the correct format: YYYY-MM-DD HH:MM:SS
     };
 
     // POST request to create an order
@@ -108,9 +113,10 @@ function createOrder(boothID, Data, totalPriceInput, dateInput) {
         });
 }
 
-
-
- 
+/**
+ * Fetch for order cancelation (PATCH)
+ * @param {Integer} orderId 
+ */
 function cancelOrder(orderId) {
     fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
         method: 'PATCH', 
@@ -133,6 +139,28 @@ function cancelOrder(orderId) {
         console.error("Error cancelling order:", error);
     });
 }
+
+//END FOR FETCH FUNCTIONS
+/* ----------------------------------------------------------------------------------------------------- */
+
+
+ /*
+Helper method to retrive date in YYYY-MM-DD HH:MM:SS'
+*/
+const getCurrentDateWithMicroseconds = () => {
+    const date = new Date();
+    
+    // Get the date in the format 'YYYY-MM-DD HH:MM:SS'
+    let formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    
+    // Get microseconds (using a simple approximation as JavaScript doesn't have built-in microsecond precision)
+    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, '0');
+    
+    // Add microseconds to the date
+    return `${formattedDate}.${microseconds}`;
+};
+
+      
 
 
 

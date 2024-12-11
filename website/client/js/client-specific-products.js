@@ -135,25 +135,14 @@ function toggleCart() {
     const cartContainer = document.querySelector('.cart-container');
     cartContainer.classList.toggle('active'); // Toggle the active class
 }
-/* ============================================= */
-/*
-function to convert blob --> base64 --> image
-*/
 
-// Function to create an image element from Base64
-function base64ToImage(base64, mimeType = 'image/png') {
-    const img = new Image();
-    img.src = `data:${mimeType};base64,${base64}`;
-    return img; // Return the image element
-}
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
-/* ============================================= */
-
-/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
-
-/*
-use get details of a specific Product method in productController.js
-*/
+/**
+ * Fetch for retreiving a specific product (GET)
+ * @param {Integer} productId 
+ */
 function getSpecificProduct(productId){
   
    fetch(`http://localhost:3000/products/details/${productId}`,{
@@ -198,5 +187,21 @@ function getSpecificProduct(productId){
         console.error("Error fetching products:", error);
     });
 }
+
+//END OF FETCH FUNCTIONS
+/* ----------------------------------------------------------------------------------------------------- */
+
+
+/*
+Helper function to convert  base64 --> image
+*/
+
+// Function to create an image element from Base64
+function base64ToImage(base64, mimeType = 'image/png') {
+    const img = new Image();
+    img.src = `data:${mimeType};base64,${base64}`;
+    return img; // Return the image element
+}
+
 
 displayBooths();

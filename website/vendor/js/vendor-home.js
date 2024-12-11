@@ -249,8 +249,12 @@ function editBoothFinished() {
   edit.classList.remove("open-editBooth");
   document.body.classList.remove("modal-open");
 }
+/* ----------------------------------------------------------------------------------------------------- */
+//THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER 
 
-
+/**
+ * Fetch for updating booth (POST)
+ */
 async function updateBoothFunction() {
   // console.log(dataset)
   const boothId = document.getElementById('edit-booth-form').dataset.boothId;
@@ -331,7 +335,11 @@ async function updateBoothFunction() {
     });
 }
 
-// DELETE BOOTH
+/**
+ * Fetch for removing a booth  (DELETE)
+ * @param {Integer} boothId 
+ * @returns 
+ */
 function deleteBooth(boothId) {
   if (!confirm('Are you sure you want to delete this booth?')) {
       return;
@@ -366,7 +374,9 @@ function deleteBooth(boothId) {
       alert(error.message || "An error occurred while deleting the booth");
   });
 }
-
+/**
+ * fetch for creating booth (POST)
+ */
 async function createBoothFunction() {
   const imageFile = document.getElementById("input-file").files[0];
   let imageData = null;
@@ -439,6 +449,9 @@ async function createBoothFunction() {
       alert("An error occurred. Please try again.");
     });
 }
+
+// END FOR FETCH FUNCTIONS
+/* ----------------------------------------------------------------------------------------------------- */
 
 function loadPage(page) {
   // for changing pages in navigation

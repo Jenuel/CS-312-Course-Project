@@ -114,12 +114,16 @@ function updateTables() {
     populateUnclaimedOrders(unclaimedOrders);
     populateClaimedOrders(claimedOrders);
 }
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER 
 
-/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
-
+/**
+ * Fetch for retrieving all complete orders
+ * @param {Integer} boothID 
+ */
 function getCompletedOrder(boothID){
   
-    fetch(`http://localhost:3000/orders/complete/${boothID}`,{// change this one
+    fetch(`http://localhost:3000/orders/complete/${boothID}`,{
      method: 'GET', 
      headers: {
          'Content-Type': 'application/json', 
@@ -142,9 +146,13 @@ function getCompletedOrder(boothID){
      });
  }
 
+ /**
+ * Fetch for retrieving all pending orders
+ * @param {Integer} boothID 
+ */
  function getPendingOrder(boothID){
   
-    fetch(`http://localhost:3000/orders/pending/${boothID}`,{// change this one
+    fetch(`http://localhost:3000/orders/pending/${boothID}`,{
      method: 'GET', 
      headers: {
          'Content-Type': 'application/json', 
@@ -167,13 +175,17 @@ function getCompletedOrder(boothID){
      });
  }
 
- function approveOrder(orderId, dateInput){
+ /**
+ * Fetch for approving  all  orders (PATCH)
+ * @param {Integer} orderId
+ */
+ function approveOrder(orderId){
     const data = {
-        datePaid:dateInput 
+        datePaid:getCurrentDateWithMicroseconds(),
     }
     data
-    fetch(`http://localhost:3000/approve/:${orderId}`,{// change this one
-     method: 'GET', 
+    fetch(`http://localhost:3000/approve/${orderId}`,{
+     method: 'PATCH', 
      headers: {
          'Content-Type': 'application/json', 
      },
@@ -188,12 +200,33 @@ function getCompletedOrder(boothID){
      })
      .then(data => {
          console.log("Products fetched successfully:", data);
-         // add handling of data
      })
      .catch(error => {
          console.error("Error fetching products:", error);
      });
  }
+
+
+ // END FOR FETCH FUNCIONS
+ /* ----------------------------------------------------------------------------------------------------- */
+
+ /*
+ helpoer functio top get date in 'YYYY-MM-DD HH:MM:SS'
+ */
+
+ const getCurrentDateWithMicroseconds = () => {
+    const date = new Date();
+    
+    // Get the date in the format 'YYYY-MM-DD HH:MM:SS'
+    let formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    
+    // Get microseconds (using a simple approximation as JavaScript doesn't have built-in microsecond precision)
+    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, '0');
+    
+    // Add microseconds to the date
+    return `${formattedDate}.${microseconds}`;
+};
+
 
 // Initialize tables
 updateTables();
