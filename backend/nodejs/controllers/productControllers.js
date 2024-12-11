@@ -15,9 +15,17 @@ const getProducts = async (request, response) => {
 
   try {
     let query =
-      'SELECT p.ProductID AS "ProductID",p.name AS "Name", p.StocksRemaining AS "Stocks" , p.Price AS "Price", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p  WHERE p.BoothID = ? ';
+      'SELECT p.ProductID AS "ProductID", p.name AS "Name", p.StocksRemaining AS "Stocks", p.Price AS "Price", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p WHERE p.BoothID = ?';
     let params = [boothId];
 
+    // Apply filter for status (active or inactive)
+    if (filter === "active") {
+      query += ` AND p.status = 'active'`;
+    } else if (filter === "inactive") {
+      query += ` AND p.status = 'inactive'`;
+    }
+
+    // Apply sorting logic
     if (sort) {
       const allowedSortFields = ["name", "price"];
       const [field, order] = sort.split(":");
@@ -32,22 +40,15 @@ const getProducts = async (request, response) => {
       }
     }
 
-    if(filter === "active"){
-      query += `AND p.status = 'active'`
-    }
-
-    if(filter === "inactive"){
-      query += `AND p.status = 'inactive'`
-    }
-
     const [rows] = await db.query(query, params);
 
-    response.json(rows); // convert response to json
+    response.json(rows); // Convert response to JSON
   } catch (error) {
     console.error("Error fetching products:", error);
     response.status(500).send("Failed to fetch products");
   }
 };
+
 
 /*
  * Gets the detailed version of the product 

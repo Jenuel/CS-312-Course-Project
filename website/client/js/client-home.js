@@ -74,7 +74,7 @@ function displayBooths(booths) {
               <p class="card-text">Operating Days: ${booth.Schedules || 'N/A'}</p>
               <p class="card-text">Location: ${booth.Location || 'N/A'}</p>
               <p class="card-text">Description: ${booth.Description}</p>
-              <a href="boothDetails.html?id=${booth.BoothID}" class="btn btn-primary">View Details</a>
+              <a href="client-products.html?id=${booth.BoothID}" class="btn btn-primary">View Details</a>
             </div>
           </div>
         </div>
