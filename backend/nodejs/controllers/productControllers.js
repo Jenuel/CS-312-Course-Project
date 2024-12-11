@@ -154,7 +154,6 @@ const createProduct = async (request, response) => {
   const db = request.db;
   const { boothID, stocks, price, name, status, image } = request.body;
 
-
   if (status !== "active" && status !== "inactive") {
     return response
       .status(400)
