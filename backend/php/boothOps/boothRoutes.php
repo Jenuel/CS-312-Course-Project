@@ -50,6 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         $booths = [];
         while ($row = $boothResult->fetch_assoc()) {
+
+            if ($row['BoothIcon'] !== null) {
+                $row['BoothIcon'] = base64_encode($row['BoothIcon']);
+            }
             $booths[] = $row;
         }
 
@@ -169,4 +173,9 @@ else {
 } 
 else {
     echo json_encode(["error" => "Invalid request method"]);
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["error" => "Invalid request method"]);
+    exit();
 }
