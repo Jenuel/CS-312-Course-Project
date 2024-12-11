@@ -10,13 +10,18 @@ const getProducts = async (request, response) => {
   const db = request.db;
   const { boothId } = request.params;
   const {
-    query: { filter, sort },
+    query: { filter, sort},
   } = request;
 
   try {
     let query =
-      'SELECT p.ProductID AS "ProductID",p.name AS "Name", p.StocksRemaining AS "Stocks" , p.Price AS "Price", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p  WHERE p.BoothID = ? ';
+      'SELECT p.ProductID AS "ProductID", p.name AS "Name", p.StocksRemaining AS "Stocks", p.Price AS "Price", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p WHERE p.BoothID = ?';
     let params = [boothId];
+
+    if (filter) {
+      query += " AND p.status = ?";
+      params.push(filter);
+    }
 
     if (sort) {
       const allowedSortFields = ["name", "price"];
@@ -28,26 +33,20 @@ const getProducts = async (request, response) => {
       ) {
         query += ` ORDER BY p.${field} ${order.toUpperCase()}`;
       } else {
-        throw new Error("Invalid sort parameter");
+        return response.status(400).json({ error: "Invalid sort parameter" });
       }
-    }
-
-    if(filter === "active"){
-      query += `AND p.status = 'active'`
-    }
-
-    if(filter === "inactive"){
-      query += `AND p.status = 'inactive'`
+    } else {
+      query += " ORDER BY p.name ASC"; // Default sorting
     }
 
     const [rows] = await db.query(query, params);
-
-    response.json(rows); // convert response to json
+    response.json(rows);
   } catch (error) {
     console.error("Error fetching products:", error);
     response.status(500).send("Failed to fetch products");
   }
 };
+
 
 /*
  * Gets the detailed version of the product 
