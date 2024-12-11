@@ -135,7 +135,7 @@ function toggleCart() {
     const cartContainer = document.querySelector('.cart-container');
     cartContainer.classList.toggle('active'); // Toggle the active class
 }
-
+/* ============================================= */
 /*
 function to convert blob --> base64 --> image
 */
@@ -146,6 +146,8 @@ function base64ToImage(base64, mimeType = 'image/png') {
     img.src = `data:${mimeType};base64,${base64}`;
     return img; // Return the image element
 }
+
+/* ============================================= */
 
 /*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
 

@@ -172,7 +172,7 @@ async function returnStocks (orderID , db){
     for(let products of getProduct){
         const {productID , qty}= products;
          await db.query(
-            `UPDATE product SET StocksRemaining = ? WHERE product.ProductID = ?`,
+            `UPDATE product SET StocksRemaining = (StocksRemaining + ?) WHERE product.ProductID = ?`,
             [qty,productID]
         );
     }
@@ -180,7 +180,6 @@ async function returnStocks (orderID , db){
         console.error('Error returning stocks:', error);
         throw new Error('Failed to return stocks'); 
     }
-
 }
 
 /*

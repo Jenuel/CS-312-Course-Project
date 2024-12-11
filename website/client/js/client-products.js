@@ -86,7 +86,7 @@ function fetchProducts(boothId) {
         console.error("Error purchasing product:", error);
     });
 }
-
+// make sure value is int
 function buyProduct(productID, value) {
 
     const data = {

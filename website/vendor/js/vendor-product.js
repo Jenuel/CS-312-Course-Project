@@ -91,6 +91,28 @@ function showLoading() {
   `;
 }
 
+/* ==================================================================================================== */
+
+// Function to convert the image file to a Blob
+function convertImageToBlob(imageFile) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const arrayBuffer = reader.result;
+      const blob = new Blob([arrayBuffer], { type: imageFile.type });
+      resolve(blob);
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsArrayBuffer(imageFile); // Convert the file to ArrayBuffer first
+  });
+}
+//end of convertion funciton
+/* ==================================================================================================== */
+
+/* ----------------------------------------------------------------------------------------------------- */
+// fetch functions 
+
+
 async function createProduct(formData) {
   try {
     const response = await fetch(`${API_BASE_URL}/create`, {
@@ -105,7 +127,7 @@ async function createProduct(formData) {
         price: parseFloat(formData.ProductPrice),
         name: formData.ProductName,
         status: formData.ProductStatus.toLowerCase(),
-        image: formData.ProductImage,
+        image: await convertImageToBlob(formData.ProductImage),// converted ProductImage to blob
       }),
     });
 
@@ -121,7 +143,73 @@ async function createProduct(formData) {
     alert("Failed to create product. Please try again.");
   }
 }
-async function updateProduct(updatedData, productContainer) {
+/**
+ * Edit product
+ * 
+ * @param {int} productId 
+ * @param {Data[String]} Data 
+ * 
+ * 
+ * here are all the possible values to be changed in a produc
+ * Data = {
+ * "Price:intvalue", 
+ * "name:stringvalue", 
+ * "Image: file", 
+ * }
+ */
+async function editProduct(productId,Data) {
+  
+  const details = await Promise.all(Data.map(async (item) => {
+    const [name, value] = item.split(":"); // Split into name and value
+    let convertedValue;
+
+    if (name === "Price") {
+      convertedValue = parseInt(value);
+    } 
+    if (name === "name") {
+      convertedValue = value;
+    } 
+    if (name === "Image") {
+      convertedValue = await convertImageToBlob(value); // await inside async function
+    }
+
+    return { [name]: convertedValue }; // Create an object with dynamic keys
+  }));
+
+
+  const data = {
+    product:details
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/edit/${productId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getSessionId()}`,
+      },
+      body: JSON.stringify({data}),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    // Refresh products list after creation
+  } catch (error) {
+    console.error("Failed to create product:", error);
+    alert("Failed to create product. Please try again.");
+  }
+}
+
+/**
+ * cayton's  edit product
+ * @param {*} updatedData 
+ * @param {*} productContainer 
+ */
+
+async function updateProduct(updatedData, productContainer) {// please specify what these value would look like
   try {
     const productId = productContainer.dataset.productId;
     if (!productId) {
@@ -142,16 +230,16 @@ async function updateProduct(updatedData, productContainer) {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionID}`,
+        Authorization: `Bearer ${getSessionId()}`,
       },
       body: JSON.stringify({
         product: {
           name: updatedData.ProductName,
           price: parseFloat(updatedData.ProductPrice),
-          status: updatedData.ProductStatus.toLowerCase(),
-          stocks: parseInt(updatedData.ProductStock),
+          status: updatedData.ProductStatus.toLowerCase(),// remove
+          stocks: parseInt(updatedData.ProductStock),// remove
           image: updatedData.ProductImage,
-          description: updatedData.ProductDescription,
+          description: updatedData.ProductDescription,// remove
         },
       }),
     });
@@ -170,6 +258,9 @@ async function updateProduct(updatedData, productContainer) {
     throw error;
   }
 }
+
+//end of fetch funtions
+/* ----------------------------------------------------------------------------------------------------- */
 
 async function getCurrentBoothId() { // WHAT DOES THIS DO??
   try {

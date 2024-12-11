@@ -7,12 +7,20 @@ const orders = [
     { orderId: "O005", customerName: "Melmar Frederick Bautista", productName: "Product E", quantity: 4, total: 400 }
 ];
 
+
 const notPreparedOrdersTable = document.getElementById("notPreparedOrders");
 const unclaimedOrdersTable = document.getElementById("unclaimedOrders");
 const claimedOrdersTable = document.getElementById("claimedOrders");
 
 const unclaimedOrders = [];
 const claimedOrders = [];
+
+function getSessionId() {
+    return document.cookie
+      .split(";")
+      .find((cookie) => cookie.trim().startsWith("PHPSESSID="))
+      ?.split("=")[1];
+  }
 
 // Populate orders not prepared
 function populateNotPreparedOrders() {
