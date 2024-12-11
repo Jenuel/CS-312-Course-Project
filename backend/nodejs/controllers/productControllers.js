@@ -295,9 +295,7 @@ export {
   getProductDetails,
   buyProduct,
   createProduct,
-  editProduct,
-  changeStatusProduct,
-  AddStocks
+  editProduct
 };
 
 /* ------------------------------------------------------------------------------------- */
@@ -314,28 +312,28 @@ HTTP PUT /<productRoutes>/<productId>
 "status": value
 }
  */
-const changeStatusProduct = async (request, response) => {
+// const changeStatusProduct = async (request, response) => {
   
-  const db = request.db;
-  const { productId } = request.params;
-  const { status } = request.body; // please check if this is right
+//   const db = request.db;
+//   const { productId } = request.params;
+//   const { status } = request.body; // please check if this is right
 
-  try {
-    // Update the stock in the database
-    const [updateResult] = await db.query(
-      "UPDATE `product` SET `status` = ? WHERE `ProductID` = ?",
-      [status, productId]
-    );
+//   try {
+//     // Update the stock in the database
+//     const [updateResult] = await db.query(
+//       "UPDATE `product` SET `status` = ? WHERE `ProductID` = ?",
+//       [status, productId]
+//     );
 
-    response.json({
-      message: "Product purchased successfully",
-      updatedRows: updateResult.affectedRows,
-    });
-  } catch (error) {
-    console.error("Error updating product status:", error);
-    response.status(500).send("Failed to update product status");
-  }
-};
+//     response.json({
+//       message: "Product purchased successfully",
+//       updatedRows: updateResult.affectedRows,
+//     });
+//   } catch (error) {
+//     console.error("Error updating product status:", error);
+//     response.status(500).send("Failed to update product status");
+//   }
+// };
 
 /*
 adding stcok of a product
@@ -347,28 +345,28 @@ HTTP PUT /<productRoutes>/<productId>
 }
  */
 
-const AddStocks = async (request, response) => {
-  const db = request.db;
-  const { productID } = request.params;
-  const { qty, date } = request.body;
+// const AddStocks = async (request, response) => {
+//   const db = request.db;
+//   const { productID } = request.params;
+//   const { qty, date } = request.body;
 
-  try {
-      await db.query(
-          `UPDATE product SET StocksRemaining = (StocksRemaining + ?) WHERE product.ProductID = ?`,
-          [qty,productID]
-      ); // query to add stocks to product
+//   try {
+//       await db.query(
+//           `UPDATE product SET StocksRemaining = (StocksRemaining + ?) WHERE product.ProductID = ?`,
+//           [qty,productID]
+//       ); // query to add stocks to product
 
-      await db.query(
-        'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) '+ 
-        'VALUES (NULL, ? , ?, "in", ?)',
-        [productID,date,qty]
-      ); // query to add stocks to inventory 
+//       await db.query(
+//         'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) '+ 
+//         'VALUES (NULL, ? , ?, "in", ?)',
+//         [productID,date,qty]
+//       ); // query to add stocks to inventory 
 
-    response.json({
-      message: `Successfully added ${qty} stocks to product with ID ${productID}.`,
-    });
-  } catch (error) {
-    console.error('Error adding stocks:', error);
-    response.status(500).send('Failed to add stocks');
-  }
-};
+//     response.json({
+//       message: `Successfully added ${qty} stocks to product with ID ${productID}.`,
+//     });
+//   } catch (error) {
+//     console.error('Error adding stocks:', error);
+//     response.status(500).send('Failed to add stocks');
+//   }
+// };

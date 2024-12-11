@@ -1,9 +1,9 @@
 <?php
 
-$DB_HOST = "mysql";
-$DB_USER = "pilot";
-$DB_PASSWORD = "pilot";
-$DB_NAME = "Blitzkrieg";
+$DB_HOST = "mysql-container";  // Use container name
+$DB_USER = "pilot";           // Use the MySQL user we created
+$DB_PASSWORD = "pilot123";     // Use the password we set
+$DB_NAME = "boothsystem";
 
 $conn = new mysqli($DB_HOST,$DB_USER, $DB_PASSWORD,$DB_NAME, 3306);
 

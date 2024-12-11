@@ -5,16 +5,15 @@ import {
   buyProduct,
   createProduct,
   editProduct,
-  changeStatusProduct,
 } from "../controllers/productControllers.js";
 
 const router = express.Router();
 
 router.get("/booth/:boothId", getProducts); // vendor * && customer *
-router.get("details/:productId", getProductDetails);// customer * 
+router.get("/details/:productId", getProductDetails);// customer * 
 router.patch("/buy/:productId", buyProduct); // customer * 
 router.post("/create", createProduct);// vendor *
 router.patch("/edit/:productId", editProduct);// vendor 
-router.patch("/status/:productId", changeStatusProduct);// vendor 
+
 
 export default router;
