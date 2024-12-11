@@ -42,42 +42,46 @@ function getMockProducts() {
 async function fetchBoothProducts() {
   showLoading();
   try {
-      // Note the updated endpoint to match your productRoutes.js
-      const response = await fetch(`${API_BASE_URL}/booth/${boothId}`, {
-          method: 'GET',
-          credentials: 'include', // Important for cookies
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${getSessionId()}`
-          }
-      });
+    // Note the updated endpoint to match your productRoutes.js
+    const response = await fetch(`${API_BASE_URL}/booth/${boothId}`, {
+      method: "GET",
+      credentials: "include", // Important for cookies
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getSessionId()}`,
+      },
+    });
 
-      let data;
-      if (!response.ok) {
-          console.log("API unavailable, using mock data");
-          data = getMockProducts();
-      } else {
-          data = await response.json();
-      }
+    let data;
+    if (!response.ok) {
+      console.log("API unavailable, using mock data");
+      data = getMockProducts();
+    } else {
+      data = await response.json();
+    }
 
-      // Map the data to match the database field names from your SQL schema
-      products = Array.isArray(data) ? data.map(product => ({
-          ProductID: product.ProductID,
-          ProductName: product.name,
-          ProductStatus: product.status === 'active' ? 'Live' : 'Pending',
-          ProductPrice: product.Price,
-          ProductStock: product.StocksRemaining,
-          ProductImage: product.Image,
-          ProductDescription: product.Description || ''
-      })) : [];
+    // Map the data to match the database field names from your SQL schema
+    products = Array.isArray(data)
+      ? data.map((product) => ({
+          ProductID: product.ProductID || product.id,
+          ProductName: product.Name || product.name,
+          ProductStatus: product.Status === "active" ? "Live" : "Pending",
+          ProductPrice: product.Price || product.price,
+          ProductStock: product.StocksRemaining || product.stocks,
+          ProductImage: product.Image
+            ? `data:image/png;base64,${product.Image}`
+            : null,
+          ProductDescription: product.Description || product.description || "",
+        }))
+      : [];
 
-      filterProducts(getCurrentFilter());
+    filterProducts(getCurrentFilter());
   } catch (error) {
-      console.log("Error fetching products:", error);
-      products = getMockProducts();
-      filterProducts(getCurrentFilter());
+    console.log("Error fetching products:", error);
+    products = getMockProducts();
+    filterProducts(getCurrentFilter());
   } finally {
-      tableBody.classList.remove("loading");
+    tableBody.classList.remove("loading");
   }
 }
 
@@ -93,34 +97,54 @@ function showLoading() {
 
 async function createProduct(formData) {
   try {
+    const boothId = sessionStorage.getItem("currentBoothId");
+
+    const requestData = {
+      boothID: parseInt(boothId),
+      stocks: parseInt(formData.ProductStock) || 0,
+      price: parseFloat(formData.ProductPrice) || 0,
+      name: formData.ProductName,
+      status: "inactive",
+      image: cleanImageData(formData),
+    };
+
     const response = await fetch(`${API_BASE_URL}/create`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getSessionId()}`,
       },
-      body: JSON.stringify({
-        boothID: formData.boothID,
-        stocks: parseInt(formData.ProductStock),
-        price: parseFloat(formData.ProductPrice),
-        name: formData.ProductName,
-        status: formData.ProductStatus.toLowerCase(),
-        image: formData.ProductImage,
-      }),
+      body: JSON.stringify(requestData),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Server response:", errorText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result = await response.json();
-    // Refresh products list after creation
-    await fetchBoothProducts(formData.boothID);
+    await fetchBoothProducts();
   } catch (error) {
     console.error("Failed to create product:", error);
     alert("Failed to create product. Please try again.");
   }
 }
+
+function cleanImageData(data) {
+  let imageBase64 = null;
+
+  // Handle the image if it exists
+  if (data) {
+    // Remove the data:image/png;base64, prefix if it exists
+    imageBase64 = data.ProductImage.includes("base64")
+      ? data.ProductImage.split(",")[1]
+      : data.ProductImage;
+  } else imageBase64 = null;
+  
+  return imageBase64;
+}
+
 async function updateProduct(updatedData, productContainer) {
   try {
     const productId = productContainer.dataset.productId;
@@ -382,32 +406,44 @@ function showAddProductForm(existingData, productContainer) {
 
   // magsubmit
   const submitBtn = modalElement.querySelector(".submit-button");
-  submitBtn.addEventListener("click", () => {
-    const formData = {
-      ProductName: modalElement.querySelector("#product-name").value,
-      ProductStatus: existingData
-        ? modalElement.querySelector("#status").value
-        : "Pending", // Default to Pending for new products
-      ProductDescription: modalElement.querySelector("#description").value,
-      ProductPrice: modalElement.querySelector("#price").value,
-      ProductStock: modalElement.querySelector("#stock").value || null,
-      ProductSales: existingData ? existingData.ProductSales : null,
-      ProductImage: imagePreview.classList.contains("d-none")
-        ? null
-        : imagePreview.src,
-    };
+  submitBtn.addEventListener("click", async () => {
+    // Disable the submit button to prevent double clicks
+    submitBtn.disabled = true;
+    
+    try {
+        const formData = {
+            boothID: parseInt(sessionStorage.getItem("currentBoothId")),
+            ProductName: modalElement.querySelector("#product-name").value,
+            ProductStatus: existingData
+                ? modalElement.querySelector("#status").value
+                : "Pending",
+            ProductDescription: modalElement.querySelector("#description").value,
+            ProductPrice: modalElement.querySelector("#price").value,
+            ProductStock: modalElement.querySelector("#stock").value || null,
+            ProductSales: existingData ? existingData.ProductSales : null,
+            ProductImage: imagePreview.classList.contains("d-none")
+                ? null
+                : imagePreview.src,
+        };
 
-    if (existingData && productContainer) {
-      updateProduct(formData, productContainer);
-    } else {
-      createProduct(formData);
+        if (existingData && productContainer) {
+            await updateProduct(formData, productContainer);
+        } else {
+            await createProduct(formData);
+        }
+
+        // Only hide and remove modal after successful creation/update
+        modal.hide();
+        modalElement.remove();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to save product. Please try again.');
+    } finally {
+        // Re-enable the submit button
+        submitBtn.disabled = false;
     }
+});
 
-    modal.hide();
-    modalElement.addEventListener("hidden.bs.modal", () => {
-      modalElement.remove();
-    });
-  });
 
   modal.show();
 }

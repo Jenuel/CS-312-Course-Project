@@ -166,25 +166,9 @@ INPUT:
 
  */
 const createProduct = async (request, response) => {
-  //GOOD KINDA
   const db = request.db;
-  const { boothID, stocks, price, name, status, image } = request.body; // please check if this is right
+  const { boothID, stocks, price, name, status, image } = request.body;
 
-  if (status !== "active" && status !== "inactive") {
-    return response
-      .status(400)
-      .send('Invalid status. It must be either "active" or "inactive".');
-  }
-  try {
-    const [rows] = await db.query(
-      "INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES (NULL, ?,?, ?, ?, ?, ?)",
-      [boothID, stocks, price, name, status, image]
-    );
-    response.json(rows);
-  } catch (error) {
-    console.error("Error creating products:", error);
-    response.status(500).send("Failed to create products");
-  }
   if (status !== "active" && status !== "inactive") {
     return response
       .status(400)
@@ -193,13 +177,13 @@ const createProduct = async (request, response) => {
 
   try {
     const [rows] = await db.query(
-      "INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES (NULL, ?,?, ?, ?, ?, ?)",
+      "INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES (NULL, ?, ?, ?, ?, ?, ?)",
       [boothID, stocks, price, name, status, image]
     );
-    response.json(rows);
+    return response.json(rows); // Add return to prevent double execution
   } catch (error) {
     console.error("Error creating products:", error);
-    response.status(500).send("Failed to create products");
+    return response.status(500).send("Failed to create products"); // Add return
   }
 };
 
