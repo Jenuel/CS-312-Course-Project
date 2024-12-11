@@ -12,7 +12,7 @@ function handleLogin(event) {
    
     fetch('http://localhost:8080/php/auth/authRoutes.php', {
         method: 'POST',
-        mode: 'no-cors',
+        // mode: 'no-cors',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -22,10 +22,7 @@ function handleLogin(event) {
         
         
         if (!response.ok) {
-            console.log("success")
             throw new Error('Network response was not ok');
-        } else {
-            console.log("failure")
         }
         responseClone = response.clone(); // 2
         return response.json();

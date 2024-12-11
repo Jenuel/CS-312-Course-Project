@@ -113,7 +113,7 @@ async function createProduct(formData) {
       price: parseFloat(formData.ProductPrice) || 0,
       name: formData.ProductName,
       status: "inactive",
-      image: cleanImageData(formData),
+      image: cleanImageData(formData.ProductImage),
     };
 
     const response = await fetch(`${API_BASE_URL}/create`, {
@@ -122,14 +122,7 @@ async function createProduct(formData) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getSessionId()}`,
       },
-      body: JSON.stringify({
-        boothID: formData.boothID,
-        stocks: parseInt(formData.ProductStock),
-        price: parseFloat(formData.ProductPrice),
-        name: formData.ProductName,
-        status: formData.ProductStatus.toLowerCase(),
-        image: await convertImageToBlob(formData.ProductImage),// converted ProductImage to blob
-      }),
+      body: JSON.stringify(requestData),
     });
 
     if (!response.ok) {
@@ -146,18 +139,14 @@ async function createProduct(formData) {
 }
 
 function cleanImageData(data) {
-  let imageBase64 = null;
+  if (!data) return null;
+  const imageData = data.ProductImage || data;
+  if (!imageData) return null;
 
-  // Handle the image if it exists
-  if (data) {
-    // Remove the data:image/png;base64, prefix if it exists
-    imageBase64 = data.ProductImage.includes("base64")
-      ? data.ProductImage.split(",")[1]
-      : data.ProductImage;
-  } else imageBase64 = null;
 
-  return imageBase64;
+  return imageData.includes("base64") ? imageData.split(",")[1] : imageData;
 }
+
 
 async function updateProduct(updatedData, productContainer) {
   try {
@@ -168,33 +157,52 @@ async function updateProduct(updatedData, productContainer) {
       throw new Error("Product ID not found");
     }
 
+    const product = [];
+    
+    if (updatedData.ProductName) {
+      product.push({ name: updatedData.ProductName });
+    }
+    
+    if (updatedData.ProductPrice) {
+      product.push({ price: parseFloat(updatedData.ProductPrice) });
+    }
+    
+    if (updatedData.ProductStatus) {
+      product.push({ status: updatedData.ProductStatus.toLowerCase() === 'live' ? 'active' : 'inactive' });
+    }
+    
+    if (updatedData.ProductStock) {
+      product.push({ StocksRemaining: parseInt(updatedData.ProductStock) });
+    }
+    
+    if (updatedData.ProductImage) {
+      const imageData = updatedData.ProductImage.includes('base64,') 
+        ? updatedData.ProductImage.split('base64,')[1] 
+        : updatedData.ProductImage;
+      product.push({ Image: imageData });
+    }
+
     const response = await fetch(`${API_BASE_URL}/edit/${productId}`, {
       method: "PATCH",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${getSessionId()}`,
+        Authorization: `Bearer ${getSessionId()}`
       },
-      body: JSON.stringify({
-        product: {
-          name: updatedData.ProductName,
-          price: parseFloat(updatedData.ProductPrice),
-          status: updatedData.ProductStatus.toLowerCase(),
-          stocks: parseInt(updatedData.ProductStock),
-          image: updatedData.ProductImage,
-        },
-      }),
+      body: JSON.stringify({ product })
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorData}`);
     }
 
     const result = await response.json();
-    if (result.success) {
-      // updateProductUI(updatedData, productContainer);
-      editProductData(updatedData, productContainer);
-    }
+    console.log("Update successful:", result);
+    
+    // Refresh the products list to show updated data
+    await fetchBoothProducts();
+    
   } catch (error) {
     console.error("Failed to update product:", error);
     alert("Failed to update product. Please try again.");
@@ -203,46 +211,7 @@ async function updateProduct(updatedData, productContainer) {
 }
 
 //end of fetch funtions
-/* ----------------------------------------------------------------------------------------------------- */
 
-// function updateProductUI(updatedData, productContainer) {
-//   const row = productContainer.querySelector(".row");
-//   const cols = row.children;
-
-//   cols[0].innerHTML = `
-//       <div>${updatedData.ProductName}</div>
-//       <small class="text-muted">${updatedData.ProductDescription || ""}</small>
-//   `;
-
-//   let badgeClass = "bg-warning";
-//   if (updatedData.ProductStatus === "Live") {
-//     badgeClass = "bg-success";
-//   } else if (updatedData.ProductStatus === "Sold Out") {
-//     badgeClass = "bg-danger";
-//   }
-
-//   cols[1].innerHTML = `
-//       <span class="badge ${badgeClass}">${updatedData.ProductStatus}</span>
-//   `;
-
-//   cols[2].textContent = updatedData.ProductPrice;
-//   cols[3].textContent = updatedData.ProductStock;
-
-//   if (updatedData.ProductImage) {
-//     cols[5].innerHTML = `
-//           <img src="${updatedData.ProductImage}"
-//                alt="Product"
-//                class="product-thumbnail rounded"
-//                style="cursor: pointer;">
-//       `;
-//     const thumbnail = cols[5].querySelector(".product-thumbnail");
-//     thumbnail.addEventListener("click", () =>
-//       showImageModal(updatedData.ProductImage)
-//     );
-//   } else {
-//     cols[5].textContent = "No Image";
-//   }
-// }
 
 function editProductData(data, productContainer) {
   // modal structure for edit
@@ -575,12 +544,6 @@ function showAddProductFormData(existingData, productContainer) {
             ? null
             : imagePreview.src,
         };
-
-        if (existingData && productContainer) {
-          updateProduct(formData, productContainer);
-        } else {
-          createProduct(formData);
-        }
         if (existingData && productContainer) {
         } else {
           await createProduct(formData);

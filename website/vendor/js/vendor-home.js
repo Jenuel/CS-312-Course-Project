@@ -52,7 +52,7 @@ let formData = {
 // fetches the data and calls the displaying function
 function getData() {
   fetch(
-    "http://localhost:8080/php/boothOps/boothRoutes.php/",
+    "http://localhost:8080/php/boothOps/boothRoutes.php",
     {
       method: "GET",
       headers: {
@@ -346,7 +346,7 @@ function deleteBooth(boothId) {
   }
 
   fetch(
-      `http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php/${boothId}`,
+      `http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`,
       {
           method: "DELETE",
           headers: {
