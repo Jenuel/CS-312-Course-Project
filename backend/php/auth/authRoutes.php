@@ -64,10 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
              
             if ($user['Status'] == 'inactive') {
             session_start();
+            /* For disabling multiple logins.
             $sqlStat = "UPDATE users SET Status='active' WHERE SchoolEmail = ? AND Password = ?";
             $stmtOn = $conn->prepare($sqlStat);
             $stmtOn->bind_param("ss", $email, $password);
             $stmtOn->execute();
+            */
 
             $_SESSION['user'] = [
                 'UserID' => $user['UserID'],
