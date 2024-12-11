@@ -52,7 +52,7 @@ let formData = {
 // fetches the data and calls the displaying function
 function getData() {
   fetch(
-    "http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php/",
+    "http://localhost:8080/php/boothOps/boothRoutes.php/",
     {
       method: "GET",
       headers: {
@@ -205,7 +205,7 @@ function editBooth(boothId) {
   document.body.classList.add("modal-open");
 
   fetch(
-    `http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php/${boothId}`,
+    `http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`,
     {
       method: "GET",
       headers: {
@@ -283,7 +283,7 @@ async function updateBoothFunction() {
   };
 
   fetch(
-    "http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php",
+    "http://localhost:8080/php/boothOps/boothRoutes.php",
     {
       method: "POST",
       body: JSON.stringify(formData),

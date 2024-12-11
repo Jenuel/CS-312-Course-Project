@@ -1,7 +1,7 @@
 <?php
 session_start(); 
 
-require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/php/connectDb.php');
 
 if (!isset($_SESSION['user'])) {
     echo json_encode(["error" => "Unauthorized"]);

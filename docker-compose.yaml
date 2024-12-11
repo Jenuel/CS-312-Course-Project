@@ -18,9 +18,10 @@ services:
     build:
       context: ./backend/nodejs
     ports:
-      - "3000:3000"  # Expose Node.js app on port 3000
+      - "3000:3000"
     volumes:
-      - ./backend/nodejs:/usr/src/app  # Mount Node.js source code
+      - ./backend/nodejs:/usr/src/app          # Mount source code
+      - /usr/src/app/node_modules             # Preserve `node_modules` in the container
     networks:
       - app-network
 
