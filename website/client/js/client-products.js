@@ -83,12 +83,12 @@ function fetchProducts(boothId) {
 /**
  * Fetch for purchasing products (PATCH)
  * @param {Integer} productID 
- * @param {Integer} value 
+ * @param {String} value 
  */
 function buyProduct(productID, value) {
 
     const data = {
-        numberOfProductSold: value,
+        numberOfProductSold: parseInt(value),
     };
 
     fetch(`http://localhost:3000/products/buy/${productID}`, { 
