@@ -474,7 +474,7 @@ function loadPage(page) {
     case "orders":
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";
-      pageFrame.src = "../htmlvendor-orders.html"; // wala pa
+      pageFrame.src = "../html/vendor-orders.html"; // wala pa
       break;
 
     case "sales":

@@ -1,100 +1,64 @@
+/* General Styles */
 body {
-    background-color: #f9f9f9;
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-h1, h2 {
-    font-weight: bold;
+header {
+    background-color: #0073e6;
+    color: white;
+    padding: 1rem;
     text-align: center;
 }
 
-.orders-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 10px;
-    grid-template-areas:
-        "Table1 Table2"
-        "Table1 Table3";
-    padding: 20px;
-    box-sizing: border-box;
+main {
+    padding: 1rem;
 }
 
-.orders-container {
-    grid-template-rows: 40vh 40vh;
+/* Section Styles */
+section {
+    margin-bottom: 2rem;
 }
 
-.table-container {
-    border: 1px solid #ccc;
-    background-color: #fff;
-    padding: 10px;
-    overflow: auto;
-    box-sizing: border-box;
+h2 {
+    color: #0073e6;
 }
 
-.left {
-    grid-area: Table1;
-}
-
-.right-top {
-    grid-area: Table2;
-}
-
-.right-bottom {
-    grid-area: Table3;
-}
-
-.orders-not-prepared, .unclaimed-orders, .claimed-orders {
-    width: 100%;    
+/* Table Styles */
+table {
+    width: 100%;
     border-collapse: collapse;
+    margin: 1rem 0;
 }
 
-.orders-not-prepared th, .unclaimed-orders th, .claimed-orders th,
-.orders-not-prepared td, .unclaimed-orders td, .claimed-orders td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: left;
 }
 
-.orders-not-prepared th {
-    background-color: #333;
-    color: #fff;
+table th {
+    background-color: #0073e6;
+    color: white;
 }
 
-.unclaimed-orders th {
-    background-color: #b88a01;
-    color: #fff;
-}
-
-.claimed-orders th {
-    background-color: #00751c;
-    color: #fff;
-}
-
-.orders-not-prepared, .table-container.left h2 {
-    background-color: #d6d6d6;
-}
-
-.unclaimed-orders, .table-container.right-top h2 {
-    background-color: #ffc107;
-    color: #fff;
-}
-
-.claimed-orders, .table-container.right-bottom h2 {
-    background-color: #28a745;
-    color: #fff;
+table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
 
 button {
-    padding: 5px 10px;
-    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    background-color: #0073e6;
+    color: white;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    opacity: 0.8;
+    background-color: #005bb5;
 }
