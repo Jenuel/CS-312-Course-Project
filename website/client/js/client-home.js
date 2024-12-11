@@ -5,8 +5,13 @@ let formData = {
     filter: document.getElementById("filter").value,
     order: document.getElementById("order")
 };
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
-//fetches the data and calls the display function when success
+
+/**
+ * Fetch for retriveing booths (GET)
+ */
 function getData() {
     fetch('http://localhost/CS-312-Course-Project/backend/php/boothOps/boothRoutes.php', {
         method: 'GET',
@@ -34,6 +39,10 @@ function getData() {
         console.error('Request failed', error);
     });
 }
+
+//END FOR FETCH FUNCTIONS
+/* ----------------------------------------------------------------------------------------------------- */
+
 
 function displayBooths(booths){
     box.innerHTML = "";

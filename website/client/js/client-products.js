@@ -24,37 +24,18 @@ function displayProducts(products) {
         box.appendChild(productDiv);
     });
 }
-/*
-function to convert blob --> base64 --> image
-*/
 
-// Function to convert a Blob to Base64
-function blobToBase64(blob, callback, errorCallback) {
-    const reader = new FileReader();
-    reader.onload = () => {
-        const base64 = reader.result.split(',')[1]; // Get Base64 without the prefix
-        callback(base64);
-    };
-    reader.onerror = (error) => {
-        errorCallback(error);
-    };
-    reader.readAsDataURL(blob); // Read Blob as Data URL
-}
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
-// Function to create an image element from Base64
-function base64ToImage(base64, mimeType = 'image/png') {
-    const img = new Image();
-    img.src = `data:${mimeType};base64,${base64}`;
-    return img; // Return the image element
-}
-
-/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
-
-// Main function to fetch products
+/**
+ * Fetch for retrieving products (GET)
+ * @param {Integer} boothId 
+ */
 function fetchProducts(boothId) {
 
-    fetch(`http://localhost:3000/products/${boothId}`, { 
-        method: 'PATCH',
+    fetch(`http://localhost:3000/products/booth/${boothId}`, { 
+        method: 'GET',
         headers: {
             "Content-type": 'application/json',
         },
@@ -71,40 +52,26 @@ function fetchProducts(boothId) {
         sample data output
         [
             {
-                "name": "Handmade Bracelet",
-                "Stocks": 50,
-                "Price": 29.99,
-                "status": "active",
-                "Image": "BLOB"
+                "Name": "Handmade Bracelet",
+                "Status": "active",
+                "Image": "base64"
             },
             {
-                "name": "Handmade Bracelet",
-                "Stocks": 50,
-                "Price": 29.99,
-                "status": "active",
-                "Image": "BLOB"
+                "Name": "Handmade Bracelet",
+                "Status": "active",
+                "Image": "base64"
             }
         ]
         */
         console.log("Products fetched successfully:", data);
 
-        // Handle the data (convert Blob to Base64 and Base64 to Image)
         data.forEach(product => {
-            if (product.Image) {
-                // Assuming "Image" is already a Blob; convert it to Base64
-                blobToBase64(
-                    product.Image, // Blob object
-                    (base64) => {
-                        console.log("Base64 String:", base64);
+            product.Name // name of the product
+            product.Status // status of the product
 
-                        // Convert Base64 to an image element
-                        const imgElement = base64ToImage(base64, 'image/png');
-                        document.body.appendChild(imgElement); // Append the image to the body
-                    },
-                    (error) => {
-                        console.error("Error converting Blob to Base64:", error);
-                    }
-                 );
+            if (product.Image) {
+                const imgElement = base64ToImage(product.Image, 'image/png');
+                document.body.appendChild(imgElement); // Append the image to the body
              }
         });    
     })
@@ -113,13 +80,18 @@ function fetchProducts(boothId) {
     });
 }
 
+/**
+ * Fetch for purchasing products (PATCH)
+ * @param {Integer} productID 
+ * @param {String} value 
+ */
 function buyProduct(productID, value) {
 
     const data = {
-        numberOfProductSold: value,
+        numberOfProductSold: parseInt(value),
     };
 
-    fetch(`http://localhost:3000/buy/${productID}`, { 
+    fetch(`http://localhost:3000/products/buy/${productID}`, { 
         method: 'PATCH',
         headers: {
             "Content-type": 'application/json',
@@ -142,6 +114,19 @@ function buyProduct(productID, value) {
     });
 }
 
+//END FOR FETCH FUNCTIONS
+/* ----------------------------------------------------------------------------------------------------- */
 
+/*
+Helper function to convert base64 --> image
+*/
+
+
+// Function to create an image element from Base64
+function base64ToImage(base64, mimeType = 'image/png') {
+    const img = new Image();
+    img.src = `data:${mimeType};base64,${base64}`;
+    return img; // Return the image element
+}
 
 fetchProducts(boothId);

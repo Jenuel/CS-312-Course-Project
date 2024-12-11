@@ -1,7 +1,7 @@
 <?php
 session_start(); 
 
-require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/php/connectDb.php');
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
 
 if (!isset($_SESSION['user'])) {
     echo json_encode(["error" => "Unauthorized"]);
@@ -65,31 +65,108 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents("php://input"), true);
  
-
+ // If boothId is present, it's an update operation
+ if (isset($input['boothId'])) {
+    $boothId = $input['boothId'];
     $orgID = $_SESSION['user']['OrgID'];
     $title = $input['title'];
     $description = $input['description'];
     $schedules = $input['schedules'];
     $location = $input['location'];
-    $boothIcon = null;
-    $status = 'open';
     
-    if ($input['boothIcon']) {
-        $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $input['boothIcon']));
-        $boothIcon = $imageData;
+    // Check if the booth belongs to the user's organization
+    $checkQuery = "SELECT BoothID FROM booth WHERE BoothID = ? AND OrgID = ?";
+    $checkStmt = $conn->prepare($checkQuery);
+    $checkStmt->bind_param("ii", $boothId, $orgID);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        echo json_encode(["error" => "Unauthorized to edit this booth"]);
+        exit();
     }
 
 
-    $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?,?,?)";
-    $insertStmt = $conn->prepare($insertQuery);
-    $insertStmt->bind_param("ssssssi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID); //check if the data types are correct
-    if ($insertStmt->execute()) {
-        http_response_code(201); // Send 201 Created status code
-        echo json_encode(["success" => true]); 
+    if (isset($input['boothIcon']) && !empty($input['boothIcon'])) {
+        $imageData = base64_decode($input['boothIcon']);
+        $updateQuery = "UPDATE booth SET Title = ?, Description = ?, Schedules = ?, Location = ?, BoothIcon = ? WHERE BoothID = ?";
+        $updateStmt = $conn->prepare($updateQuery);
+        $updateStmt->bind_param("sssssi", $title, $description, $schedules, $location, $imageData, $boothId);
     } else {
-        echo json_encode(["error" => "Error: " . $conn->error]);
+        $updateQuery = "UPDATE booth SET Title = ?, Description = ?, Schedules = ?, Location = ? WHERE BoothID = ?";
+        $updateStmt = $conn->prepare($updateQuery);
+        $updateStmt->bind_param("ssssi", $title, $description, $schedules, $location, $boothId);
+    }
+
+    if ($updateStmt->execute()) {
+        echo json_encode(["success" => true]);
+    } else {
+        echo json_encode(["error" => "Error updating booth: " . $conn->error]);
+    }
+} 
+// If no boothId, it's a create operation
+else {
+        $orgID = $_SESSION['user']['OrgID'];
+        $title = $input['title'];
+        $description = $input['description'];
+        $schedules = $input['schedules'];
+        $location = $input['location'];
+        $boothIcon = null;
+        $status = 'open';
+        
+        if ($input['boothIcon']) {
+            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $input['boothIcon']));
+            $boothIcon = $imageData;
+        }
+
+
+        $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?,?,?)";
+        $insertStmt = $conn->prepare($insertQuery);
+        $insertStmt->bind_param("ssssssi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID); //check if the data types are correct
+        if ($insertStmt->execute()) {
+            http_response_code(201); // Send 201 Created status code
+            echo json_encode(["success" => true]); 
+        } else {
+            echo json_encode(["error" => "Error: " . $conn->error]);
+        }
     }
     
-} else {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    // Get booth ID from URL
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $pathSegments = explode('/', $path);
+    $boothId = end($pathSegments);
+
+    if (!is_numeric($boothId)) {
+        echo json_encode(["error" => "Invalid booth ID"]);
+        exit();
+    }
+
+    $orgID = $_SESSION['user']['OrgID'];
+    
+    // Check if the booth belongs to the user's organization
+    $checkQuery = "SELECT BoothID FROM booth WHERE BoothID = ? AND OrgID = ?";
+    $checkStmt = $conn->prepare($checkQuery);
+    $checkStmt->bind_param("ii", $boothId, $orgID);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        echo json_encode(["error" => "Unauthorized to delete this booth"]);
+        exit();
+    }
+
+    // Delete the booth
+    $deleteQuery = "DELETE FROM booth WHERE BoothID = ? AND OrgID = ?";
+    $deleteStmt = $conn->prepare($deleteQuery);
+    $deleteStmt->bind_param("ii", $boothId, $orgID);
+
+    if ($deleteStmt->execute()) {
+        echo json_encode(["success" => true]);
+    } else {
+        echo json_encode(["error" => "Error deleting booth: " . $conn->error]);
+    }
+} 
+else {
     echo json_encode(["error" => "Invalid request method"]);
 }

@@ -7,12 +7,20 @@ const orders = [
     { orderId: "O005", customerName: "Melmar Frederick Bautista", productName: "Product E", quantity: 4, total: 400 }
 ];
 
+
 const notPreparedOrdersTable = document.getElementById("notPreparedOrders");
 const unclaimedOrdersTable = document.getElementById("unclaimedOrders");
 const claimedOrdersTable = document.getElementById("claimedOrders");
 
 const unclaimedOrders = [];
 const claimedOrders = [];
+
+function getSessionId() {
+    return document.cookie
+      .split(";")
+      .find((cookie) => cookie.trim().startsWith("PHPSESSID="))
+      ?.split("=")[1];
+  }
 
 // Populate orders not prepared
 function populateNotPreparedOrders() {
@@ -106,78 +114,16 @@ function updateTables() {
     populateUnclaimedOrders(unclaimedOrders);
     populateClaimedOrders(claimedOrders);
 }
-/*******************************************************************/
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER 
+
 /**
- * FUNCTIONS IMAGE --> BASE64 --> BLOB
- * 
- * sample usage:
-
-const fileInput = document.getElementById('imageInput'); // <input type="file" id="imageInput">
-fileInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        try {
-            const base64 = await imageToBase64(file); // Convert to Base64
-            console.log('Base64:', base64);
-
-            const blob = base64ToBlob(base64, file.type); // Convert Base64 to Blob
-            console.log('Blob:', blob);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-});
+ * Fetch for retrieving all complete orders
+ * @param {Integer} boothID 
  */
-
-// Function to convert an image file to Base64
-const imageToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]); // Get Base64 string without "data:image/...;base64,"
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file); // Read file as Data URL
-    });
-};
-
-// Function to convert Base64 to a Blob
-const base64ToBlob = (base64, mimeType = 'image/png') => {
-    const binary = atob(base64); // Decode Base64
-    const array = [];
-    for (let i = 0; i < binary.length; i++) {
-        array.push(binary.charCodeAt(i));
-    }
-    return new Blob([new Uint8Array(array)], { type: mimeType });
-};
-/**
- * FUNCTIONS BLOB --> BASE64 --> IMAGE  
- * 
- * sample application:
- * 
- * 
- */
-
-// Function to convert a Blob to Base64
-const blobToBase64 = (blob) => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]); // Base64 string without prefix
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(blob); // Read Blob as Data URL
-    });
-};
-
-// Function to create an image element from Base64
-const base64ToImage = (base64, mimeType = 'image/png') => {
-    const img = new Image();
-    img.src = `data:${mimeType};base64,${base64}`;
-    return img; // Return the image element
-};
-
-/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
-
 function getCompletedOrder(boothID){
   
-    fetch(`http://localhost:3000/complete/:${boothID}`,{// change this one
+    fetch(`http://localhost:3000/orders/complete/${boothID}`,{
      method: 'GET', 
      headers: {
          'Content-Type': 'application/json', 
@@ -200,9 +146,13 @@ function getCompletedOrder(boothID){
      });
  }
 
- function getPendingOrder(){
+ /**
+ * Fetch for retrieving all pending orders
+ * @param {Integer} boothID 
+ */
+ function getPendingOrder(boothID){
   
-    fetch(`http://localhost:3000/pending`,{// change this one
+    fetch(`http://localhost:3000/orders/pending/${boothID}`,{
      method: 'GET', 
      headers: {
          'Content-Type': 'application/json', 
@@ -225,13 +175,17 @@ function getCompletedOrder(boothID){
      });
  }
 
- function approveOrder(orderId, dateInput){
+ /**
+ * Fetch for approving  all  orders (PATCH)
+ * @param {Integer} orderId
+ */
+ function approveOrder(orderId){
     const data = {
-        datePaid:dateInput 
+        datePaid:getCurrentDateWithMicroseconds(),
     }
     data
-    fetch(`http://localhost:3000/approve/:${orderId}`,{// change this one
-     method: 'GET', 
+    fetch(`http://localhost:3000/approve/${orderId}`,{
+     method: 'PATCH', 
      headers: {
          'Content-Type': 'application/json', 
      },
@@ -246,12 +200,33 @@ function getCompletedOrder(boothID){
      })
      .then(data => {
          console.log("Products fetched successfully:", data);
-         // add handling of data
      })
      .catch(error => {
          console.error("Error fetching products:", error);
      });
  }
+
+
+ // END FOR FETCH FUNCIONS
+ /* ----------------------------------------------------------------------------------------------------- */
+
+ /*
+ helpoer functio top get date in 'YYYY-MM-DD HH:MM:SS'
+ */
+
+ const getCurrentDateWithMicroseconds = () => {
+    const date = new Date();
+    
+    // Get the date in the format 'YYYY-MM-DD HH:MM:SS'
+    let formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    
+    // Get microseconds (using a simple approximation as JavaScript doesn't have built-in microsecond precision)
+    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, '0');
+    
+    // Add microseconds to the date
+    return `${formattedDate}.${microseconds}`;
+};
+
 
 // Initialize tables
 updateTables();

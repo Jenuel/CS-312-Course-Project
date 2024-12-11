@@ -7,13 +7,32 @@ This function is for getting the advanced/pending orders of a certain booth
 */
 const getPendingOrders = async (request, response) => {
     const db = request.db;
-
+    const{boothID} = request.params;
     try {
-        const [rows] = await db.query('SELECT o.OrderID AS "order id", o.Price AS "Total Price",o.Status AS "Status",p.Quantity AS "Product Quantiti", c.name AS "Product Name" FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID WHERE o.Status = "Pending" ORDER BY o.OrderID ASC;');
+        const [rows] = await db.query(`
+            SELECT 
+                o.OrderID AS "order id", 
+                o.Price AS "Total Price", 
+                o.Status AS "Status", 
+                p.Quantity AS "Product Quantity", 
+                c.Name AS "Product Name" 
+            FROM 
+                \`order\` o 
+            JOIN 
+                \`order_products\` p ON o.OrderID = p.OrderID 
+            JOIN 
+                \`product\` c ON p.ProductID = c.ProductID 
+            WHERE 
+                o.Status = "Pending" 
+                AND o.BoothID = ? 
+            ORDER BY 
+                o.OrderID ASC
+        `, [boothID]);
+
         response.json(rows);
     } catch (error) {
-        console.error('Error fetching pending order:', error);
-        response.status(500).send('Failed to fetch pending order');
+        console.error('Error fetching completed orders:', error);
+        response.status(500).send('Failed to fetch completed orders');
     }
 };
 
@@ -24,15 +43,36 @@ This function is for getting the completed orders of a certain booth
 */
 const getCompletedOrders = async (request, response) => {
     const db = request.db;
+    const { boothID } = request.params;
 
     try {
-        const [rows] = await db.query('SELECT o.OrderID AS "order id", o.Price AS "Total Price",o.Status AS "Status",p.Quantity AS "Product Quantiti", c.name AS "Product Name" FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID WHERE o.Status = "Complete" ORDER BY o.OrderID ASC;');
+        const [rows] = await db.query(`
+            SELECT 
+                o.OrderID AS "order id", 
+                o.Price AS "Total Price", 
+                o.Status AS "Status", 
+                p.Quantity AS "Product Quantity", 
+                c.Name AS "Product Name" 
+            FROM 
+                \`order\` o 
+            JOIN 
+                \`order_products\` p ON o.OrderID = p.OrderID 
+            JOIN 
+                \`product\` c ON p.ProductID = c.ProductID 
+            WHERE 
+                o.Status = "Complete" 
+                AND o.BoothID = ? 
+            ORDER BY 
+                o.OrderID ASC
+        `, [boothID]);
+
         response.json(rows);
     } catch (error) {
-        console.error('Error fetching completed order:', error);
-        response.status(500).send('Failed to fetch completed order');
+        console.error('Error fetching completed orders:', error);
+        response.status(500).send('Failed to fetch completed orders');
     }
 };
+
 
 /*
 CLIENT CONTROLLER
@@ -60,7 +100,12 @@ const createOrder = async (request, response) => {
             return response.status(400).send('Invalid totalPrice');
         }
 
-        const {orderQuery}= await db.query('INSERT INTO `order` (`OrderID`, `BoothID`, `Status`, `DateOrdered`, `DatePaid`, `Price`) VALUES (NULL, ?, "Pending", ?, NULL, ?)',[boothID, date, totalPrice]);
+        const { orderQuery } = await db.query(`
+            INSERT INTO \`order\` 
+            (\`OrderID\`, \`BoothID\`, \`Status\`, \`DateOrdered\`, \`DatePaid\`, \`Price\`) 
+            VALUES (NULL, ?, "Pending", ?, NULL, ?)`,
+            [boothID, date, totalPrice]);
+        
 
         const latestOrderID = orderQuery.insertId;
 
@@ -70,7 +115,9 @@ const createOrder = async (request, response) => {
             const { productId, quantity, totalPricePerProduct } = fields; // Destructure fields
 
             // Execute the query for each product update
-            const [insertResult] = await db.query('INSERT INTO `order_products` (`ProductID`, `OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',[productId, latestOrderID,quantity, totalPricePerProduct]);
+            const [insertResult] = await db.query('INSERT INTO `order_products` (`ProductID`, ' + 
+                ' `OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
+                [productId, latestOrderID,quantity, totalPricePerProduct]);
 
             if (insertResult.affectedRows === 0) {
                 console.warn(`Product with ID ${productId} was not found or not updated.`);
@@ -125,7 +172,7 @@ async function returnStocks (orderID , db){
     for(let products of getProduct){
         const {productID , qty}= products;
          await db.query(
-            `UPDATE product SET StocksRemaining = ? WHERE product.ProductID = ?`,
+            `UPDATE product SET StocksRemaining = (StocksRemaining + ?) WHERE product.ProductID = ?`,
             [qty,productID]
         );
     }
@@ -133,7 +180,6 @@ async function returnStocks (orderID , db){
         console.error('Error returning stocks:', error);
         throw new Error('Failed to return stocks'); 
     }
-
 }
 
 /*
@@ -154,7 +200,8 @@ const approveOrder = async (request, response) => {
     const {datePaid}= request.body;
 
     try {
-        const [rows] = await db.query('UPDATE `order` SET `Status` = "Complete", `DatePaid` = ? WHERE `order`.`OrderID` = ?',[datePaid, orderId]);
+        const [rows] = await db.query('UPDATE `order` SET `Status` = "Complete", `DatePaid` = ? WHERE `order`.`OrderID` = ?',
+            [datePaid, orderId]);
         res.json(rows);
     } catch (error) {
         console.error('Error approving order:', error);

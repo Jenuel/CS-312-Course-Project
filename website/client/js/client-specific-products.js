@@ -136,38 +136,16 @@ function toggleCart() {
     cartContainer.classList.toggle('active'); // Toggle the active class
 }
 
-/*
-function to convert blob --> base64 --> image
-*/
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
-// Function to convert a Blob to Base64
-function blobToBase64(blob, callback, errorCallback) {
-    const reader = new FileReader();
-    reader.onload = () => {
-        const base64 = reader.result.split(',')[1]; // Get Base64 without the prefix
-        callback(base64);
-    };
-    reader.onerror = (error) => {
-        errorCallback(error);
-    };
-    reader.readAsDataURL(blob); // Read Blob as Data URL
-}
-
-// Function to create an image element from Base64
-function base64ToImage(base64, mimeType = 'image/png') {
-    const img = new Image();
-    img.src = `data:${mimeType};base64,${base64}`;
-    return img; // Return the image element
-}
-
-/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
-
-/*
-use get details of a specific Product method in productController.js
-*/
+/**
+ * Fetch for retreiving a specific product (GET)
+ * @param {Integer} productId 
+ */
 function getSpecificProduct(productId){
   
-   fetch(`http://localhost:3000/details/:${productId}`,{// change this one
+   fetch(`http://localhost:3000/products/details/${productId}`,{
     method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 
@@ -182,39 +160,48 @@ function getSpecificProduct(productId){
     return response.json();
     })
     .then(data => {
-     /*SAMPLE data  OUTPUT
-    
-    {
-        "name": "Handmade Bracelet",
-        "Stocks": 50,
-        "Price": 29.99,
-        "status": "active",
-        "Image": "BLOB"
-    }
+        /*SAMPLE data  OUTPUT
+        
+        {
+            "Name": "Handmade Bracelet",
+            "Stocks": 50,
+            "Price": 29.99,
+            "Status": "active",
+            "Image": "base64"
+        }
 
-    */
+        */
+       data.Name // name of product
+       data.Stocks // remaining stocks of product
+       data.Price // price of  product
+       data.Status //status of product
+
         console.log("Products fetched successfully:", data);
         // Handle the "Image" field
         if (data.Image) {
-            blobToBase64(
-                data.Image, // Assuming Image is a Blob
-                (base64) => {
-                    console.log("Base64 String:", base64);
-
-                    // Convert Base64 to an image element
-                    const imgElement = base64ToImage(base64, 'image/png');
-                    document.body.appendChild(imgElement); // Append the image to the body
-                },
-                (error) => {
-                    console.error("Error converting Blob to Base64:", error);
-                }
-            );
+            const imgElement = base64ToImage(data.Image, 'image/png');
+            document.body.appendChild(imgElement); // Append the image to the body
         }
-        // add handling of data
     })
     .catch(error => {
         console.error("Error fetching products:", error);
     });
 }
+
+//END OF FETCH FUNCTIONS
+/* ----------------------------------------------------------------------------------------------------- */
+
+
+/*
+Helper function to convert  base64 --> image
+*/
+
+// Function to create an image element from Base64
+function base64ToImage(base64, mimeType = 'image/png') {
+    const img = new Image();
+    img.src = `data:${mimeType};base64,${base64}`;
+    return img; // Return the image element
+}
+
 
 displayBooths();

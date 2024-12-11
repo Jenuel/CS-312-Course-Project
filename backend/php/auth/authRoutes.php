@@ -1,6 +1,6 @@
 <?php
 
-require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/php/connectDb.php');
+require_once (realpath($_SERVER["DOCUMENT_ROOT"]) .'/CS-312-Course-Project/backend/php/connectDb.php');
 
 header('Content-Type: application/json; charset=utf-8');
 

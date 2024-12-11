@@ -30,82 +30,100 @@ function displayBooths(){
         box.appendChild(valueDiv); // appending the child to "box"
 }
 
-/*THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER */
+/* ----------------------------------------------------------------------------------------------------- */
+// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
-/*
-format of line in data[] :
-"<productID> , <quantity> , <totalPricePerProduct>",
-"<productID> , <quantity> , <totalPricePerProduct>"
-*/
+/**
+ * Fetch for creating an irder (POST)
+ * @param {Integer} boothID 
+ * @param {Array} Data 
+ * @param {Integer} totalPriceInput 
+ */
 
-function createOrder (boothID, Data, totalPriceInput, dateInput){ 
+function createOrder(boothID, Data, totalPriceInput) {
    /*
-     const products = dataArray.map(Data => {// NOT SURE HERE
-        const [productID, quantity, totalPricePerProduct] = Data.split(',');
+    format of line in data[] :
+    const Data = [
+        "<productID> , <quantity> , <totalPricePerProduct>",
+        "<productID> , <quantity> , <totalPricePerProduct>"
+    ];
+    refer the format of date input to the db
+    */ 
+    const products = Data.map(entry => {
+        const [productID, quantity, totalPricePerProduct] = entry.split(',');
         return {
-            productID: productID.trim(),
-            quantity: parseInt(quantity.trim(), 10),
-            totalPricePerProduct: parseFloat(totalPricePerProduct.trim()),
+            productID: parseInt(productID.trim(), 10), // Ensure integer for productID
+            quantity: parseInt(quantity.trim(), 10),  // Ensure integer for quantity
+            totalPricePerProduct: parseFloat(totalPricePerProduct.trim()).toFixed(2), // Ensure decimal(10,2)
         };
     });
-
-    const data = {
-        products: products,
-        totalPrice : totalPriceInput,
-        date:dateInput 
-    }
-
-    */
-    let details = "";
-
-   for(let i = 0; i< Data.length ; i++ ){
-    const temp = Data[i].split(",");
-    if(i == Data.length -1){
-        details =details ,`[productID:${temp[0]}, quantity:${temp[1]}, totalPricePerProduct:${temp[2]}]`;
-    }else{
-        details =details ,`[productID:${temp[0]}, quantity:${temp[1]}, totalPricePerProduct:${temp[2]}],\n`;
-    }
-      
-   }
-   
-    const data = {
-        products: details,
-        totalPrice : totalPriceInput,
-        date:dateInput 
-    }
     
-    fetch(`http://localhost:3000/details/${boothID}`,{// change this one
-        method: 'POST', // PATCH is appropriate for partial updates like changing an order's status
+    const data = {
+        products,
+        totalPrice: parseFloat(totalPriceInput).toFixed(2), // Ensure decimal(10,2) for totalPrice
+        date:  getCurrentDateWithMicroseconds(), // Date must be in the correct format: YYYY-MM-DD HH:MM:SS
+    };
+
+    // POST request to create an order
+    fetch(`http://localhost:3000/orders/create/${boothID}`, {// URL for creating order
+        method: 'POST',
         headers: {
-            'Content-Type': 'application/json', // Ensure headers are set
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data), // Send the status change in the body
-   
+        body: JSON.stringify(data),
     })
-    .then(response => {
-     if (!response.ok) {
-         throw new Error(`HTTP error! status: ${response.status}`);
-     }
-     return response.json();
-     })
-     .then(data => {
-         console.log("Products fetched successfully:", data);
-         // add handling of data
-     })
-     .catch(error => {
-         console.error("Error fetching products:", error);
-     });
- }
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(orderData => {
+            console.log("Order created successfully:", orderData);
 
+            // For each product, send a PATCH request to update stock
+            products.forEach(product => {
+                const productData = {
+                    numberOfProductsSold: product.quantity, // Pass the integer value for quantity
+                };
 
- 
+                fetch(`http://localhost:3000/products/buy/${product.productID}`, {// URL for buying product
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(productData => {
+                        console.log(`Product ${product.productID} updated successfully:`, productData);
+                    })
+                    .catch(error => {
+                        console.error(`Error updating product ${product.productID}:`, error);
+                    });
+            });
+        })
+        .catch(error => {
+            console.error("Error creating order:", error);
+        });
+}
+
+/**
+ * Fetch for order cancelation (PATCH)
+ * @param {Integer} orderId 
+ */
 function cancelOrder(orderId) {
-    fetch(`http://localhost:3000/cancel/${orderId}`, { // Use a meaningful endpoint
-        method: 'PATCH', // PATCH is appropriate for partial updates like changing an order's status
+    fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+        method: 'PATCH', 
         headers: {
-            'Content-Type': 'application/json', // Ensure headers are set
+            'Content-Type': 'application/json', 
         },
-        body: JSON.stringify({ status: 'cancelled' }), // Send the status change in the body
+        body: JSON.stringify({ status: 'cancelled' }), 
     })
     .then(response => {
         if (!response.ok) {
@@ -114,13 +132,35 @@ function cancelOrder(orderId) {
         return response.json();
     })
     .then(data => {
+        // data is a json massgae no parsing needed
         console.log("Order cancelled successfully:", data);
-        // add handling of data
     })
     .catch(error => {
         console.error("Error cancelling order:", error);
     });
 }
+
+//END FOR FETCH FUNCTIONS
+/* ----------------------------------------------------------------------------------------------------- */
+
+
+ /*
+Helper method to retrive date in YYYY-MM-DD HH:MM:SS'
+*/
+const getCurrentDateWithMicroseconds = () => {
+    const date = new Date();
+    
+    // Get the date in the format 'YYYY-MM-DD HH:MM:SS'
+    let formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    
+    // Get microseconds (using a simple approximation as JavaScript doesn't have built-in microsecond precision)
+    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, '0');
+    
+    // Add microseconds to the date
+    return `${formattedDate}.${microseconds}`;
+};
+
+      
 
 
 
