@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Check if the user is a customer
-            $customerQuery = "SELECT CustomerID FROM CUSTOMER WHERE UserID = ?";
+            $customerQuery = "SELECT CustomerID FROM customer WHERE UserID = ?";
             $customerStmt = $conn->prepare($customerQuery);
             $customerStmt->bind_param("i", $userID);
             $customerStmt->execute();
