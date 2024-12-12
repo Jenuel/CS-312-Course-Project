@@ -6,13 +6,11 @@ const boothId = urlParams.get('id');
     document.addEventListener('DOMContentLoaded', () => {
       const myPurchasesLink = document.getElementById('my-purchases');
 
-      if (customerID) {
+
         // Append the customerID as a query parameter to the URL
-        myPurchasesLink.href = `/client-purchases.html?id=${boothId}`;
-      } else {
-        console.warn('booth id not found!');
-      }
-    });
+        myPurchasesLink.href = `client-purchases.html?id=${boothId}`;
+      } 
+    );
 
 let box = document.querySelector(".product-list"); 
 
