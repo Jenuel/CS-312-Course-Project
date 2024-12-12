@@ -1,7 +1,15 @@
-let cart = []; 
-let grandTotal= 0.0;
+import { Session } from "inspector/promises";
+
+let cart = [];
+let grandTotal;
+if(sessionStorage.getItem("Grandtotal")) {
+    grandTotal= parseFloat(sessionStorage.getItem("Grandtotal"));
+}
+
+
 const urlParams = new URLSearchParams(window.location.search);
-const productId = urlParams.get('id');
+const productId = urlParams.get('productID');
+const boothId = urlParams.get('boothID'); 
 
 function displaySpecficProduct(product) {
     const container = document.querySelector(".container px-4 px-lg-5 my-5");
@@ -30,21 +38,27 @@ function displaySpecficProduct(product) {
 
 function addToCart(quantity,ProductID,Price ){
     let totalPrice = quantity * Price;
-    cart.push({
-        ProductID: ProductID,
-        quantity : quantity,
-        price: Price,
-        total:totalPrice
-    });
+    const qty = quantity.toString;
+    const productID = ProductID.toString;
+    const totalPricePerProduct = totalPrice.toString;
+
+    cart.push("",productID,",",qty,",",totalPricePerProduct);
     grandTotal += totalPrice;
+    sessionStorage.setItem("Grandtotal", grandTotal)
 }
  
-function checkout() { 
-    alert("checking out products");
-    const cartJSON = JSON.stringify(cart);
-    window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
-}
+// function checkout() { 
+//     alert("checking out products");
+//     const cartJSON = JSON.stringify(cart);
+//     window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
+// }
 
+if(sessionStorage.getItem("OrderID")){// true if orderID has value
+    const orderId = parseInt(sessionStorage.getItem("OrderID"));
+    addToOrder(orderId, cart);
+}else{// false no order id
+    createOrder(boothId, cart, grandTotal); 
+}
 
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
@@ -80,17 +94,7 @@ function getSpecificProduct(productId){
         }
 
         */
-       data.Name // name of product
-       data.Stocks // remaining stocks of product
-       data.Price // price of  product
-       data.Status //status of product
-
-        console.log("Products fetched successfully:", data);
-        // Handle the "Image" field
-        // if (data.Image) {
-        //     const imgElement = base64ToImage(data.Image, 'image/png');
-        //     document.body.appendChild(imgElement); // Append the image to the body
-        // }
+       console.log("Products fetched successfully:", data);
 
         displaySpecficProduct(data);
     })
@@ -98,6 +102,162 @@ function getSpecificProduct(productId){
         console.error("Error fetching products:", error);
     });
 }
+
+/**
+ * Fetch for creating an irder (POST)
+ * @param {Integer} boothID 
+ * @param {Array} Data 
+ * @param {Integer} totalPriceInput 
+ */
+
+function createOrder(boothID, Data, totalPriceInput) {
+    /*
+     format of line in data[] :
+     const Data = [
+         "<productID> , <quantity> , <totalPricePerProduct>",
+         "<productID> , <quantity> , <totalPricePerProduct>"
+     ];
+     refer the format of date input to the db
+     */ 
+     const products = Data.map(entry => {
+         const [productID, quantity, totalPricePerProduct] = entry.split(',');
+         return {
+             productID: parseInt(productID.trim(), 10), // Ensure integer for productID
+             quantity: parseInt(quantity.trim(), 10),  // Ensure integer for quantity
+             totalPricePerProduct: parseFloat(totalPricePerProduct.trim()).toFixed(2), // Ensure decimal(10,2)
+         };
+     });
+     
+     const data = {
+         products,
+         totalPrice: parseFloat(totalPriceInput).toFixed(2), // Ensure decimal(10,2) for totalPrice
+         date:  getCurrentDateWithMicroseconds(), // Date must be in the correct format: YYYY-MM-DD HH:MM:SS
+     };
+ 
+     // POST request to create an order
+     fetch(`http://localhost:3000/orders/create/${boothID}`, {// URL for creating order
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(data),
+     })
+         .then(response => {
+             if (!response.ok) {
+                 throw new Error(`HTTP error! status: ${response.status}`);
+             }
+             return response.json();
+
+
+         })
+         .then(orderData => {
+             console.log("Order created successfully:", orderData);
+             sessionStorage.setItem("OrderID", orderData);// set order id to session
+ 
+             // For each product, send a PATCH request to update stock
+             products.forEach(product => {
+                 const productData = {
+                     numberOfProductsSold: product.quantity, // Pass the integer value for quantity
+                 };
+ 
+                 fetch(`http://localhost:3000/products/buy/${product.productID}`, {// URL for buying product
+                     method: 'PATCH',
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(productData),
+                 })
+                     .then(response => {
+                         if (!response.ok) {
+                             throw new Error(`HTTP error! status: ${response.status}`);
+                         }
+                         return response.json();
+                     })
+                     .then(productData => {
+                         console.log(`Product ${product.productID} updated successfully:`, productData);
+                     })
+                     .catch(error => {
+                         console.error(`Error updating product ${product.productID}:`, error);
+                     });
+             });
+         })
+         .catch(error => {
+             console.error("Error creating order:", error);
+         });
+ }
+
+ function addToOrder(orderID, Data){
+      /*
+     format of line in data[] :
+     const Data = [
+         "<productID> , <quantity> , <totalPricePerProduct>",
+         "<productID> , <quantity> , <totalPricePerProduct>"
+     ];
+     refer the format of date input to the db
+     */ 
+     const products = Data.map(entry => {
+        const [productID, quantity, totalPricePerProduct] = entry.split(',');
+        return {
+            productID: parseInt(productID.trim(), 10), // Ensure integer for productID
+            quantity: parseInt(quantity.trim(), 10),  // Ensure integer for quantity
+            totalPricePerProduct: parseFloat(totalPricePerProduct.trim()).toFixed(2), // Ensure decimal(10,2)
+        };
+    });
+    
+    const data = {
+        products,
+    };
+
+    // POST request to create an order
+    fetch(`http://localhost:3000/orders/addToOrder/${orderID}`, {// URL for creating order
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(orderData => {
+            console.log("Order created successfully:", orderData);
+
+            // For each product, send a PATCH request to update stock
+            products.forEach(product => {
+                const productData = {
+                    numberOfProductsSold: product.quantity, // Pass the integer value for quantity
+                };
+
+                fetch(`http://localhost:3000/products/buy/${product.productID}`, {// URL for buying product
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(productData => {
+                        console.log(`Product ${product.productID} updated successfully:`, productData);
+                    })
+                    .catch(error => {
+                        console.error(`Error updating product ${product.productID}:`, error);
+                    });
+            });
+        })
+        .catch(error => {
+            console.error("Error creating order:", error);
+        });
+
+ }
+
 
 //END OF FETCH FUNCTIONS
 /* ----------------------------------------------------------------------------------------------------- */

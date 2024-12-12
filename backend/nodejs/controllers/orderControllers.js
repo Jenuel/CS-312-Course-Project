@@ -127,7 +127,45 @@ const createOrder = async (request, response) => {
         // Additional processing for totalPrice if needed
         console.log(`Total price of all products: ${totalPrice}`);
 
-        response.json({ message: 'Products updated successfully', totalPrice });
+        response.json(latestOrderID);// return latestOrderID
+    } catch (error) {
+        console.error('Error creating order:', error);
+        response.status(500).send('Failed to create order');
+    }
+};
+/*
+CLIENT CONTROLLER
+
+This function is for adding new products to orders
+
+HTTP PUT /<orderRoutes>/<orderID
+{
+  "products":[
+    ["productID":value, "quantity": value,  "totalPricePerProduct":value ], FOLLOW THE FORMAT HERE SA PAG COMPOSE NG BODY
+    ["productID":100, "quantity": 100,  "totalPricePerProduct":100.00 ] MAKE SURE DECIMAL SIYA
+    ],
+} 
+*/ 
+
+const addToOrder = async (request, response) => {
+    const db = request.db;
+    const{orderID} = request.params;
+    const { productId, quantity, totalPricePerProduct } = request.body; // Extract updates map and total price
+
+    try {
+        // Validate totalPrice if needed
+        if (!totalPrice || typeof totalPrice !== 'number' || totalPrice < 0) {
+            return response.status(400).send('Invalid totalPrice');
+        }
+
+        const [insertResult] = await db.query('INSERT INTO `order_products` (`ProductID`, ' + 
+            ' `OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
+            [productId, orderID,quantity, totalPricePerProduct]);
+
+        // Additional processing for totalPrice if needed
+        console.log(`Total price of all products: ${totalPricePerProduct }`);
+
+        response.json({ message: 'Products updated successfully', totalPricePerProduct  });
     } catch (error) {
         console.error('Error creating order:', error);
         response.status(500).send('Failed to create order');
@@ -210,4 +248,4 @@ const approveOrder = async (request, response) => {
 };
 
 
-export { getPendingOrders, getCompletedOrders, createOrder, cancelOrder, approveOrder};
+export { getPendingOrders, getCompletedOrders, createOrder, cancelOrder, approveOrder, addToOrder};

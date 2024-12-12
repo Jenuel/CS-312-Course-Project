@@ -86,5 +86,15 @@ function displayBooths(booths) {
   
 }
 
+/**
+ * start session 
+ */
+sessionStorage.setItem("OrderID", "");
+sessionStorage.setItem("Grandtotal", "");
+
+sessionStorage.removeItem("OrderID");
+sessionStorage.removeItem("Grandtotal");
+
+
 // Call getData to fetch the booth data when the page loads
 getData();

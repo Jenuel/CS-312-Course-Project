@@ -1,3 +1,11 @@
+// Retrieve the parameters from the URL
+const urlParams = new URLSearchParams(window.location.search);
+const cartJSON = decodeURIComponent(urlParams.get('cart'));
+const grandTotal = parseFloat(decodeURIComponent(urlParams.get('total')));
+
+// Parse the cart JSON string back into an array of objects
+const cart = JSON.parse(cartJSON);
+
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
 function displayBooths(){
@@ -33,85 +41,6 @@ function displayBooths(){
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
-/**
- * Fetch for creating an irder (POST)
- * @param {Integer} boothID 
- * @param {Array} Data 
- * @param {Integer} totalPriceInput 
- */
-
-function createOrder(boothID, Data, totalPriceInput) {
-   /*
-    format of line in data[] :
-    const Data = [
-        "<productID> , <quantity> , <totalPricePerProduct>",
-        "<productID> , <quantity> , <totalPricePerProduct>"
-    ];
-    refer the format of date input to the db
-    */ 
-    const products = Data.map(entry => {
-        const [productID, quantity, totalPricePerProduct] = entry.split(',');
-        return {
-            productID: parseInt(productID.trim(), 10), // Ensure integer for productID
-            quantity: parseInt(quantity.trim(), 10),  // Ensure integer for quantity
-            totalPricePerProduct: parseFloat(totalPricePerProduct.trim()).toFixed(2), // Ensure decimal(10,2)
-        };
-    });
-    
-    const data = {
-        products,
-        totalPrice: parseFloat(totalPriceInput).toFixed(2), // Ensure decimal(10,2) for totalPrice
-        date:  getCurrentDateWithMicroseconds(), // Date must be in the correct format: YYYY-MM-DD HH:MM:SS
-    };
-
-    // POST request to create an order
-    fetch(`http://localhost:3000/orders/create/${boothID}`, {// URL for creating order
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(orderData => {
-            console.log("Order created successfully:", orderData);
-
-            // For each product, send a PATCH request to update stock
-            products.forEach(product => {
-                const productData = {
-                    numberOfProductsSold: product.quantity, // Pass the integer value for quantity
-                };
-
-                fetch(`http://localhost:3000/products/buy/${product.productID}`, {// URL for buying product
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(productData),
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(productData => {
-                        console.log(`Product ${product.productID} updated successfully:`, productData);
-                    })
-                    .catch(error => {
-                        console.error(`Error updating product ${product.productID}:`, error);
-                    });
-            });
-        })
-        .catch(error => {
-            console.error("Error creating order:", error);
-        });
-}
 
 /**
  * Fetch for order cancelation (PATCH)
