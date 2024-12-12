@@ -8,7 +8,14 @@
     
 </head>
 <body>
+    <div class="background"></div>
     <div class="login-container">
+        <div class="logo-section">
+            <img src="../res/slu_logo.svg" alt="SLU Logo" class="slu-logo">
+            <div class="text">
+                <h1>SLU Virtual Booths</h1>
+            </div>
+        </div>
         <h2>Login</h2>
         <form id="loginForm" onsubmit="handleLogin(event)" action="signIn">
             <label for="username">Username</label>
@@ -17,9 +24,10 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
+            <p>Not yet registered? <a href="register.html">Click here</a> to register.</p>
+
             <button type="submit">Login</button>
         </form>
-        <a href="#" class="forgot-password">Forgot your password?</a>
     </div>
     <script src="../js/login- script.js" defer></script>
 </body>
