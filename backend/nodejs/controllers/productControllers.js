@@ -100,7 +100,6 @@ HTTP PUT /<productRoutes>/<orderId>
 
  */
 const buyProduct = async (request, response) => {
-  //PLEASE DOUBLE CHECK LOGIC
   const db = request.db;
   const { orderId } = request.params;
   const { datePaid } = request.body;
@@ -120,7 +119,7 @@ const buyProduct = async (request, response) => {
       `,
       [orderId]
     );
-    
+
     if (allPositive.length && allPositive[0].AllPositive) {
 
       await db.query(
@@ -154,6 +153,7 @@ const buyProduct = async (request, response) => {
     response.status(500).send("Failed to buy products");
   }
 };
+
 
 /**
  * Create product
