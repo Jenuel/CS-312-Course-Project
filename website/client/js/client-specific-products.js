@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const productId = urlParams.get('productID');
     if (productId) {
         getSpecificProduct(productId);
+        localStorage.setItem('currentpId', productId);
     } else {
         console.error("Product ID is missing in the URL parameters.");
     }
@@ -160,10 +161,19 @@ function createOrder(boothID, data, totalPrice,customerID) {
 
 
 function addToOrder(orderID, data,) {
+
+    let productID = localStorage.getItem('currentpId');
+
+
+    console.log("addtoorder", productID );
+
+    const id = parseInt(productID, 10);
+
     const formattedProducts = data.map(entry => {
-        const [productID, quantity, totalPricePerProduct] = entry.split(',');
+        
+        const [id, quantity, totalPricePerProduct] = entry.split(',');
         return {
-            productID: parseInt(productID, 10),
+            productID: id,
             quantity: parseInt(quantity, 10),
             totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
         };
@@ -171,7 +181,10 @@ function addToOrder(orderID, data,) {
 
     const payload = {
         products: formattedProducts,
+        productID: id,
     };
+
+    console.log(payload);
 
     fetch(`http://localhost:3000/orders/addToOrder/${orderID}`, {
         method: 'POST',

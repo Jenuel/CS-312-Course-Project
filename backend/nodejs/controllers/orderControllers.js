@@ -93,11 +93,13 @@ const createOrder = async (request, response) => {
         console.log("Received date:", date);
 
         // Insert order into the database
-        const { orderQuery } = await db.query(
-            "INSERT INTO order (OrderID, BoothID, Status, DateOrdered, DatePaid, Price, customerID) VALUES (NULL, ?, 'Pending',?, NULL, ?, ?)",
-            [boothId, date, totalPrice,customerId]);
-
-        const latestOrderID = orderQuery.insertId;
+        const [orderQuery] = await db.query(
+            "INSERT INTO `order` (OrderID, BoothID, Status, DateOrdered, DatePaid, Price, customerID) VALUES (NULL, ?, 'Pending', ?, NULL, ?, ?)",
+            [boothID, date, totalPrice, customerId]
+          );
+          
+          const latestOrderID = orderQuery.insertId;
+          
 
         if (!latestOrderID) {
             throw new Error("Failed to create order. No insertId returned.");
@@ -149,13 +151,16 @@ HTTP PUT /<orderRoutes>/<orderID
 const addToOrder = async (request, response) => {
     const db = request.db;
     const{orderId} = request.params;
-    const { productId, quantity, totalPricePerProduct } = request.body; // Extract updates map and total price
+    const { productID, quantity, totalPricePerProduct } = request.body; // Extract updates map and total price
 
+
+    console.log("add to" , productID);
+    
     try {
         // Validate totalPrice if needed
         const [insertResult] = await db.query(
             'INSERT INTO order_products (ProductID,`OrderID`, Quantity, Total) VALUES (?, ?, ?, ?)',
-            [productId, orderId,quantity, totalPricePerProduct]);
+            [productID, orderId,quantity, totalPricePerProduct]);
             
         // Additional processing for totalPrice if needed
         console.log(`Total price of all products: ${totalPricePerProduct }`);
