@@ -221,7 +221,6 @@ function getBase64(file) {
 }
 
 // Edit Section
-
 function editBooth(boothId) {
   console.log(boothId);
   modal.classList.add("show");

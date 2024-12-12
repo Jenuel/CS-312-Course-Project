@@ -318,19 +318,23 @@ function setupTabNavigation() {
       // Remove active class from all tabs
       navLinks.forEach(tab => {
         tab.classList.remove('active');
+        tab.style.color = 'rgb(98, 97, 97)';  
+        tab.style.borderBottom = 'none';       
       });
       
       // Add active class to clicked tab
       link.classList.add('active');
+      link.style.color = '#0d6efd';           
+      link.style.borderBottom = '2px solid #0d6efd';  // Add active border
       
       const tabType = link.getAttribute('data-tab');
       
-      // Handle tab switching logic
-      if (tabType === 'Orders') {
+      if (link.getAttribute('data-section') === 'orders') {
         showOrders();
       } else {
         showProducts();
-        filterProducts(tabType);
+        const filterValue = link.getAttribute('data-filter') || link.textContent;
+        filterProducts(filterValue);
       }
     });
   });
@@ -756,13 +760,21 @@ async function initializePage() {
 }
 document.addEventListener("DOMContentLoaded", () => {
   setupTabNavigation()
+  const activeTab = document.querySelector('.nav-link.tab-link.active');
+  if (activeTab) {
+    activeTab.style.color = '#0d6efd';
+    activeTab.style.borderBottom = '2px solid #0d6efd';
+  }
   initializePage()
 });
 
 
 
 
-// For Orders
+
+
+
+// THE ORDERS TAB
 
 // DOM Elements
 const pendingOrdersTable = document.querySelector("#pendingOrders tbody");

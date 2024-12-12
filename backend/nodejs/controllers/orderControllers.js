@@ -9,6 +9,11 @@ const getReservedOrders = async (request, response) => {
     const db = request.db;
     const{boothID} = request.params;
     try {
+        // Validate boothID
+        if (!boothID || isNaN(boothID)) {
+            return response.status(400).json({ error: 'Invalid booth ID' });
+        }
+        
         const [rows] = await db.query(`
             SELECT 
                 o.OrderID AS "order id", 
