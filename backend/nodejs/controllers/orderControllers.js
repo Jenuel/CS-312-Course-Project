@@ -102,6 +102,12 @@ const createOrder = async (request, response) => {
         }
             */
 
+        if (!boothID || isNaN(boothID)) {
+            return response.status(400).send('Invalid boothID');
+        }
+        console.log('Received boothID:', boothID);
+
+
         const { orderQuery } = await db.query(`
             INSERT INTO \`order\` 
             (\`OrderID\`, \`BoothID\`, \`Status\`, \`DateOrdered\`, \`DatePaid\`, \`Price\`) 

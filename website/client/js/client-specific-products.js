@@ -77,13 +77,6 @@ function addToCart(quantity, ProductID, Price) {
     }
     console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
 
-    if (sessionStorage.getItem("OrderID")) { // there is an existing order
-        const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
-        addToOrder(orderId, cart);
-    } else { // wala pang order
-        createOrder(boothId, cart, grandTotal);
-    }
-
 }
 
 function checkout() {
@@ -123,6 +116,8 @@ function createOrder(boothID, data, totalPrice) {
         };
     });
 
+    console.log("id: " ,boothId);
+    
     // Ensure the total price is a float (not a string)
     const formattedTotalPrice = parseFloat(totalPrice); 
 
