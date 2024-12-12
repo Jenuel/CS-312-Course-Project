@@ -1,4 +1,4 @@
-let modal, create, edit, boothImage, inputFile;
+let modal, create, edit, boothImage, inputFile, searchInput, sortSelect;
 
 let boothContainer = document.querySelector(".booth-container");
 let productContainer = document.querySelector(".main-container");
@@ -20,20 +20,19 @@ function closeCreateBooth() {
 
 
 function createBoothFinished() {
+
+  const form = document.getElementById("booth-form");
+
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return; // Stop the function if validation fails
+  }
   createBoothFunction();
   modal.classList.remove("show");
   create.classList.remove("open-createBooth");
   document.body.classList.remove("modal-open");
 }
 
-// function loadProduct() {
-//   const pageFrame = document.getElementById("page-frame");
-//   const boothContent = document.getElementById("booth-content");
-
-//   boothContent.classList.remove("active");
-//   pageFrame.style.display = "block";
-//   pageFrame.src = "../html/vendor-product.html";
-// }
 
 function showProducts(boothId) {
   sessionStorage.setItem("currentBoothId", boothId);
@@ -51,6 +50,10 @@ let formData = {
 
 // fetches the data and calls the displaying function
 function getData() {
+  const searchTerm = searchInput?.value || "";
+  const sortOption = sortSelect?.value || "A-Z";
+
+
   fetch(
     "http://localhost:8080/php/boothOps/boothRoutes.php",
     {
@@ -74,8 +77,26 @@ function getData() {
         if (data.error) {
           console.error("Error:", data.error);
         } else {
+
+          let filteredData = data;
+        
+
+          if (searchTerm) {
+            filteredData = data.filter(booth => 
+              booth.Title.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+          }
+          
+  
+          filteredData.sort((a, b) => {
+            if (sortOption === "Z-A") {
+              return b.Title.localeCompare(a.Title);
+            }
+            return a.Title.localeCompare(b.Title);
+          });
+
           console.log("Booths data:", data);
-          displayBooths(data);
+          displayBooths(filteredData);
         }
       },
 
@@ -116,36 +137,54 @@ async function displayBooths(data) {
       : "../res/1564534_customer_man_user_account_profile_icon.png";
 
     valueDiv.innerHTML =`
-    <div class="card booth-card" style="width: 18rem;">
-      <img class="card-img-top" src="${imageSrc}" alt="Booth image" style="height: 200px; object-fit: cover;">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">${value.Title}</h5>
-        <div class="description-container">
-          <p class="card-text">${value.Description}</p>
+     <div class="card booth-card">
+        <!-- Booth Image -->
+        <div class="text-center">
+          <img 
+            class="card-img-top booth-image p-3" 
+            src="${imageSrc}" 
+            alt="Booth image"
+          >
         </div>
-        <div class="booth-info mt-auto">
-          <p class="card-text">
-            <small class="text-muted">
-              Location: ${value.Location}<br>
-              Schedule: ${value.Schedules}
-            </small>
+
+        <!-- Card Content -->
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title h5 fw-bold mb-2">
+            ${value.Title}
+          </h5>
+          
+          <p class="card-text text-muted mb-3">
+            ${value.Description}
           </p>
+          
+          <!-- Location & Schedule -->
+          <div class="booth-info mt-auto">
+            <div class="d-flex align-items-center text-secondary mb-2">
+              <i class='bx bx-map-pin me-2'></i>
+              <span>Location: ${value.Location}</span>
+            </div>
+            <div class="d-flex align-items-center text-secondary">
+              <i class='bx bx-time me-2'></i>
+              <span>Schedule: ${value.Schedules}</span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="card-footer">
-        <div class="d-flex justify-content-between ">
-          <button type="button" class="btn btn-outline-primary btn-sm" onclick="editBooth(${value.BoothID})">
-            <i class="bx bx-edit"></i> EDIT
-          </button>
-          <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteBooth(${value.BoothID})">
-            <i class="bx bx-trash"></i> DELETE
-          </button>
-          <button type="button" class="btn btn-primary btn-sm" id="products-button" onclick="viewProducts(${value.BoothID})">
-            <i class="bx bx-store"></i> PRODUCTS
-          </button>
+        
+        <!-- Action Buttons -->
+        <div class="card-footer bg-transparent border-top-0">
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" onclick="editBooth(${value.BoothID})">
+              <i class="bx bx-edit me-1"></i> EDIT
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm flex-grow-1" onclick="deleteBooth(${value.BoothID})">
+              <i class="bx bx-trash me-1"></i> DELETE
+            </button>
+            <button type="button" class="btn btn-primary btn-sm flex-grow-1" onclick="viewProducts(${value.BoothID})">
+              <i class="bx bx-store me-1"></i> PRODUCTS
+            </button>
+          </div>
         </div>
-      </div> 
-    </div>`;;
+      </div>`;;
     box.appendChild(valueDiv);
   });
 }
@@ -478,8 +517,12 @@ function loadPage(page) {
 
     case "sales":
       boothContent.classList.remove("active");
-      pageFrame.style.display = "block";
-      pageFrame.src = "../html/vendor-sales.html"; 
+            pageFrame.style.display = "block";
+            pageFrame.style.height = "100%";
+            pageFrame.style.width = "100%";
+            pageFrame.style.minHeight = "calc(100vh - 56px)"; // Account for navbar
+            pageFrame.style.border = "none"; 
+            pageFrame.src = "../html/vendor-sales.html";
       break;
   }
 }
@@ -502,6 +545,28 @@ document.addEventListener("DOMContentLoaded", () => {
   inputFile.onchange = function () {
     boothImage.src = URL.createObjectURL(inputFile.files[0]);
   };
+
+  searchInput = document.querySelector(".searchbox");
+  sortSelect = document.getElementById("sortDropdown");
+
+  
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      getData();
+    });
+  }
+
+  // Update your dropdown click handlers
+  const sortLinks = document.querySelectorAll(".dropdown-item");
+  sortLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const sortValue = e.target.textContent;  // This will be "A-Z" or "Z-A"
+      sortSelect.textContent = `Sort By: ${sortValue}`; 
+      sortSelect.value = sortValue;  // Store the sort value
+      getData();
+    });
+  });
 
   loadPage("home");
   getData();

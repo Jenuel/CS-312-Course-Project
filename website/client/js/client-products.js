@@ -16,7 +16,7 @@ function displayProducts(products) {
       const price = product.Price ? parseFloat(product.Price) : null;
   
       productDiv.innerHTML = `
-        <div class="card h-100">
+        <div class="card h-100"  style="min-height: 500px;">
           <img 
             class="card-img-top" 
             src="${product.Image ? `data:image/png;base64,${product.Image}` : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'}" 
