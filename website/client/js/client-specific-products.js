@@ -1,7 +1,7 @@
 let cart = [];
 let grandTotal = sessionStorage.getItem("Grandtotal")
     ? parseFloat(sessionStorage.getItem("Grandtotal"))
-    : 0;
+    : 0.0;
 
 const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('boothID');
@@ -70,22 +70,21 @@ function addToCart(quantity, ProductID, Price) {
     sessionStorage.setItem("Grandtotal", grandTotal.toFixed(2));
 
     console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
+
+    if (sessionStorage.getItem("OrderID")) { // there is an existing order
+        const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
+        addToOrder(orderId, cart);
+    } else { // wala pang order
+        createOrder(boothId, cart, grandTotal);
+    }
+
 }
 
 function checkout() {
     alert("Checking out products");
     const cartJSON = JSON.stringify(cart);
-    window.location.href = `client-purchases.html?orderID=${orderID}`;// NEED TO FIND LIKE A SET OF VALUE GANUN
+    window.location.href = `client-purchases.html?orderID=${sessionStorage.getItem("OrderID")}`;// NEED TO FIND LIKE A SET OF VALUE GANUN
 }
-
-/*
-if (sessionStorage.getItem("OrderID")) {
-    const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
-    addToOrder(orderId, cart);
-} else {
-    createOrder(boothId, cart, grandTotal);
-}
-    */
 
 /* Fetch Functions */
 
