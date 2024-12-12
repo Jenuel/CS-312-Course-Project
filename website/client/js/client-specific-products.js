@@ -23,10 +23,10 @@ function displaySpecficProduct(product) {
     }
 
     // Parse product details
-    const productName = product.Name || "Unknown Product";
-    const productPrice = parseFloat(product.Price) || 0.0; // Convert Price to a number or fallback to 0.0
-    const productImage = product.Image 
-        ? `data:image/png;base64,${product.Image}` 
+    const productName = product[0].Name || "Unknown Product";
+    const productPrice = parseFloat(product[0].Price) || 0.0; // Convert Price to a number or fallback to 0.0
+    const productImage = product[0].Image 
+        ? `data:image/png;base64,${product[0].Image}` 
         : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'; // Fallback if Image is missing
 
     console.log("Parsed product details:", { productName, productPrice, productImage });
@@ -50,7 +50,7 @@ function displaySpecficProduct(product) {
                     <button class="btn btn-primary ms-3" type="button" 
                         onclick="addToCart(
                             this.parentElement.querySelector('#quantityInput').value,
-                            ${product.ProductID},
+                            ${product[0].ProductID},
                             ${productPrice}
                         )">
                         Add to Cart
@@ -101,8 +101,7 @@ function checkout() {
  * Fetch for retreiving a specific product (GET)
  * @param {Integer} productId 
  */
-function getSpecificProduct(productId){
-  
+function getSpecificProduct(productId) {
     fetch(`http://localhost:3000/products/details/${productId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -114,10 +113,17 @@ function getSpecificProduct(productId){
         return response.json();
     })
     .then(data => {
-        console.log("Status: ", data.Status);
         console.log("Fetched product data:", data);
-        if (data && data.Status === "active") {
-            displaySpecficProduct(data);
+
+        // Safely access and log specific fields
+        const status = data[0].Status || 'Status not found';
+        const name = data[0].Name || 'Name not found';
+        console.log("Status: ", status);
+        console.log("Name: ", name);
+
+        // Check if product is active
+        if (status.toLowerCase() === "active") {
+            displaySpecficProduct(data); // Call your display function
         } else {
             console.error("Product status is not active or undefined.");
             alert("The requested product is not available.");
@@ -126,8 +132,6 @@ function getSpecificProduct(productId){
     .catch(error => {
         console.error("Error fetching product:", error);
     });
-    
-    
 }
 
 //END OF FETCH FUNCTIONS
