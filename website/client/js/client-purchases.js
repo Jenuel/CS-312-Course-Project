@@ -10,6 +10,9 @@ const cart = JSON.parse(cartJSON);
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
 function displayBooths(data) {
+
+    const id = localStorage.getItem('id');
+    console.log("id on cart", id);
     const purchaseList = document.getElementById('purchase-list');
 
     if (!purchaseList) {
