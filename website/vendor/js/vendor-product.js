@@ -771,9 +771,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
-
-
 // THE ORDERS TAB
 
 // DOM Elements
@@ -793,6 +790,7 @@ function getCurrentDateWithMicroseconds() {
 function getBoothIdFromSession() {
   return sessionStorage.getItem("currentBoothId");
 }
+
 // Populate Pending Orders
 function populatePendingOrders(boothId) {
     fetch(`http://localhost:3000/orders/reserved/${boothId}`, {
@@ -813,10 +811,10 @@ function populatePendingOrders(boothId) {
                 const row = `
                     <tr>
                         <td>${order.OrderId}</td>
+                        <td>${order.CustomerName}</td>
                         <td>${order.ProductName}</td>
                         <td>${order.Quantity}</td>
                         <td>₱${order.TotalPrice}</td>
-                        <td>${order.Status}</td>
                         <td><button class="btn btn-sm btn-success" onclick="markAsCompleted('${order.OrderId}')">Complete</button></td>
                     </tr>`;
                 pendingOrdersTable.insertAdjacentHTML("beforeend", row);
@@ -825,36 +823,38 @@ function populatePendingOrders(boothId) {
         .catch((error) => console.error("Error fetching pending orders:", error));
 }
 
+
 // Populate Completed Orders
 function populateCompletedOrders(boothId) {
   fetch(`http://localhost:3000/orders/complete/${boothId}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-})
-    .then((response) => {
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return response.json();
-    })
-    .then((orders) => {
-    completedOrdersTable.innerHTML = ""; // Clear existing rows
-    if (completedOrders.length === 0) {
-        completedOrdersTable.innerHTML = "<tr><td colspan='6'>No completed orders yet.</td></tr>";
-        return;
-    }
-    orders.forEach((order) => {
-        const row = `
-            <tr>
-                <td>${order.OrderId}</td>
-                <td>${order.ProductName}</td>
-                <td>${order.Quantity}</td>
-                <td>₱${order.TotalPrice}</td>
-                <td>${order.Status}</td>
-                <td>Completed</td>
-                // <td><button class="btn btn-sm btn-danger" onclick="removeCompletedOrder('${order.OrderId}')">Remove</button></td>
-            </tr>`;
-        completedOrdersTable.insertAdjacentHTML("beforeend", row);
-    });
-  });
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+  })
+  .then((response) => {
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return response.json();
+  })
+  .then((orders) => {
+      completedOrdersTable.innerHTML = ""; // Clear existing rows
+      if (orders.length === 0) {
+          completedOrdersTable.innerHTML = "<tr><td colspan='6'>No completed orders yet.</td></tr>";
+          return;
+      }
+
+      orders.forEach((order) => {
+          const row = `
+              <tr id="order-${order.OrderId}">
+                  <td>${order.OrderId}</td>
+                  <td>${order.CustomerName}</td>
+                  <td>${order.ProductName}</td>
+                  <td>${order.Quantity}</td>
+                  <td>₱${order.TotalPrice}</td>
+                  <td><button class="btn btn-sm btn-danger" onclick="removeCompletedOrder('${order.OrderId}')">Remove</button></td>
+              </tr>`;
+          completedOrdersTable.insertAdjacentHTML("beforeend", row);
+      });
+  })
+  .catch((error) => console.error("Error fetching completed orders:", error));
 }
 
 // Mark an Order as Completed
@@ -881,12 +881,23 @@ function markAsCompleted(orderId) {
 
 // Remove a Completed Order
 function removeCompletedOrder(orderId) {
-    const index = completedOrders.findIndex((order) => order.orderId === orderId);
-    if (index !== -1) {
-        completedOrders.splice(index, 1);
-        populateCompletedOrders();
-    }
+  if (!confirm("Are you sure you want to remove this order?")) return;
+
+  // Send request to remove the order from the backend
+  fetch(`http://localhost:3000/orders/${orderId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" }
+  })
+  .then((response) => {
+      if (!response.ok) throw new Error(`Error removing order: ${response.status}`);
+      console.log(`Order ${orderId} removed successfully`);
+
+      // After removal, update the table
+      updateTables();
+  })
+  .catch((error) => console.error("Error removing completed order:", error));
 }
+
 
 // Update Tables
 function updateTables() {
