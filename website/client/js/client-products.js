@@ -1,11 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('id'); 
 
-function myPurchases() {
-  alert("Checking out products");
-  window.location.href = `client-purchases.html?orderID=${orderID}`;// NEED TO FIND LIKE A SET OF VALUE GANUN
-}
-
 
     // Function to dynamically set the "My Purchases" URL
     document.addEventListener('DOMContentLoaded', () => {
@@ -13,7 +8,7 @@ function myPurchases() {
 
       if (customerID) {
         // Append the customerID as a query parameter to the URL
-        myPurchasesLink.href = `client-purchases.html?id=${boothId}`;
+        myPurchasesLink.href = `/client-purchases.html?id=${boothId}`;
       } else {
         console.warn('booth id not found!');
       }

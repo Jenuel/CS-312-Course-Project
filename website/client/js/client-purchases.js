@@ -2,7 +2,7 @@
 
 // Retrieve the parameters from the URL
 const urlParams = new URLSearchParams(window.location.search);
-const orderID = decodeURIComponent(urlParams.get('orderID'));
+const boothId = decodeURIComponent(urlParams.get('boothId'));
 
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
@@ -242,4 +242,4 @@ function fetchCartData() {
     });
 }
 
-fetchCartData();
+fetchCartData(boothId);
