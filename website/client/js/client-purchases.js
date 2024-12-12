@@ -4,7 +4,10 @@ import { getProducts } from "../../../backend/nodejs/controllers/productControll
 const urlParams = new URLSearchParams(window.location.search);
 const cartJSON = decodeURIComponent(urlParams.get('cart'));
 const grandTotal = parseFloat(decodeURIComponent(urlParams.get('total')));
+const boothId = urlParams.get('id'); 
 
+const customerID = localStorage.getItem('id');
+document.cookie = "customerID=" + customerID ;
 
 // Parse the cart JSON string back into an array of objects
 const cart = JSON.parse(cartJSON);
@@ -205,8 +208,13 @@ function createOrder(boothID, data, totalPrice) {
 }
 
 
-function fetchCartData() {
-    fetch("http://localhost:3000/cart")
+function fetchCartData(boothid) {
+    fetch('http://localhost:3000/complete/${boothid}', {
+        method: 'GET',
+        headers: {
+            "Content-type": 'application/json',
+        },
+    })
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -224,4 +232,4 @@ function fetchCartData() {
     });
 }
 
-fetchCartData();
+fetchCartData(boothId);

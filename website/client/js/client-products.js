@@ -2,6 +2,18 @@ const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('id'); 
 
 
+    // Function to dynamically set the "My Purchases" URL
+    document.addEventListener('DOMContentLoaded', () => {
+      const myPurchasesLink = document.getElementById('my-purchases');
+
+      if (customerID) {
+        // Append the customerID as a query parameter to the URL
+        myPurchasesLink.href = `client-purchases.html?id=${boothId}`;
+      } else {
+        console.warn('booth id not found!');
+      }
+    });
+
 let box = document.querySelector(".product-list"); 
 
 function displayProducts(products) {
