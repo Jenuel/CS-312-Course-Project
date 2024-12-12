@@ -30,12 +30,16 @@ function displayCart(cartItems) {
     cartItems.forEach((item, index) => {
         const row = document.createElement('tr');
 
-        // Ensure proper data handling and dynamic row rendering
+        // Use base64 image if available; otherwise, fallback to a placeholder
+        const imageSrc = item.image 
+            ? `data:image/png;base64,${item.image}` 
+            : 'https://via.placeholder.com/50';
+
         row.innerHTML = `
             <th scope="row">${index + 1}</th>
             <td>
                 <img 
-                    src="${item.image || 'https://via.placeholder.com/50'}" 
+                    src="${imageSrc}" 
                     alt="${item.productName || 'Product Image'}" 
                     class="img-fluid" 
                     style="max-height: 50px; max-width: 50px;">
@@ -62,6 +66,7 @@ function displayCart(cartItems) {
     // Update the cart total after rendering
     updateCartTotal(cartItems);
 }
+
 
 function updateCartTotal(cartItems) {
     const cartTotalElement = document.getElementById('cart-total');
@@ -248,11 +253,12 @@ function getCart(customerId) {
                 return;
             }
 
+            
             // Map the API response to the format expected by `displayCart`
-            const cartItems = data[0].map(product => ({
+            const cartItems = data.map(product => ({
                 productID: product['Product ID'],
                 productName: product['Product Name'] || 'Unknown Product',
-                image: product['Image'], // If image is base64 or URL
+                image: product['Product Image'], // If image is base64 or URL
                 quantity: product['Quantity'],
                 price: parseFloat(product['Unit Price']),
                 total: parseFloat(product['Total price per product']),
@@ -260,11 +266,18 @@ function getCart(customerId) {
 
             // Update the cart display
             displayCart(cartItems);
+
+            updateCartTotal(data.)
+            
         })
         .catch(error => {
             console.error("Error fetching cart items:", error);
         });
 }
 
+function updateCartTotal(total) {
+    const totalElement = document.getElementById('cart-total');
+    totalElement.textContent = total.toFixed(2);
+}
 
 getCart(localStorage.getItem('id'));

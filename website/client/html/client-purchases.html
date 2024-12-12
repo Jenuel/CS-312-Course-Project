@@ -75,7 +75,7 @@
             <th scope="col">Image</th>
             <th scope="col">Product Name</th>
             <th scope="col">Quantity</th>
-            <th scope="col">Date of Transaction</th>
+            <th scope="col">Price</th>
             <th scope="col">Total</th>
             <th scope="col">Options</th>
           </tr>
@@ -98,7 +98,7 @@
     </div>
 
     <div class="cart-container mt-4 d-flex flex-column justify-content-center align-items-center">
-      <div class="cart-total text-center mb-2">
+      <div class="cart-total text-center mb-2" id="grand-total">
         Total Amount: $<span id="cart-total">0.00</span>
       </div>
       <button class="btn btn-success" onclick="checkout()">Checkout</button>
