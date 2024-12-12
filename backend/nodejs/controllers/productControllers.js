@@ -122,34 +122,12 @@ const buyProduct = async (request, response) => {
     
     if (allPositive.length && allPositive[0].AllPositive) {
       await db.query(
-      `
-      UPDATE product p
-      SET p.StocksRemaining = p.StocksRemaining - (
-          SELECT o.Quantity
-          FROM order_products o
-          WHERE o.OrderID = ? AND o.ProductID = p.ProductID
-      )
-      WHERE p.ProductID IN (
-          SELECT o.ProductID
-          FROM order_products o
-          WHERE o.OrderID = ?
-      )
-      `,
+      "UPDATE product p SET p.StocksRemaining = p.StocksRemaining - ( SELECT o.Quantity FROM order_products o WHERE o.OrderID = 1 AND o.ProductID = p.ProductID ) WHERE p.ProductID IN ( SELECT o.ProductID FROM order_products o WHERE o.OrderID = 1 )",
       [orderId, orderId]
     );
 
     await db.query(
-      `
-      INSERT INTO inventory (InventoryID, ProductID, Date, Type, Quantity)
-      SELECT NULL, 
-             p.ProductID, 
-             DATE(o.DatePaid) AS DatePaid, 
-             'out', 
-             p.Quantity
-      FROM \`order\` o
-      JOIN order_products p ON o.OrderID = p.OrderID
-      WHERE o.OrderID = ?
-      `,
+      "INSERT INTO inventory (InventoryID, ProductID, Date, Type, Quantity) SELECT NULL, p.ProductID, DATE(o.DatePaid) AS DatePaid, 'out', p.Quantity FROM `order` o JOIN order_products p ON o.OrderID = p.OrderID WHERE o.OrderID = 1",
       [orderId]
     );
 
