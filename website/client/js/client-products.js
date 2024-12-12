@@ -1,5 +1,11 @@
 const urlParams = new URLSearchParams(window.location.search);
-const boothId = urlParams.get('id'); 
+let boothId = urlParams.get('id'); 
+let custID=0;
+if(!(urlParams.get('id'))){
+  getCustomerID(localStorage.getItem('id'))
+  getCart(custID);
+}
+
 
 
     // Function to dynamically set the "My Purchases" URL
@@ -134,9 +140,53 @@ function cancelOrder(orderId) {
   });
 }
 
+function getCustomerID(id){
+  fetch(`http://localhost:3000/orders/getCustomerID/${id}`, { // URL for Cancel order
+    method: 'GET', 
+    headers: {
+        'Content-Type': 'application/json', 
+    },
+    body: JSON.stringify({ status: 'cancelled' }), 
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      // add handling of data 
+      if (data.error) {
+        // Handle the error message if the response contains an error
+        console.error("Error:", data.error);
+    } else {
+      /*
+      date output:
+      [
+        {
+            "Customer ID": 12345
+        }
+      ]
+      */
+      if (data.length > 0) {
+        custID = data[0]['Customer ID'];
+        console.log("Customer ID:", custID);
+      } else {
+        console.log("No customer found.");
+      }
+
+     
+    }
+  })
+  .catch(error => {
+      console.error("Error cancelling order:", error);
+  });
+
+}
+
 function getCart(customerId){
   fetch(`http://localhost:3000/orders/checkPendingOrder/${customerId}`, { // URL for Cancel order
-    method: 'PATCH', 
+    method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 
     },
@@ -180,11 +230,11 @@ function getCart(customerId){
         }
       ]
 
-      */
-           // Arrays to hold product IDs, quantities, and totals
+      sample handling of data 
+        // Arrays to hold product IDs, quantities, and totals
            const orderId = data[0]['Order ID'];
            const grandTotal = data[0]['Grand total'];
-           const boothId = data[0]['Booth ID'];
+           const boothIdData = data[0]['Booth ID'];
            const productIds = [];
            const quantities = [];
            const totals = [];
@@ -201,6 +251,10 @@ function getCart(customerId){
                image.push(product['Product Image']);
                price.push(product['Product price']);
            });
+      */
+           
+          const boothIdData = data[0]['Booth ID'];
+          boothId =boothIdData;
  
     }
   })
@@ -259,7 +313,7 @@ function logout() {
       alert("Logout failed. Please try again.");
     });
 
-    localStorage.setItem("Status", "client-product.html")  // adding status
+    localStorage.setItem("Status", "client-product.html");  // adding status
 }
 
 document.addEventListener("DOMContentLoaded", () => {

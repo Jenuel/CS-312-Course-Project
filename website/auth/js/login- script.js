@@ -42,7 +42,18 @@ function handleLogin(event) {
                 const id = data.UserID;
                 localStorage.setItem('id', id);
                 console.log("ID : ", id);
-                window.location.href = 'http://localhost:8080/client/html/client-home.html'; //redirect to customer side
+                if(localStorage.getItem("Status") === "client-purchases.html"){
+                    window.location.href = 'client-purchases.html?orderID=none';
+                }
+                if(localStorage.getItem("Status") === "client-specific-products.html"){
+                    window.location.href = '"client-specific-product.html?productID=none&boothID=none';
+                }
+                if(localStorage.getItem("Status") === "client-product.html"){
+                    window.location.href = 'client-products.html?id=none';
+                }else{
+                    window.location.href = ''; //redirect to customer side
+                }
+                
                 
             }                
         } else {
