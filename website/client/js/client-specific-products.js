@@ -75,7 +75,6 @@ function addToCart(quantity, ProductID, Price) {
     } else {
         createOrder(boothId, cart, grandTotal);
     }
-    
     console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
 }
 
@@ -115,18 +114,22 @@ function getSpecificProduct(productId) {
 }
 
 function createOrder(boothID, data, totalPrice) {
+    // Parse and format product data
     const formattedProducts = data.map(entry => {
         const [productID, quantity, totalPricePerProduct] = entry.split(',');
         return {
             productID: parseInt(productID, 10),
             quantity: parseInt(quantity, 10),
-            totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
+            totalPricePerProduct: parseFloat(totalPricePerProduct), // Send as a float, not a string
         };
     });
 
+    // Ensure the total price is a float (not a string)
+    const formattedTotalPrice = parseFloat(totalPrice); 
+
     const payload = {
         products: formattedProducts,
-        totalPrice: parseFloat(totalPrice).toFixed(2),
+        totalPrice: formattedTotalPrice, // Send as a number, not a string
         date: new Date().toISOString().slice(0, 19).replace('T', ' '),
     };
 
@@ -135,13 +138,23 @@ function createOrder(boothID, data, totalPrice) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     })
-        .then(response => response.ok ? response.json() : Promise.reject(response))
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(err => { throw new Error(err); });
+            }
+            return response.json(); // Parse the JSON response if it's okay
+        })
         .then(orderData => {
             console.log("Order created successfully:", orderData);
-            sessionStorage.setItem("OrderID", orderData.id); //ETO PO YUNG PAG SAVE NG ID PAPALIT NA LANG ************************************
+            sessionStorage.setItem("OrderID", orderData.id); // Save OrderID to sessionStorage
         })
-        .catch(error => console.error("Error creating order:", error));
+        .catch(error => {
+            console.error("Error creating order:", error);
+            alert(`Error creating order: ${error.message}`); // Provide an error message
+        });
 }
+
+
 
 function addToOrder(orderID, data,) {
     const formattedProducts = data.map(entry => {
