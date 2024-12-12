@@ -7,7 +7,7 @@ This function is for getting the advanced/pending orders of a certain booth
 */
 const getReservedOrders = async (request, response) => {
     const db = request.db;
-    const{boothID} = request.params;
+    const{boothId} = request.params;
     try {
         const [rows] = await db.query(`
             SELECT 
@@ -27,7 +27,7 @@ const getReservedOrders = async (request, response) => {
                 AND o.BoothID = ? 
             ORDER BY 
                 o.OrderID ASC
-        `, [boothID]);
+        `, [boothId]);
 
         response.json(rows);
     } catch (error) {
@@ -43,7 +43,7 @@ This function is for getting the completed orders of a certain booth
 */
 const getCompletedOrders = async (request, response) => {
     const db = request.db;
-    const { boothID } = request.params;
+    const { boothId } = request.params;
 
     try {
         const [rows] = await db.query(`
@@ -64,7 +64,7 @@ const getCompletedOrders = async (request, response) => {
                 AND o.BoothID = ? 
             ORDER BY 
                 o.OrderID ASC
-        `, [boothID]);
+        `, [boothId]);
 
         response.json(rows);
     } catch (error) {
@@ -91,8 +91,8 @@ HTTP PUT /<orderRoutes>/<boothId>
 */ 
 const createOrder = async (request, response) => {
     const db = request.db;
-    const{boothID} = request.params;
-    const { products, totalPrice, date } = request.body; // Extract updates map and total price
+    const{boothId} = request.params;
+    const { products, totalPrice, date ,customerId} = request.body; // Extract updates map and total price
 
     try {
         // Validate totalPrice if needed
@@ -110,9 +110,9 @@ const createOrder = async (request, response) => {
 
         const { orderQuery } = await db.query(`
             INSERT INTO \`order\` 
-            (\`OrderID\`, \`BoothID\`, \`Status\`, \`DateOrdered\`, \`DatePaid\`, \`Price\`) 
-            VALUES (NULL, ?, "Pending", ?, NULL, ?)`,
-            [boothID, date, totalPrice]);
+            (\`OrderID\`, \`BoothID\`, \`Status\`, \`DateOrdered\`, \`DatePaid\`, \`Price\`, \`customerID\`) 
+            VALUES (NULL, ?, "Pending", ?, NULL, ?,?)`,
+            [boothId, date, totalPrice,customerId]);
         
 
         const latestOrderID = orderQuery.insertId;
@@ -157,7 +157,7 @@ HTTP PUT /<orderRoutes>/<orderID
 
 const addToOrder = async (request, response) => {
     const db = request.db;
-    const{orderID} = request.params;
+    const{orderId} = request.params;
     const { productId, quantity, totalPricePerProduct } = request.body; // Extract updates map and total price
 
     try {
@@ -168,7 +168,7 @@ const addToOrder = async (request, response) => {
 
         const [insertResult] = await db.query('INSERT INTO `order_products` (`ProductID`, ' + 
             ' `OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
-            [productId, orderID,quantity, totalPricePerProduct]);
+            [productId, orderId,quantity, totalPricePerProduct]);
 
         // Additional processing for totalPrice if needed
         console.log(`Total price of all products: ${totalPricePerProduct }`);
@@ -208,18 +208,18 @@ const cancelOrder = async (request, response) => {// RECENTLY DONE
     }
 };
 
-async function returnStocks (orderID , db){
+async function returnStocks (orderId , db){
     try {
     const [getProduct] = await db.query(
         `SELECT o.ProductID as productID , o.Quantity as qty FROM order_products o WHERE o.OrderID = ?`,
-         [orderID]
+         [orderId]
         );
     //extract rows and 
     for(let products of getProduct){
-        const {productID , qty}= products;
+        const {productId , qty}= products;
          await db.query(
             `UPDATE product SET StocksRemaining = (StocksRemaining + ?) WHERE product.ProductID = ?`,
-            [qty,productID]
+            [qty,productId]
         );
     }
     } catch (error) {
