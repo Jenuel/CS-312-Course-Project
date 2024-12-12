@@ -10,31 +10,71 @@ if(sessionStorage.getItem("Grandtotal")) {
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('productID');
 const boothId = urlParams.get('boothID'); 
+let cart = []; 
+let grandTotal= 0.0;
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    if (productId) {
+        getSpecificProduct(productId);
+    } else {
+        console.error("Product ID is missing in the URL parameters.");
+    }
+});
+
 
 function displaySpecficProduct(product) {
-    const container = document.querySelector(".container px-4 px-lg-5 my-5");
-    container.innerHTML = "";
+    console.log("Product received in displaySpecficProduct:", product); // Debugging log
 
-    const valueDiv = document.createElement('div');
-    valueDiv.classList.add('row gx-4 gx-lg-5 align-items-center');
-    valueDiv.innerHTML = `
-     <div class="col-md-6">
-          <img id="product-image" class="card-img-top mb-5 mb-md-0"   src="${product.Image ? `data:image/png;base64,${product.Image}` : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'}" 
-            alt="${product.Name}"/>
-        </div>
-        <div class="col-md-6">
-          <h1 id="product-name" class="display-5 fw-bolder">${product.Name}</h1>
-          <div class="fs-5 mb-2">
-            <span id="product-price">₱${product.Price}</span>
-          </div>
-          <p id="product-description" class="lead">Product Description</p>
-          <div class="d-flex align-items-center">
-            <label for="quantityInput" class="me-2">Quantity:</label>
-            <input type="number" id="quantityInput" min="1" value="1" class="form-control" style="width: 5rem;">
-            <button class="btn btn-primary ms-3" type="button" onclick="addToCart(this.parentElement.querySelector('#quantityInput').value,${product.ProductID},${product.Price})">Add to Cart</button>
-          </div>`;
-    box.appendChild(valueDiv);
+    const container = document.querySelector(".container.px-4.px-lg-5.my-5");
+    if (!container) {
+        console.error("Container element not found. Check your HTML structure.");
+        return;
+    }
+
+    // Parse product details
+    const productName = product[0].Name || "Unknown Product";
+    const productPrice = parseFloat(product[0].Price) || 0.0; // Convert Price to a number or fallback to 0.0
+    const productImage = product[0].Image 
+        ? `data:image/png;base64,${product[0].Image}` 
+        : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'; // Fallback if Image is missing
+
+    console.log("Parsed product details:", { productName, productPrice, productImage });
+
+    container.innerHTML = `
+        <div class="row gx-4 gx-lg-5 align-items-center">
+            <div class="col-md-6">
+                <img id="product-image" class="card-img-top mb-5 mb-md-0" 
+                    src="${productImage}" 
+                    alt="${productName}" />
+            </div>
+            <div class="col-md-6">
+                <h1 id="product-name" class="display-5 fw-bolder">${productName}</h1>
+                <div class="fs-5 mb-2">
+                    <span id="product-price">₱${productPrice.toFixed(2)}</span>
+                </div>
+                <p id="product-description" class="lead">Product Description</p>
+                <div class="d-flex align-items-center">
+                    <label for="quantityInput" class="me-2">Quantity:</label>
+                    <input type="number" id="quantityInput" min="1" value="1" class="form-control" style="width: 5rem;">
+                    <button class="btn btn-primary ms-3" type="button" 
+                        onclick="addToCart(
+                            this.parentElement.querySelector('#quantityInput').value,
+                            ${product[0].ProductID},
+                            ${productPrice}
+                        )">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>`;
 }
+
+
+
+
 
 function addToCart(quantity,ProductID,Price ){
     let totalPrice = quantity * Price;
@@ -43,8 +83,28 @@ function addToCart(quantity,ProductID,Price ){
     const totalPricePerProduct = totalPrice.toString;
 
     cart.push("",productID,",",qty,",",totalPricePerProduct);
+function addToCart(quantity, ProductID, Price) {
+    quantity = parseInt(quantity, 10);
+    if (isNaN(quantity) || quantity <= 0) {
+        alert("Invalid quantity. Please enter a positive number.");
+        return;
+    }
+
+    // Ensure Price is numeric
+    const numericPrice = parseFloat(Price) || 0.0;
+
+    let totalPrice = quantity * numericPrice;
+    cart.push({
+        ProductID: ProductID,
+        quantity: quantity,
+        price: numericPrice,
+        total: totalPrice
+    });
+
     grandTotal += totalPrice;
     sessionStorage.setItem("Grandtotal", grandTotal)
+
+    console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
 }
  
 // function checkout() { 
@@ -52,6 +112,12 @@ function addToCart(quantity,ProductID,Price ){
 //     const cartJSON = JSON.stringify(cart);
 //     window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
 // }
+
+function checkout() { 
+    alert("checking out products");
+    const cartJSON = JSON.stringify(cart);
+    window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
+}
 
 if(sessionStorage.getItem("OrderID")){// true if orderID has value
     const orderId = parseInt(sessionStorage.getItem("OrderID"));
@@ -67,19 +133,16 @@ if(sessionStorage.getItem("OrderID")){// true if orderID has value
  * Fetch for retreiving a specific product (GET)
  * @param {Integer} productId 
  */
-function getSpecificProduct(productId){
-  
-   fetch(`http://localhost:3000/products/details/${productId}`,{
-    method: 'GET', 
-    headers: {
-        'Content-Type': 'application/json', 
-    }
-   })
-   .then(response => {
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
+function getSpecificProduct(productId) {
+    fetch(`http://localhost:3000/products/details/${productId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
     })
     .then(data => {
         /*SAMPLE data  OUTPUT
@@ -97,9 +160,24 @@ function getSpecificProduct(productId){
        console.log("Products fetched successfully:", data);
 
         displaySpecficProduct(data);
+        console.log("Fetched product data:", data);
+
+        // Safely access and log specific fields
+        const status = data[0].Status || 'Status not found';
+        const name = data[0].Name || 'Name not found';
+        console.log("Status: ", status);
+        console.log("Name: ", name);
+
+        // Check if product is active
+        if (status.toLowerCase() === "active") {
+            displaySpecficProduct(data); // Call your display function
+        } else {
+            console.error("Product status is not active or undefined.");
+            alert("The requested product is not available.");
+        }
     })
     .catch(error => {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching product:", error);
     });
 }
 
@@ -274,5 +352,3 @@ function base64ToImage(base64, mimeType = 'image/png') {
     return img; // Return the image element
 }
 
-
-getSpecificProduct(productId);

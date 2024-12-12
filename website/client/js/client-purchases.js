@@ -119,3 +119,9 @@ document.getElementById("profile-form").addEventListener("submit", function(e) {
 
     closeProfile(); // Close the profile popup after submission
 });
+
+function checkout() { 
+    alert("checking out products");
+    const cartJSON = JSON.stringify(cart);
+    window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
+}
