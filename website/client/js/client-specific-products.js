@@ -95,8 +95,8 @@ function addToCart(quantity, ProductID, Price) {
         const orderId = parseInt(localStorage.getItem("OrderID"), 10);
         addToOrder(orderId, cart);
     } else { // wala pang order
-        const cid = localStorage.getItem('id');
-        createOrder(boothId, cart, grandTotal,cid);// please assign calue for customerID
+        const cid = localStorage.getItem('id');// get user id
+        createOrder(boothId, cart, grandTotal,getCustomerID(cid));
     }
 
 }
@@ -250,6 +250,7 @@ function getCustomerID(id){
         if (data.length > 0) {
           custID = data[0]['Customer ID'];
           console.log("Customer ID:", custID);
+          return data[0]['Customer ID'];
         } else {
           console.log("No customer found.");
         }
