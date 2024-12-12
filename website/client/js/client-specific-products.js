@@ -5,6 +5,22 @@ let grandTotal = sessionStorage.getItem("Grandtotal")
 
 const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('boothID');
+let custID=0;
+if((urlParams.get('id'))==="none"){
+
+    const localStorageId = localStorage.getItem('id');// user id
+    getCustomerID(localStorageId)
+  
+    const hasCart =  getCart(custID); //  result of getCart
+  
+    if(hasCart){// a pedning order exists
+      console.log("customer has existing cart")
+    }else{
+      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+    }
+  
+  }
+  
 
 document.addEventListener("DOMContentLoaded", () => {
     const backToProductsButton = document.getElementById('backToProducts');
@@ -75,7 +91,7 @@ function addToCart(quantity, ProductID, Price) {
     grandTotal += totalPrice;
     sessionStorage.setItem("Grandtotal", grandTotal.toFixed(2));
 
-    if (sessionStorage.getItem("OrderID")) { // there is an existing order
+    if (localStorage.getItem("OrderID")) { // there is an existing order
         const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
         addToOrder(orderId, cart);
     } else { // wala pang order
@@ -201,6 +217,135 @@ function addToOrder(orderID, data,) {
         })
         .catch(error => console.error("Error creating order:", error));
 }
+
+function getCustomerID(id){
+    fetch(`http://localhost:3000/orders/getCustomerID/${id}`, { // URL for Cancel order
+      method: 'GET', 
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify({ status: 'cancelled' }), 
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // add handling of data 
+        if (data.error) {
+          // Handle the error message if the response contains an error
+          console.error("Error:", data.error);
+          return null;
+      } else {
+        /*
+        date output:
+        [
+          {
+              "Customer ID": 12345
+          }
+        ]
+        */
+        if (data.length > 0) {
+          custID = data[0]['Customer ID'];
+          console.log("Customer ID:", custID);
+        } else {
+          console.log("No customer found.");
+        }
+  
+       
+      }
+    })
+    .catch(error => {
+        console.error("Error cancelling order:", error);
+    });
+  
+  }
+  
+  function getCart(customerId){
+    let cid = parseInt(customerId);
+    fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
+      method: 'GET', 
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify({ status: 'cancelled' }), 
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // add handling of data 
+        if (data.error) {
+          // Handle the error message if the response contains an error
+          console.error("Error:", data.error);
+      } else {
+        /*
+       [
+          {
+              "Booth ID": 1,
+              "Order ID": 123,
+              "Grand total": 150.00,
+              "Product ID": 101,
+              "Quantity": 2,
+              "Total price per product": 30.00,
+              "Product Name": "Product A",
+              "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)",
+              "Product price": 69.0
+          },
+          {
+              "Booth ID": 2,
+              "Order ID": 123,
+              "Grand total": 150.00,
+              "Product ID": 102,
+              "Quantity": 3,
+              "Total price per product": 60.00,
+              "Product Name": "Product B",
+              "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)",
+              "Product price": 69.0
+          }
+        ]
+  
+        sample handling of data 
+          // Arrays to hold product IDs, quantities, and totals
+             const orderId = data[0]['Order ID'];
+             const grandTotal = data[0]['Grand total'];
+             const boothIdData = data[0]['Booth ID'];
+             const productIds = [];
+             const quantities = [];
+             const totals = [];
+             const name = [];
+             const image = [];
+             const price = [];
+   
+             // Loop through the response data and extract the required values
+             data.forEach(product => {
+                 productIds.push(product['Product ID']);
+                 quantities.push(product['Quantity']);
+                 totals.push(product['Total price per product']);
+                 name.push(product['Product Name']);
+                 image.push(product['Product Image']);
+                 price.push(product['Product price']);
+             });
+        */
+             
+            const boothIdData = data[0]['Booth ID'];
+            
+            boothId =boothIdData;
+  
+            const orderId = data[0]['Order ID'];
+            localStorage.setItem("OrderId",orderId);
+      }
+    })
+    .catch(error => {
+        console.error("Error cancelling order:", error);
+    });
+  }
+  
 
 
 
