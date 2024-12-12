@@ -1,42 +1,36 @@
 let cart = [];
 let totalValue = 0;
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get('id'); 
 
-function displayBooths() {
-    const box = document.querySelector(".specific-product-container");
-    box.innerHTML = "";
+function displaySpecificProductUI(product) {
+    const container = document.querySelector(".container.px-4.px-lg-5.my-5"); // Fix class selector
+    container.innerHTML = "";
+  
     const valueDiv = document.createElement('div');
-    valueDiv.classList.add('box');
+    valueDiv.classList.add('row', 'gx-4', 'gx-lg-5', 'align-items-center'); // Use class names as arguments
+  
     valueDiv.innerHTML = `
-    <div class="image">
-    </div>
-    <div class="right-side">
-        <div class="button-container">
-            <button type="button" class="row-button back-button">
-                <img src="back.png" alt="Back">
-            </button>
-            <button type="button" class="row-button cart-button" onclick="toggleCart()">
-                <img src="..\res\cart_icon.png" alt="Cart">
-            </button>
+      <div class="col-md-6">
+        <img id="product-image" class="card-img-top mb-5 mb-md-0"
+             src="${product.Image ? `data:image/png;base64,${product.Image}` : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'}"
+             alt="${product.Name || 'Product Name'}"/>
+      </div>
+      <div class="col-md-6">
+        <h1 id="product-name" class="display-5 fw-bolder">${product.Name || 'Product Name'}</h1>
+        <div class="fs-5 mb-2">
+          <span id="product-price">₱${product.Price || 0.00}</span>
         </div>
-        <div class="title">
-            <p>Product Name</p>
+        <p id="product-description" class="lead">Product Description</p>
+        <div class="d-flex align-items-center">
+          <label for="quantityInput" class="me-2">Quantity:</label>
+          <input type="number" id="quantityInput" min="1" value="1" class="form-control" style="width: 5rem;">
+          <button class="btn btn-primary ms-3" type="button" onclick="addToCart(this.parentElement.querySelector('#quantityInput').value, ${product.ProductID}, ${product.Price})">Add to Cart</button>
         </div>
-        <div class="description">
-            <p>Amazing product description here.</p>
-        </div> 
-        <div class="buttons">
-            <button type="button" onclick="preorderItem('Product Name', 100, 'image/path.jpg')" id="preorder-button">
-                PRE-ORDER
-            </button>
-            <div class="quantity-container">
-                <button onclick="minusQuantity()" id="minus-button">-</button>
-                <span class="quantity-text">1</span>
-                <button onclick="addQuantity()" id="add-button">+</button>
-            </div>
-        </div>
-    </div>`;
-    box.appendChild(valueDiv);
-}
+      </div>`;
+  
+    container.appendChild(valueDiv);
+  }
 
 function openProfile() {
     const profile = document.getElementById("profile");
@@ -49,6 +43,7 @@ function closeProfile() {
     profile.classList.remove("open-profile");
 }
 
+/*
 // Optionally, handle form submission
 document.getElementById("profile-form").addEventListener("submit", function(e) {
     e.preventDefault(); // Prevent page reload on form submit
@@ -62,6 +57,7 @@ document.getElementById("profile-form").addEventListener("submit", function(e) {
 
     closeProfile(); // Close the profile popup after submission
 });
+*/
 
 function preorderItem(name, price, image) {
     alert("Added to cart!");
@@ -149,9 +145,7 @@ function getSpecificProduct(productId){
     method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 
-    },
-    body: JSON.stringify({ status: 'cancelled' }), 
-
+    }
    })
    .then(response => {
     if (!response.ok) {
@@ -178,10 +172,9 @@ function getSpecificProduct(productId){
 
         console.log("Products fetched successfully:", data);
         // Handle the "Image" field
-        if (data.Image) {
-            const imgElement = base64ToImage(data.Image, 'image/png');
-            document.body.appendChild(imgElement); // Append the image to the body
-        }
+   
+
+        displaySpecificProductUI(data);
     })
     .catch(error => {
         console.error("Error fetching products:", error);
@@ -204,4 +197,4 @@ function base64ToImage(base64, mimeType = 'image/png') {
 }
 
 
-displayBooths();
+getSpecificProduct(productId);
