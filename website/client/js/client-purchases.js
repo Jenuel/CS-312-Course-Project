@@ -263,7 +263,7 @@ function getCart(customerId) {
                 return;
             }
 
-            localStorage.setItem('orderId', data.orderId);
+            localStorage.setItem('orderId', data[0]['Order ID']);
             
             // Map the API response to the format expected by `displayCart`
             const cartItems = data.map(product => ({
