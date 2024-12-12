@@ -96,61 +96,74 @@ HTTP PUT /<orderRoutes>/<boothId>
 */ 
 const createOrder = async (request, response) => {
     const db = request.db;
-    const{boothID} = request.params;
-    const { products, totalPrice, date ,customerId} = request.body; // Extract updates map and total price
+    const { boothID } = request.params;
+    const { products, totalPrice, date, customerId } = request.body;
+
+    console.log("Request body:", request.body);
 
     try {
-        // Validate totalPrice if needed
-        /*
-        if (!totalPrice || typeof totalPrice !== 'number' || totalPrice < 0) {
-            return response.status(400).send('Invalid totalPrice');
-        }
-            */
-
-        console.log("customer id", customerId);
-
+        // Validate inputs
         if (!boothID || isNaN(boothID)) {
             return response.status(400).send('Invalid boothID');
         }
-        console.log('Received boothID:', boothID);
-        console.log('Received products:', products);
-        console.log('Received price:', totalPrice);
-        console.log('Received date:', date);
 
+        if (!products || !Array.isArray(products) || products.length === 0) {
+            return response.status(400).send('Invalid or empty products array');
+        }
 
-        const { orderQuery } = await db.query(`
-            INSERT INTO \`order\` 
-            (\`OrderID\`, \`BoothID\`, \`Status\`, \`DateOrdered\`, \`DatePaid\`, \`Price\`, \`customerID\`) 
-            VALUES (NULL, ?, "Pending", ?, NULL, ?,?)`,
-            [boothID, date, totalPrice,customerId]);
-        
+        if (!totalPrice || typeof totalPrice !== 'number' || totalPrice <= 0) {
+            return response.status(400).send('Invalid totalPrice');
+        }
+
+        if (!customerId || isNaN(customerId)) {
+            return response.status(400).send('Invalid customerId');
+        }
+
+        console.log("Received boothID:", boothID);
+        console.log("Received products:", products);
+        console.log("Received totalPrice:", totalPrice);
+        console.log("Received date:", date);
+
+        // Insert order into the database
+        const { orderQuery } = await db.query(
+            "INSERT INTO order (OrderID, BoothID, Status, DateOrdered, DatePaid, Price, customerID) VALUES (NULL, ?, 'Pending',?, NULL, ?, ?)",
+            [boothId, date, totalPrice,customerId]);
 
         const latestOrderID = orderQuery.insertId;
 
-        // Process updates map
-        for (const [fields] of Object.entries(products)) {
-
-            const { productId, quantity, totalPricePerProduct } = fields; // Destructure fields
-
-            // Execute the query for each product update
-            const [insertResult] = await db.query('INSERT INTO `order_products` (`ProductID`, ' + 
-                ' `OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
-                [productId, latestOrderID,quantity, totalPricePerProduct]);
-
-            if (insertResult.affectedRows === 0) {
-                console.warn(`Product with ID ${productId} was not found or not updated.`);
-            }
+        if (!latestOrderID) {
+            throw new Error("Failed to create order. No insertId returned.");
         }
 
-        // Additional processing for totalPrice if needed
+        console.log("New Order ID:", latestOrderID);
+
+        // Insert each product into `order_products`
+        for (const product of products) {
+            const { productID, quantity, totalPricePerProduct } = product;
+
+            if (!productID || isNaN(productID) || !quantity || isNaN(quantity) || !totalPricePerProduct || isNaN(totalPricePerProduct)) {
+                throw new Error(`Invalid product data: ${JSON.stringify(product)}`);
+            }
+
+            await db.query(
+                'INSERT INTO order_products (ProductID,`OrderID`, Quantity, Total) VALUES (?, ?, ?, ?)',
+                [productID, latestOrderID, quantity, totalPricePerProduct]
+            );
+
+            console.log(`Product inserted: ${JSON.stringify(product)}`);
+        }
+
         console.log(`Total price of all products: ${totalPrice}`);
 
-        response.json(latestOrderID);// return latestOrderID
+        // Return the latest order ID
+        response.status(201).json({ id: latestOrderID });
+
     } catch (error) {
-        console.error('Error creating order:', error);
-        response.status(500).send('Failed to create order');
+        console.error('Error creating order:', error.message || error);
+        response.status(500).json({ error: 'Failed to create order', details: error.message });
     }
 };
+
 /*
 CLIENT CONTROLLER
 
@@ -172,14 +185,10 @@ const addToOrder = async (request, response) => {
 
     try {
         // Validate totalPrice if needed
-        if (!totalPrice || typeof totalPrice !== 'number' || totalPrice < 0) {
-            return response.status(400).send('Invalid totalPrice');
-        }
-
-        const [insertResult] = await db.query('INSERT INTO `order_products` (`ProductID`, ' + 
-            ' `OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
+        const [insertResult] = await db.query(
+            'INSERT INTO order_products (ProductID,`OrderID`, Quantity, Total) VALUES (?, ?, ?, ?)',
             [productId, orderId,quantity, totalPricePerProduct]);
-
+            
         // Additional processing for totalPrice if needed
         console.log(`Total price of all products: ${totalPricePerProduct }`);
 
@@ -280,5 +289,27 @@ const approveOrder = async (request, response) => {
     }
 };
 
+const checkPendingOrder =async (request, response) => {
+    const db = request.db;
+    const {customerId} = request.params;
 
-export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder};
+    try {
+        // First check if order exists and is not already completed
+        const [orderCheck] = await db.query(
+          "SELECT b.BoothID as 'Booth ID',o.OrderID as 'Order ID',o.Price as 'grandTotal', p.ProductID as 'Product ID', p.Quantity as 'Quantity',p.Total as 'Total price per product', x.name as 'Product Name', TO_BASE64(x.Image) as 'Product Image', x.Price as 'Product price'FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` x ON p.ProductID = x.ProductID JOIN `booth` b ON b.BoothID = x.BoothID WHERE o.customerID = 1 AND o.Status = 'Pending'",
+           [customerId]
+        );
+
+        if (!orderCheck.length) {
+            return response.status(404).json({ error: 'Order not found' });
+        }
+
+        response.json(orderCheck);
+    } catch (error) {
+        console.error('Error approving order:', error);
+        response.status(500).send('Failed to approve order');
+    }
+};
+
+
+export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder};

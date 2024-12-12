@@ -2,7 +2,7 @@
 
 // Retrieve the parameters from the URL
 const urlParams = new URLSearchParams(window.location.search);
-const orderID = decodeURIComponent(urlParams.get('orderID'));
+const boothId = decodeURIComponent(urlParams.get('boothId'));
 
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
@@ -30,12 +30,16 @@ function displayCart(cartItems) {
     cartItems.forEach((item, index) => {
         const row = document.createElement('tr');
 
-        // Add content dynamically based on item properties
+        // Use base64 image if available; otherwise, fallback to a placeholder
+        const imageSrc = item.image 
+            ? `data:image/png;base64,${item.image}` 
+            : 'https://via.placeholder.com/50';
+
         row.innerHTML = `
             <th scope="row">${index + 1}</th>
             <td>
                 <img 
-                    src="${item.image || 'https://via.placeholder.com/50'}" 
+                    src="${imageSrc}" 
                     alt="${item.productName || 'Product Image'}" 
                     class="img-fluid" 
                     style="max-height: 50px; max-width: 50px;">
@@ -47,12 +51,12 @@ function displayCart(cartItems) {
                     class="form-control form-control-sm" 
                     value="${item.quantity || 1}" 
                     min="1" 
-                    onchange="updateCartItem(${item.id}, this.value)">
+                    onchange="updateCartItem(${item.productID}, this.value)">
             </td>
             <td>${item.price ? `₱${parseFloat(item.price).toFixed(2)}` : '₱0.00'}</td>
             <td>${item.total ? `₱${parseFloat(item.total).toFixed(2)}` : '₱0.00'}</td>
             <td>
-                <button class="btn btn-danger btn-sm" onclick="removeCartItem(${item.id})">Remove</button>
+                <button class="btn btn-danger btn-sm" onclick="removeCartItem(${item.productID})">Remove</button>
             </td>
         `;
 
@@ -62,6 +66,23 @@ function displayCart(cartItems) {
     // Update the cart total after rendering
     updateCartTotal(cartItems);
 }
+
+
+function updateCartTotal(cartItems) {
+    const cartTotalElement = document.getElementById('cart-total');
+    if (!cartTotalElement) {
+        console.error("Cart total element not found.");
+        return;
+    }
+
+    const totalAmount = cartItems.reduce((total, item) => {
+        return total + (item.price * item.quantity || 0);
+    }, 0);
+
+    cartTotalElement.textContent = `₱${totalAmount.toFixed(2)}`;
+}
+
+
 
 // Function to update the total amount dynamically
 function updateCartTotal(cartItems) {
@@ -76,6 +97,10 @@ function updateCartTotal(cartItems) {
     }, 0);
 
     cartTotalElement.textContent = totalAmount.toFixed(2);
+}
+
+function cancelOrders(){
+    cancelOrder(orderID); 
 }
 
 
@@ -111,7 +136,7 @@ function cancelOrder(orderId) {
     });
 }
 
-function removeProductFromDB(orderID){
+function checkoutProducts(orderID){
     etch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
         method: 'PATCH', 
         headers: {
@@ -126,7 +151,47 @@ function removeProductFromDB(orderID){
         return response.json();
     })
     .then(data => {
-        // data is a json massgae no parsing needed
+        /*
+        data output sample:
+        [
+            {
+                "order id": 1,
+                "product name": "Burger",
+                "product price": 5.00,
+                "number of ordered product": 2,
+                "total price per product": 10.00,
+                "overall total": 10.00
+            },
+            {
+                "order id": 1,
+                "product name": "Fries",
+                "product price": 2.50,
+                "number of ordered product": 1,
+                "total price per product": 2.50,
+                "overall total": 10.00
+            }
+        ]
+
+        */
+        // Arrays to hold individual values
+        const orderId = data[0]['order id']; // Assuming all products belong to the same order ID
+        const grandTotal = data[0]['overall total']; // Same for grand total
+        const productIds = [];
+        const quantities = [];
+        const totals = [];
+        const names = [];
+        const prices = [];
+
+        // Loop through the response data and extract the required values
+        data.forEach(item => {
+            // Add product-specific information to arrays
+            productIds.push(item['order id']); // If you want to store 'order id' for each product
+            quantities.push(item['number of ordered product']);
+            totals.push(item['total price per product']);
+            names.push(item['product name']);
+            prices.push(item['product price']);
+        });
+
         console.log("Order cancelled successfully:", data);
     })
     .catch(error => {
@@ -160,9 +225,6 @@ const getCurrentDateWithMicroseconds = () => {
       
 
 
-
-displayBooths();
-
 function openProfile() {
     const profile = document.getElementById("profile");
     profile.classList.add("open-profile");
@@ -173,20 +235,6 @@ function closeProfile() {
     const profile = document.getElementById("profile");
     profile.classList.remove("open-profile");
 }
-
-// Optionally, handle form submission
-document.getElementById("profile-form").addEventListener("submit", function(e) {
-    e.preventDefault(); // Prevent page reload on form submit
-    const name = document.getElementById("profile-name").value;
-    const email = document.getElementById("profile-email").value;
-    const password = document.getElementById("profile-password").value;
-
-    // Send the updated data to the server or process accordingly
-    console.log("Updated Profile:", name, email, password);
-    // You can implement an API call to save the changes here
-
-    closeProfile(); // Close the profile popup after submission
-});
 
 function checkout() { 
     alert("checking out products");
@@ -226,23 +274,50 @@ function createOrder(boothID, data, totalPrice) {
 }
 
 
-function fetchCartData() {
-    fetch("http://localhost:3000/cart")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(cartData => {
-        console.log("Fetched cart data:", cartData);
 
-        // Pass the cart data to displayCart function to render the updated cart
-        displayCart(cartData);
+function getCart(customerId) {
+    let cid = parseInt(customerId);
+    fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, {
+        method: 'GET', // Fetching pending orders
+        headers: { 'Content-Type': 'application/json' },
     })
-    .catch(error => {
-        console.error("Error fetching cart data:", error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                console.error("Error:", data.error);
+                return;
+            }
+
+            
+            // Map the API response to the format expected by `displayCart`
+            const cartItems = data.map(product => ({
+                productID: product['Product ID'],
+                productName: product['Product Name'] || 'Unknown Product',
+                image: product['Product Image'], // If image is base64 or URL
+                quantity: product['Quantity'],
+                price: parseFloat(product['Product price']),
+                total: parseFloat(product['Total price per product']),
+            }));
+
+            // Update the cart display
+            displayCart(cartItems);
+
+            updateCartTotal(data.grandTotal);
+            
+        })
+        .catch(error => {
+            console.error("Error fetching cart items:", error);
+        });
 }
 
-fetchCartData();
+function updateCartTotal(total) {
+    const totalElement = document.getElementById('cart-total');
+    totalElement.textContent = total.toFixed(2);
+}
+
+getCart(localStorage.getItem('id'));
