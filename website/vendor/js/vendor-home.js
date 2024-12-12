@@ -495,8 +495,12 @@ function loadPage(page) {
 
     case "sales":
       boothContent.classList.remove("active");
-      pageFrame.style.display = "block";
-      pageFrame.src = "../html/vendor-sales.html"; 
+            pageFrame.style.display = "block";
+            pageFrame.style.height = "100%";
+            pageFrame.style.width = "100%";
+            pageFrame.style.minHeight = "calc(100vh - 56px)"; // Account for navbar
+            pageFrame.style.border = "none"; 
+            pageFrame.src = "../html/vendor-sales.html";
       break;
   }
 }
