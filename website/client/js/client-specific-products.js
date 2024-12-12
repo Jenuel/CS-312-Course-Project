@@ -92,7 +92,7 @@ function addToCart(quantity, ProductID, Price) {
     sessionStorage.setItem("Grandtotal", grandTotal.toFixed(2));
 
     if (localStorage.getItem("OrderID")) { // there is an existing order
-        const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
+        const orderId = parseInt(localStorage.getItem("OrderID"), 10);
         addToOrder(orderId, cart);
     } else { // wala pang order
         const cid = localStorage.getItem('id');
