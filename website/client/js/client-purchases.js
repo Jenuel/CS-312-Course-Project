@@ -116,6 +116,32 @@ function cancelOrder(orderId) {
     });
 }
 
+function removeProductFromDB(orderID){
+    etch(`http://localhost:3000/products/buy/${orderId}`, { // URL for updaeting product in db
+        method: 'PATCH', 
+        headers: {
+            'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify({ status: 'cancelled' }), 
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // data is a json massgae no parsing needed
+        console.log("Order cancelled successfully:", data);
+    })
+    .catch(error => {
+        console.error("Error cancelling order:", error);
+    });
+
+}
+
+
+
 //END FOR FETCH FUNCTIONS
 /* ----------------------------------------------------------------------------------------------------- */
 

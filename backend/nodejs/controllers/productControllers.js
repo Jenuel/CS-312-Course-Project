@@ -96,60 +96,70 @@ directlty from the store
 already paid
 
 INPUT:
-HTTP PUT /<productRoutes>/<productId>
-{
-"numberOfProductSold":value
-}
+HTTP PUT /<productRoutes>/<orderId>
+
  */
 const buyProduct = async (request, response) => {
   //PLEASE DOUBLE CHECK LOGIC
   const db = request.db;
-  const { productId } = request.params;
-  const { numberOfProductsSold } = request.body; // please check if this is right
+  const { orderID } = request.params;
 
   try {
-    // Step 1: Check current stock
-    const [product] = await db.query(
-      "SELECT StocksRemaining FROM product WHERE ProductID = ?",
-      [productId]
+    const [allPositive] = await db.query(
+      `
+      SELECT 
+        CASE 
+          WHEN COUNT(*) = SUM(CASE WHEN (p.StocksRemaining - o.Quantity) > 0 THEN 1 ELSE 0 END) 
+          THEN TRUE 
+          ELSE FALSE 
+        END AS AllPositive
+      FROM product p
+      JOIN order_products o ON p.ProductID = o.ProductID
+      WHERE o.OrderID = ?;
+      `,
+      [orderID]
     );
-
-    if (product.length === 0) {
-      return response.status(404).json({ message: "Product not found" });
-    }
-
-    const { StocksRemaining } = product[0];
-
-    // Step 2: Validate stock availability
-    if (numberOfProductsSold > StocksRemaining) {
-      return response.status(400).json({
-        message: "Insufficient stock",
-        availableStock: StocksRemaining,
-      });
-    }
-
-    // Step 3: Update the stock
-    const [updateResult] = await db.query(
-      "UPDATE product SET StocksRemaining = (StocksRemaining  - ? ) WHERE ProductID = ?",
-      [numberOfProductsSold, productId]
-    );
-
-    // Step 4: Fetch the new stock level
-    const [updatedProduct] = await db.query(
-      "SELECT StocksRemaining FROM product WHERE ProductID = ?",
-      [productId]
+    
+    if (allPositive.length && allPositive[0].AllPositive) {
+      await db.query(
+      `
+      UPDATE product p
+      SET p.StocksRemaining = p.StocksRemaining - (
+          SELECT o.Quantity
+          FROM order_products o
+          WHERE o.OrderID = ? AND o.ProductID = p.ProductID
+      )
+      WHERE p.ProductID IN (
+          SELECT o.ProductID
+          FROM order_products o
+          WHERE o.OrderID = ?
+      )
+      `,
+      [orderID, orderID]
     );
 
     await db.query(
-      'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) VALUES (NULL, ?, ?, "out", ?)',
-      [productId, getCurrentDate(), numberOfProductsSold]
-    );// query to add stocks to inventory
-
-    response.json({
-      message: "Product purchased successfully",
-      updatedRows: updateResult.affectedRows,
-      remainingStock: updatedProduct[0].StocksRemaining,
-    });
+      `
+      INSERT INTO inventory (InventoryID, ProductID, Date, Type, Quantity)
+      SELECT NULL, 
+             p.ProductID, 
+             DATE(o.DatePaid) AS DatePaid, 
+             'out', 
+             p.Quantity
+      FROM \`order\` o
+      JOIN order_products p ON o.OrderID = p.OrderID
+      WHERE o.OrderID = ?
+      `,
+      [orderID]
+    );
+      response.json({
+        message: "Product purchased successfully",
+      });
+    } else {
+      response.json({
+        message: "Product purchased unsuccessfully",
+      });
+    }
   } catch (error) {
     console.error("Error buying products:", error);
     response.status(500).send("Failed to buy products");
