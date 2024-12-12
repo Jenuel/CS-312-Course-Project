@@ -80,7 +80,7 @@ const getProductDetails = async (request, response) => {
 
   try {
     const [rows] = await db.query(
-      "SELECT p.name AS Name,p.StocksRemaining AS Stocks , p.Price as Price, p.status AS Status,TO_BASE64(p.Image) as Image FROM `product` p WHERE p.ProductID = ?",
+      "SELECT p.ProductID AS ProductID ,p.name AS Name,p.StocksRemaining AS Stocks , p.Price as Price, p.status AS Status,TO_BASE64(p.Image) as Image FROM `product` p WHERE p.ProductID = ?",
       [productId]
     );
     response.json(rows);
