@@ -32,10 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result->num_rows > 0) {    
             echo json_encode(["success" => false, "error" => "Email already in use"]);
         } else {
-            $insertQuery = "INSERT INTO users (FirstName, LastName, SchoolEmail, Password) 
-                            VALUES (?, ?, ?, ?)";
+            $insertQuery = "INSERT INTO users (FirstName, LastName, SchoolEmail, Password, Image) 
+                            VALUES (?, ?, ?, ?,?)";
             $insertStmt = $conn->prepare($insertQuery);
-            $insertStmt->bind_param("ssss", $firstName, $lastName, $email, $password);
+            $imageData = file_get_contents("./vendor/res/1564534_customer_man_user_account_profile_icon.png"); // please check if folder is correct
+            $insertStmt->bind_param("ssssb", $firstName, $lastName, $email, $password,$imageData);
 
             if ($insertStmt->execute()) {
                 echo json_encode(["success" => true, "message" => "User registered successfully"]); //Redirection will happen in the frontend
