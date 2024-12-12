@@ -137,14 +137,15 @@ function cancelOrder(orderId) {
 }
 
 function checkoutProducts(){
-
+    const date = getCurrentDateWithMicroseconds();
+ 
     let orderID = localStorage.getItem('orderId');
     fetch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
         method: 'PATCH', 
         headers: {
             'Content-Type': 'application/json', 
         },
-        body: JSON.stringify({ status: 'cancelled' }), 
+        body: JSON.stringify({datePaid:date}), 
     })
     .then(response => {
         if (!response.ok) {
@@ -263,22 +264,22 @@ function getCart(customerId) {
                 return;
             }
 
-            localStorage.setItem('orderId', data[0]['Order ID']);
+            localStorage.setItem('orderId', data[0]['orderID']);
             
             // Map the API response to the format expected by `displayCart`
             const cartItems = data.map(product => ({
                 productID: product['Product ID'],
-                productName: product['Product Name'] || 'Unknown Product',
-                image: product['Product Image'], // If image is base64 or URL
-                quantity: product['Quantity'],
-                price: parseFloat(product['Product price']),
-                total: parseFloat(product['Total price per product']),
+                productName: product['productName'] || 'Unknown Product',
+                image: product['productImage'], // If image is base64 or URL
+                quantity: product['quantity'],
+                price: parseFloat(product['productPrice']),
+                total: parseFloat(product['totalPricePerProduct']),
             }));
 
             // Update the cart display
             displayCart(cartItems);
 
-            updateCartTotal(data.grandTotal);
+            updateCartTotal(data[0]['grandTotal']);
             
         })
         .catch(error => {
@@ -292,3 +293,48 @@ function updateCartTotal(total) {
 }
 
 getCart(localStorage.getItem('id'));
+
+
+/*
+logout
+*/
+function logout() {
+    fetch("/php/auth/logout.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "logout=true",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          window.location.href = "/auth/html/index.html";
+        } else {
+          throw new Error(data.message || "Logout failed");
+        }
+      })
+      .catch((error) => {
+        console.error("Logout failed:", error);
+        alert("Logout failed. Please try again.");
+      });
+
+      localStorage.setItem("Status", "client-purchases.html"); // adding status
+  }
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    const logoutBtn = document.getElementById("logout-btn");
+  
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        logout(); 
+    });}
+        getData();
+  });

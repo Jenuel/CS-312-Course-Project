@@ -103,6 +103,7 @@ const buyProduct = async (request, response) => {
   //PLEASE DOUBLE CHECK LOGIC
   const db = request.db;
   const { orderId } = request.params;
+  const { datePaid } = request.body;
 
   try {
     const [allPositive] = await db.query(
@@ -121,42 +122,27 @@ const buyProduct = async (request, response) => {
     );
     
     if (allPositive.length && allPositive[0].AllPositive) {
-      await db.query(
-      `
-      UPDATE product p
-      SET p.StocksRemaining = p.StocksRemaining - (
-          SELECT o.Quantity
-          FROM order_products o
-          WHERE o.OrderID = ? AND o.ProductID = p.ProductID
-      )
-      WHERE p.ProductID IN (
-          SELECT o.ProductID
-          FROM order_products o
-          WHERE o.OrderID = ?
-      )
-      `,
-      [orderId, orderId]
-    );
 
+      await db.query(
+      "UPDATE `order` SET `Status` = 'Complete', `DatePaid` = ? WHERE `order`.`OrderID` = ?",
+      [datePaid,orderId]
+    );// updated status and date of order
+
+      await db.query(
+      "UPDATE product p SET p.StocksRemaining = p.StocksRemaining - ( SELECT o.Quantity FROM order_products o WHERE o.OrderID = ? AND o.ProductID = p.ProductID ) WHERE p.ProductID IN ( SELECT o.ProductID FROM order_products o WHERE o.OrderID = ? )",
+      [orderId, orderId]
+    ); // remove stocks in product
+
+    
     await db.query(
-      `
-      INSERT INTO inventory (InventoryID, ProductID, Date, Type, Quantity)
-      SELECT NULL, 
-             p.ProductID, 
-             DATE(o.DatePaid) AS DatePaid, 
-             'out', 
-             p.Quantity
-      FROM \`order\` o
-      JOIN order_products p ON o.OrderID = p.OrderID
-      WHERE o.OrderID = ?
-      `,
+      "INSERT INTO inventory (InventoryID, ProductID, Date, Type, Quantity) SELECT NULL, p.ProductID, DATE(o.DatePaid) AS DatePaid, 'out', p.Quantity FROM `order` o JOIN order_products p ON o.OrderID = p.OrderID WHERE o.OrderID = ?",
       [orderId]
-    );
+    );// insert updated in inventory
 
     const [breakdown]= await db.query(
       "SELECT o.OrderID AS 'order id', x.name AS 'product name', x.Price AS 'product price', p.Quantity AS 'number of ordered product', p.Total AS 'total price per product', o.Price AS 'overall total' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` x ON p.ProductID = x.ProductID JOIN `booth` b ON b.BoothID = x.BoothID WHERE o.OrderID = ?",
       [orderId]
-    );
+    );// return breakdown order
       response.json(breakdown);
     } else {
       response.json({

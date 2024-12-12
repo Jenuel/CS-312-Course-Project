@@ -227,3 +227,48 @@ function base64ToImage(base64, mimeType = 'image/png') {
 }
 
 fetchProducts(boothId);
+
+
+/*
+logout
+*/
+function logout() {
+  fetch("/php/auth/logout.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: "logout=true",
+    credentials: "include",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.success) {
+        window.location.href = "/auth/html/index.html";
+      } else {
+        throw new Error(data.message || "Logout failed");
+      }
+    })
+    .catch((error) => {
+      console.error("Logout failed:", error);
+      alert("Logout failed. Please try again.");
+    });
+
+    localStorage.setItem("Status", "client-product.html")  // adding status
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logout-btn");
+
+  if (logoutBtn) {
+      logoutBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      logout(); 
+  });}
+      getData();
+});

@@ -264,9 +264,24 @@ const checkPendingOrder =async (request, response) => {
     try {
         // First check if order exists and is not already completed
         const [orderCheck] = await db.query(
-          "SELECT b.BoothID as 'Booth ID',o.Order ID as 'Order ID',o.Price as 'grandTotal', p.ProductID as 'Product ID', p.Quantity as 'Quantity',p.Total as 'Total price per product', x.name as 'Product Name', TO_BASE64(x.Image) as 'Product Image', x.Price as 'Product price'FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` x ON p.ProductID = x.ProductID JOIN `booth` b ON b.BoothID = x.BoothID WHERE o.customerID = 1 AND o.Status = 'Pending'",
-           [customerId]
+            `SELECT 
+                b.BoothID as 'boothID',
+                o.OrderID as 'orderID',
+                o.Price as 'grandTotal',
+                p.ProductID as 'productID',
+                p.Quantity as 'quantity',
+                p.Total as 'totalPricePerProduct',
+                x.name as 'productName',
+                TO_BASE64(x.Image) as 'productImage',
+                x.Price as 'productPrice'
+             FROM \`order\` o 
+             JOIN \`order_products\` p ON o.OrderID = p.OrderID 
+             JOIN \`product\` x ON p.ProductID = x.ProductID 
+             JOIN \`booth\` b ON b.BoothID = x.BoothID 
+             WHERE o.customerID = ? AND o.Status = 'Pending'`,
+            [customerId]
         );
+        
 
         if (!orderCheck.length) {
             return response.status(404).json({ error: 'Order not found' });
