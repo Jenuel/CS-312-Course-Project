@@ -7,6 +7,7 @@ import {
   addToOrder,
   getReservedOrders,
   checkPendingOrder,
+  getCustomerID
 } from "../controllers/orderControllers.js";
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.patch("/cancel/:orderId", cancelOrder); // customer *
 router.patch("/approve/:orderId", approveOrder); // vendor *
 router.post("/addToOrder/:orderId", addToOrder); // customer *
 router.get("/checkPendingOrder/:customerId",checkPendingOrder)// customer 
+router.get("/getCustomerID/:userId",checkPendingOrder)// customer 
 
 export default router;

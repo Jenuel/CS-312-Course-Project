@@ -294,5 +294,27 @@ const checkPendingOrder =async (request, response) => {
     }
 };
 
+const getCustomerID =async (request, response) => {
+    const db = request.db;
+    const {userId} = request.params;
 
-export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder};
+    try {
+
+        const [orderCheck] = await db.query(
+            `SELECT c.CustomerID as "Customer ID" FROM customer c WHERE c.UserID = ?`,
+            [userId]
+        );
+        
+        if (!orderCheck.length) {
+            return response.status(404).json({ error: 'Order not found' });
+        }
+
+        response.json(orderCheck);
+    } catch (error) {
+        console.error('Error approving order:', error);
+        response.status(500).send('Failed to approve order');
+    }
+};
+
+
+export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder,getCustomerID};
