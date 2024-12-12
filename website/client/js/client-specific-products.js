@@ -81,7 +81,8 @@ function addToCart(quantity, ProductID, Price) {
         const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
         addToOrder(orderId, cart);
     } else { // wala pang order
-        createOrder(boothId, cart, grandTotal,customerID);// please assign calue for customerID
+        const cid = localStorage.getItem('id');
+        createOrder(boothId, cart, grandTotal,cid);// please assign calue for customerID
     }
 
 }
@@ -124,6 +125,7 @@ function createOrder(boothID, data, totalPrice,customerID) {
     });
 
     console.log("id: " ,boothId);
+    console.log("id: " ,customerID);
     
     // Ensure the total price is a float (not a string)
     const formattedTotalPrice = parseFloat(totalPrice); 
@@ -132,6 +134,7 @@ function createOrder(boothID, data, totalPrice,customerID) {
         products: formattedProducts,
         totalPrice: formattedTotalPrice, // Send as a number, not a string
         date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        customerId: customerID,
     };
 
     fetch(`http://localhost:3000/orders/create/${boothID}`, {
