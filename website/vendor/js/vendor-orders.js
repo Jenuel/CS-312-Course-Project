@@ -1,27 +1,41 @@
+// DOM Elements
 const pendingOrdersTable = document.querySelector("#pendingOrders tbody");
 const completedOrdersTable = document.querySelector("#completedOrders tbody");
 const completedOrders = [];
 
-function getSessionId() {
+// Helper: Get current date with microseconds
+function getCurrentDateWithMicroseconds() {
+    const date = new Date();
+    const formattedDate = date.toISOString().slice(0, 19).replace("T", " ");
+    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, "0");
+    return `${formattedDate}.${microseconds}`;
+}
+
+// Helper: Get booth ID from session
+function getBoothIdFromSession() {
     return document.cookie
         .split(";")
         .find((cookie) => cookie.trim().startsWith("PHPSESSID="))
         ?.split("=")[1];
 }
 
-// Fetch and populate pending orders
+// Populate Pending Orders
 function populatePendingOrders(boothID) {
     fetch(`http://localhost:3000/orders/pending/${boothID}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
         .then((response) => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
-        .then((data) => {
-            pendingOrdersTable.innerHTML = "";
-            data.forEach((order) => {
+        .then((orders) => {
+            pendingOrdersTable.innerHTML = ""; // Clear existing rows
+            if (orders.length === 0) {
+                pendingOrdersTable.innerHTML = "<tr><td colspan='6'>No pending orders found.</td></tr>";
+                return;
+            }
+            orders.forEach((order) => {
                 const row = `
                     <tr>
                         <td>${order.orderId}</td>
@@ -37,9 +51,13 @@ function populatePendingOrders(boothID) {
         .catch((error) => console.error("Error fetching pending orders:", error));
 }
 
-// Populate completed orders
+// Populate Completed Orders
 function populateCompletedOrders() {
-    completedOrdersTable.innerHTML = "";
+    completedOrdersTable.innerHTML = ""; // Clear existing rows
+    if (completedOrders.length === 0) {
+        completedOrdersTable.innerHTML = "<tr><td colspan='6'>No completed orders yet.</td></tr>";
+        return;
+    }
     completedOrders.forEach((order) => {
         const row = `
             <tr>
@@ -54,7 +72,7 @@ function populateCompletedOrders() {
     });
 }
 
-// Mark an order as completed
+// Mark an Order as Completed
 function markAsCompleted(orderId) {
     if (!confirm("Mark this order as completed?")) return;
 
@@ -67,17 +85,17 @@ function markAsCompleted(orderId) {
         }),
     })
         .then((response) => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then((order) => {
             completedOrders.push(order);
             updateTables();
         })
-        .catch((error) => console.error("Error updating order status:", error));
+        .catch((error) => console.error("Error marking order as completed:", error));
 }
 
-// Remove a completed order
+// Remove a Completed Order
 function removeCompletedOrder(orderId) {
     const index = completedOrders.findIndex((order) => order.orderId === orderId);
     if (index !== -1) {
@@ -86,53 +104,35 @@ function removeCompletedOrder(orderId) {
     }
 }
 
-// Update tables
+// Update Tables
 function updateTables() {
-    const boothID = getSessionId();
+    const boothID = getBoothIdFromSession();
+    if (!boothID) {
+        console.error("Booth ID is missing or invalid.");
+        return;
+    }
     populatePendingOrders(boothID);
     populateCompletedOrders();
 }
 
-// Helper: Get current date with microseconds
-function getCurrentDateWithMicroseconds() {
-    const date = new Date();
-    const formattedDate = date.toISOString().slice(0, 19).replace("T", " ");
-    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, "0");
-    return `${formattedDate}.${microseconds}`;
+// Event Handlers for Navigation
+function showOrders() {
+    document.getElementById("product-section").style.display = "none";
+    document.getElementById("orders-section").style.display = "block";
+    updateTables();
 }
 
-// Navigation: Load pages
-function loadPage(page) {
-    const pageFrame = document.getElementById("page-frame");
-    const boothContent = document.getElementById("booth-content");
+function showProducts() {
+    document.getElementById("product-section").style.display = "block";
+    document.getElementById("orders-section").style.display = "none";
+}
 
-    // Hide both booth content and iframe by default before updating
-    boothContent.style.display = "none";
-    pageFrame.style.display = "none"; // Hide iframe initially
-
-    switch (page) {
-        case "home":
-            // Show the booth content and hide iframe for the "home" page
-            boothContent.style.display = "none";  // hide booth content
-            pageFrame.style.display = "block";      // show iframe
-            pageFrame.src = "../html/vendor-home.html"; // Load vendor-sales.html in iframe
-            break;
-
-        case "orders":
-            // Hide booth content and show iframe for the "orders" page
-            boothContent.style.display = "block";   // show booth content
-            pageFrame.style.display = "none";     // hide iframe
-            break;
-
-        case "sales":
-            // Hide booth content and show iframe for the "sales" page
-            boothContent.style.display = "none";   // Hide booth content
-            pageFrame.style.display = "block";     // Show iframe
-            pageFrame.src = "../html/vendor-sales.html"; // Load vendor-sales.html in iframe
-            break;
+// Initialize on Page Load
+document.addEventListener("DOMContentLoaded", () => {
+    const boothID = getBoothIdFromSession();
+    if (boothID) {
+        populatePendingOrders(boothID);
+    } else {
+        console.error("No valid booth ID found. Please check session or cookies.");
     }
-}
-
-
-// Initialize
-updateTables();
+});

@@ -1,140 +1,98 @@
-let cart = [];
-let totalValue = 0;
+let cart = []; 
+let grandTotal= 0.0;
 
-function displayBooths() {
-    const box = document.querySelector(".specific-product-container");
-    box.innerHTML = "";
-    const valueDiv = document.createElement('div');
-    valueDiv.classList.add('box');
-    valueDiv.innerHTML = `
-    <div class="image">
-    </div>
-    <div class="right-side">
-        <div class="button-container">
-            <button type="button" class="row-button back-button">
-                <img src="back.png" alt="Back">
-            </button>
-            <button type="button" class="row-button cart-button" onclick="toggleCart()">
-                <img src="..\res\cart_icon.png" alt="Cart">
-            </button>
-        </div>
-        <div class="title">
-            <p>Product Name</p>
-        </div>
-        <div class="description">
-            <p>Amazing product description here.</p>
-        </div> 
-        <div class="buttons">
-            <button type="button" onclick="preorderItem('Product Name', 100, 'image/path.jpg')" id="preorder-button">
-                PRE-ORDER
-            </button>
-            <div class="quantity-container">
-                <button onclick="minusQuantity()" id="minus-button">-</button>
-                <span class="quantity-text">1</span>
-                <button onclick="addQuantity()" id="add-button">+</button>
-            </div>
-        </div>
-    </div>`;
-    box.appendChild(valueDiv);
-}
 
-function openProfile() {
-    const profile = document.getElementById("profile");
-    profile.classList.add("open-profile");
-}
-
-// Close profile form popup
-function closeProfile() {
-    const profile = document.getElementById("profile");
-    profile.classList.remove("open-profile");
-}
-
-// Optionally, handle form submission
-document.getElementById("profile-form").addEventListener("submit", function(e) {
-    e.preventDefault(); // Prevent page reload on form submit
-    const name = document.getElementById("profile-name").value;
-    const email = document.getElementById("profile-email").value;
-    const password = document.getElementById("profile-password").value;
-
-    // Send the updated data to the server or process accordingly
-    console.log("Updated Profile:", name, email, password);
-    // You can implement an API call to save the changes here
-
-    closeProfile(); // Close the profile popup after submission
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    if (productId) {
+        getSpecificProduct(productId);
+    } else {
+        console.error("Product ID is missing in the URL parameters.");
+    }
 });
 
-function preorderItem(name, price, image) {
-    alert("Added to cart!");
-    const cartContainer = document.querySelector(".cart-container");
-    cartContainer.classList.remove("hidden");
 
-    const cartItems = document.querySelector(".cart-items");
+function displaySpecficProduct(product) {
+    console.log("Product received in displaySpecficProduct:", product); // Debugging log
 
-    const existingItem = cart.find(item => item.name === name);
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({ name, price, image, quantity: 1 });
+    const container = document.querySelector(".container.px-4.px-lg-5.my-5");
+    if (!container) {
+        console.error("Container element not found. Check your HTML structure.");
+        return;
     }
 
-    updateCart();
-}
+    // Parse product details
+    const productName = product[0].Name || "Unknown Product";
+    const productPrice = parseFloat(product[0].Price) || 0.0; // Convert Price to a number or fallback to 0.0
+    const productImage = product[0].Image 
+        ? `data:image/png;base64,${product[0].Image}` 
+        : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'; // Fallback if Image is missing
 
-function updateCart() {
-    const cartItems = document.querySelector(".cart-items");
-    const cartTotal = document.getElementById("cart-total");
+    console.log("Parsed product details:", { productName, productPrice, productImage });
 
-    cartItems.innerHTML = "";
-    totalValue = 0;
-
-    cart.forEach(item => {
-        totalValue += item.price * item.quantity;
-
-        const itemDiv = document.createElement('div');
-        itemDiv.classList.add('cart-item');
-
-        itemDiv.innerHTML = `
-            <img src="${item.image}" alt="${item.name}" class="cart-image">
-            <div class="cart-details">
-                <p>${item.name}</p>
-                <p>$${item.price.toFixed(2)}</p>
-                <div class="quantity-controls">
-                    <button onclick="updateQuantity('${item.name}', -1)">-</button>
-                    <span>${item.quantity}</span>
-                    <button onclick="updateQuantity('${item.name}', 1)">+</button>
+    container.innerHTML = `
+        <div class="row gx-4 gx-lg-5 align-items-center">
+            <div class="col-md-6">
+                <img id="product-image" class="card-img-top mb-5 mb-md-0" 
+                    src="${productImage}" 
+                    alt="${productName}" />
+            </div>
+            <div class="col-md-6">
+                <h1 id="product-name" class="display-5 fw-bolder">${productName}</h1>
+                <div class="fs-5 mb-2">
+                    <span id="product-price">₱${productPrice.toFixed(2)}</span>
+                </div>
+                <p id="product-description" class="lead">Product Description</p>
+                <div class="d-flex align-items-center">
+                    <label for="quantityInput" class="me-2">Quantity:</label>
+                    <input type="number" id="quantityInput" min="1" value="1" class="form-control" style="width: 5rem;">
+                    <button class="btn btn-primary ms-3" type="button" 
+                        onclick="addToCart(
+                            this.parentElement.querySelector('#quantityInput').value,
+                            ${product[0].ProductID},
+                            ${productPrice}
+                        )">
+                        Add to Cart
+                    </button>
                 </div>
             </div>
-        `;
-        cartItems.appendChild(itemDiv);
+        </div>`;
+}
+
+
+
+
+
+function addToCart(quantity, ProductID, Price) {
+    quantity = parseInt(quantity, 10);
+    if (isNaN(quantity) || quantity <= 0) {
+        alert("Invalid quantity. Please enter a positive number.");
+        return;
+    }
+
+    // Ensure Price is numeric
+    const numericPrice = parseFloat(Price) || 0.0;
+
+    let totalPrice = quantity * numericPrice;
+    cart.push({
+        ProductID: ProductID,
+        quantity: quantity,
+        price: numericPrice,
+        total: totalPrice
     });
 
-    cartTotal.textContent = totalValue.toFixed(2);
+    grandTotal += totalPrice;
+
+    console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
 }
 
-function updateQuantity(name, change) {
-    const item = cart.find(item => item.name === name);
-    if (!item) return;
-
-    item.quantity += change;
-    if (item.quantity <= 0) {
-        cart = cart.filter(cartItem => cartItem.name !== name);
-    }
-    updateCart();
-
-    if (cart.length === 0) {
-        document.querySelector(".cart-container").classList.add("hidden");
-    }
+function checkout() { 
+    alert("checking out products");
+    const cartJSON = JSON.stringify(cart);
+    window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
 }
 
-function checkout() {
-    alert("Proceeding to checkout...");
-    // Implement checkout logic here
-}
-
-function toggleCart() {
-    const cartContainer = document.querySelector('.cart-container');
-    cartContainer.classList.toggle('active'); // Toggle the active class
-}
 
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
@@ -143,48 +101,36 @@ function toggleCart() {
  * Fetch for retreiving a specific product (GET)
  * @param {Integer} productId 
  */
-function getSpecificProduct(productId){
-  
-   fetch(`http://localhost:3000/products/details/${productId}`,{
-    method: 'GET', 
-    headers: {
-        'Content-Type': 'application/json', 
-    },
-    body: JSON.stringify({ status: 'cancelled' }), 
-
-   })
-   .then(response => {
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
+function getSpecificProduct(productId) {
+    fetch(`http://localhost:3000/products/details/${productId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
     })
     .then(data => {
-        /*SAMPLE data  OUTPUT
-        
-        {
-            "Name": "Handmade Bracelet",
-            "Stocks": 50,
-            "Price": 29.99,
-            "Status": "active",
-            "Image": "base64"
-        }
+        console.log("Fetched product data:", data);
 
-        */
-       data.Name // name of product
-       data.Stocks // remaining stocks of product
-       data.Price // price of  product
-       data.Status //status of product
+        // Safely access and log specific fields
+        const status = data[0].Status || 'Status not found';
+        const name = data[0].Name || 'Name not found';
+        console.log("Status: ", status);
+        console.log("Name: ", name);
 
-        console.log("Products fetched successfully:", data);
-        // Handle the "Image" field
-        if (data.Image) {
-            const imgElement = base64ToImage(data.Image, 'image/png');
-            document.body.appendChild(imgElement); // Append the image to the body
+        // Check if product is active
+        if (status.toLowerCase() === "active") {
+            displaySpecficProduct(data); // Call your display function
+        } else {
+            console.error("Product status is not active or undefined.");
+            alert("The requested product is not available.");
         }
     })
     .catch(error => {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching product:", error);
     });
 }
 
@@ -203,5 +149,3 @@ function base64ToImage(base64, mimeType = 'image/png') {
     return img; // Return the image element
 }
 
-
-displayBooths();
