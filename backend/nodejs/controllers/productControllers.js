@@ -80,7 +80,7 @@ const getProductDetails = async (request, response) => {
 
   try {
     const [rows] = await db.query(
-      "SELECT p.name AS Name,p.StocksRemaining AS Stocks , p.Price as Price, p.status AS Status,TO_BASE64(p.Image) as Image FROM `product` p WHERE p.ProductID = ?",
+      "SELECT p.ProductID AS ProductID ,p.name AS Name,p.StocksRemaining AS Stocks , p.Price as Price, p.status AS Status,TO_BASE64(p.Image) as Image FROM `product` p WHERE p.ProductID = ?",
       [productId]
     );
     response.json(rows);
@@ -181,9 +181,15 @@ const createProduct = async (request, response) => {
       .send('Invalid status. It must be either "active" or "inactive".');
   }
   try {
+
+    console.log("Received image data length:", image ? image.length : 0);
+
+    let imageBuffer = null;
+    if (image) { imageBuffer = Buffer.from(image, 'base64');}
+
     const [rows] = await db.query(
       'INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES (NULL, ?,?, ?, ?, ?, ?)',
-      [boothID, stocks, price, name, status, image]
+      [boothID, stocks, price, name, status, imageBuffer]
     );// query for creating new product
 
     await db.query(
@@ -306,12 +312,82 @@ const updateStockInInventory = async (value, productId, db) => {
   }
 };
 
+const deleteProduct = async (request, response) => {
+  const db = request.db;
+  const { productId } = request.params;
+
+  try {
+    // First check if the product exists
+    const [product] = await db.query(
+      "SELECT ProductID FROM product WHERE ProductID = ?",
+      [productId]
+    );
+
+    if (product.length === 0) {
+      return response.status(404).json({
+        message: "Product not found"
+      });
+    }
+
+    // Check if product has any orders
+    const [orders] = await db.query(
+      "SELECT COUNT(*) as orderCount FROM order_products WHERE ProductID = ?",
+      [productId]
+    );
+
+    if (orders[0].orderCount > 0) {
+      return response.status(400).json({
+        message: "Cannot delete product that has associated orders. Consider deactivating it instead."
+      });
+    }
+
+    // Start a transaction
+    await db.beginTransaction();
+
+    try {
+      // Delete inventory records first
+      await db.query(
+        "DELETE FROM inventory WHERE ProductID = ?",
+        [productId]
+      );
+
+      // Delete the product
+      const [deleteResult] = await db.query(
+        "DELETE FROM product WHERE ProductID = ?",
+        [productId]
+      );
+
+      // Commit the transaction
+      await db.commit();
+
+      response.json({
+        message: "Product deleted successfully",
+        deletedProductId: productId
+      });
+
+    } catch (error) {
+      await db.rollback();
+      throw error;
+    }
+
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    response.status(500).json({
+      message: "Failed to delete product",
+      error: error.message
+    });
+  }
+};
+
+
+
 export {
   getProducts,
   getProductDetails,
   buyProduct,
   createProduct,
-  editProduct
+  editProduct,
+  deleteProduct
 };
 
 /* ------------------------------------------------------------------------------------- */
