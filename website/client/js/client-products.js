@@ -154,9 +154,30 @@ function getCart(customerId){
         // Handle the error message if the response contains an error
         console.error("Error:", data.error);
     } else {
+      /*
+      [
+    {
+        "Booth ID": 1,
+        "Order ID": 123,
+        "Grand total": 150.00,
+        "Product ID": 101,
+        "Quantity": 2,
+        "Total price per product": 30.00
+    },
+    {
+        "Booth ID": 1,
+        "Order ID": 123,
+        "Grand total": 150.00,
+        "Product ID": 102,
+        "Quantity": 3,
+        "Total price per product": 60.00
+    }
+]
+      */
            // Arrays to hold product IDs, quantities, and totals
            const orderId = data[0]['Order ID'];
            const grandTotal = data[0]['Grand total'];
+           const boothId = data[0]['Booth ID'];
            const productIds = [];
            const quantities = [];
            const totals = [];
