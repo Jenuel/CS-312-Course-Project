@@ -2,7 +2,7 @@
 
 // Retrieve the parameters from the URL
 const urlParams = new URLSearchParams(window.location.search);
-const orderID = decodeURIComponent(urlParams.get('orderID'));
+const boothId = decodeURIComponent(urlParams.get('boothId'));
 
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
@@ -78,6 +78,10 @@ function updateCartTotal(cartItems) {
     cartTotalElement.textContent = totalAmount.toFixed(2);
 }
 
+function cancelOrders(){
+    cancelOrder(orderID); 
+}
+
 
 
 /* ----------------------------------------------------------------------------------------------------- */
@@ -111,7 +115,7 @@ function cancelOrder(orderId) {
     });
 }
 
-function removeProductFromDB(orderID){
+function checkoutProducts(orderID){
     etch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
         method: 'PATCH', 
         headers: {
@@ -242,4 +246,4 @@ function fetchCartData() {
     });
 }
 
-fetchCartData();
+fetchCartData(boothId);

@@ -1,11 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('id'); 
 
-function myPurchases() {
-  alert("Checking out products");
-  window.location.href = `client-purchases.html?orderID=${orderID}`;// NEED TO FIND LIKE A SET OF VALUE GANUN
-}
-
 
     // Function to dynamically set the "My Purchases" URL
     document.addEventListener('DOMContentLoaded', () => {
@@ -13,7 +8,7 @@ function myPurchases() {
 
       if (customerID) {
         // Append the customerID as a query parameter to the URL
-        myPurchasesLink.href = `client-purchases.html?id=${boothId}`;
+        myPurchasesLink.href = `/client-purchases.html?id=${boothId}`;
       } else {
         console.warn('booth id not found!');
       }
@@ -61,6 +56,9 @@ function displayProducts(products) {
     });
   }
   
+  function cancelOrders(){
+    cancelOrder(orderID);
+  }
   
 
 /* ----------------------------------------------------------------------------------------------------- */
@@ -112,6 +110,30 @@ function fetchProducts(boothId,type, order ) {
     .catch(error => {
         console.error("Error purchasing product:", error);
     });
+}
+
+
+function cancelOrder(orderId) {
+  fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+      method: 'PATCH', 
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify({ status: 'cancelled' }), 
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      // data is a json massgae no parsing needed
+      console.log("Order cancelled successfully:", data);
+  })
+  .catch(error => {
+      console.error("Error cancelling order:", error);
+  });
 }
 
 //END FOR FETCH FUNCTIONS
