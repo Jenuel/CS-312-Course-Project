@@ -32,21 +32,25 @@
   <body>
     <div class="main-container container-fluid px-4 py-3">
       <header class="mb-3">
+        <!-- <button class="btn btn-secondary me-3 arrow-back-btn">
+          <i class='bx bx-arrow-back'></i> Back to Booths
+        </button> -->
         <nav>
           <ul class="nav nav-tabs nav-links border-0">
+            
             <li class="nav-item">
-              <a class="nav-link tab-link active" href="#" data-section="products">All</a>
+              <a href="#" class="nav-link tab-link" data-section="products" data-filter="all">All Products</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link tab-link" href="#" data-status="Live">Live</a>
+              <a href="#" class="nav-link tab-link" data-section="products" data-filter="live">Live</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link tab-link" href="#" data-status="Pending">Pending</a>
+              <a href="#" class="nav-link tab-link" data-section="products" data-filter="pending">Pending</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link tab-link" href="#" data-section="orders" onclick="showOrders()">Orders</a>
+              <a href="#" class="nav-link tab-link" data-section="orders" onclick="showOrders()">Orders</a>
             </li>
-          </ul>
+        </nav>
       </header>
 
       <div class="content-panel">
@@ -84,31 +88,22 @@
           </section>
 
           <section class="product-list-container card">
-            <div class="table-body card-body">
-              <table
-                id="productsTable"
-                class="table table-striped table-bordered"
-              >
-                <thead class="table-primary">
-                  <tr>
-                    <th>Product Name</th>
-                    <th>Status</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Image</th>
-                    <th>Options</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Products will be dynamically added here -->
-                </tbody>
-              </table>
+            <div class="table-head card-header">
+              <div class="row text-center">
+                <div class="col">Product Name</div>
+                <div class="col">Status</div>
+                <div class="col">Price</div>
+                <div class="col">Stock</div>
+                <div class="col">Image</div>
+                <div class="col">Options</div>
+              </div>
             </div>
+            <div class="table-body card-body"></div>
           </section>
         </section>
 
         <!-- Orders Section (Initially hidden) -->
-        <section id="orders-section" style="display: none">
+        <section id="orders-section" style="display: none;">
           <main class="container my-4">
             <div class="row">
               <!-- Pending Orders Table -->
@@ -117,10 +112,7 @@
                   <h2 class="text-primary">Pending Orders</h2>
                   <section class="product-list-container card">
                     <div class="table-body card-body">
-                      <table
-                        id="pendingOrders"
-                        class="table table-striped table-bordered"
-                      >
+                      <table id="pendingOrders" class="table table-striped table-bordered">
                         <thead class="table-primary">
                           <tr>
                             <th>Order ID</th>
@@ -146,10 +138,7 @@
                   <h2 class="text-success">Completed Orders</h2>
                   <section class="product-list-container card">
                     <div class="table-body card-body">
-                      <table
-                        id="completedOrders"
-                        class="table table-striped table-bordered"
-                      >
+                      <table id="completedOrders" class="table table-striped table-bordered">
                         <thead class="table-success">
                           <tr>
                             <th>Order ID</th>

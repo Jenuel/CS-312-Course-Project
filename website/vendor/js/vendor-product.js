@@ -334,6 +334,7 @@ function setupTabNavigation() {
       } else {
         showProducts();
         const filterValue = link.getAttribute('data-filter') || link.textContent;
+        console.log("Filter TYPEEE"+filterValue)
         filterProducts(filterValue);
       }
     });
@@ -486,6 +487,7 @@ function showProductDetail(product) {
   productDetailContainer.className = "product-detail-container mb-4";
   productDetailContainer.id = `product-${product.ProductID}`;
 
+  console.log(product.ProductStatus)
   const badgeClass =
     product.ProductStatus === "Live"
       ? "bg-success"
@@ -567,19 +569,33 @@ function setupEventListeners() {
     eventListeners.search = true;
   }
 
+  // const navLinks = document.querySelectorAll(".nav-links .nav-link");
+  // if (navLinks && !eventListeners.navLinks) {
+  //   navLinks.forEach((link) => {
+  //     const newLink = link.cloneNode(true);
+  //     link.parentNode.replaceChild(newLink, link);
+  //     newLink.addEventListener("click", (e) => {
+  //       e.preventDefault();
+  //       navLinks.forEach((l) => l.classList.remove("active"));
+  //       newLink.classList.add("active");
+  //       filterProducts(newLink.textContent);
+  //     });
+  //   });
+  //   eventListeners.navLinks = true;
+  // }
+
   const navLinks = document.querySelectorAll(".nav-links .nav-link");
-  if (navLinks && !eventListeners.navLinks) {
+  if (navLinks) {
     navLinks.forEach((link) => {
-      const newLink = link.cloneNode(true);
-      link.parentNode.replaceChild(newLink, link);
-      newLink.addEventListener("click", (e) => {
+      link.addEventListener("click", (e) => {
         e.preventDefault();
         navLinks.forEach((l) => l.classList.remove("active"));
-        newLink.classList.add("active");
-        filterProducts(newLink.textContent);
+        link.classList.add("active");
+        const filterType = link.dataset.filter || link.textContent;
+        console.log("Filter333"+filterType)
+        filterProducts(filterType);
       });
     });
-    eventListeners.navLinks = true;
   }
 
   const backButton = document.querySelector(".arrow-back-btn");
@@ -646,7 +662,7 @@ function setupImageUpload(imageInput, imagePreview) {
 // Add Filtration feature
 function getCurrentFilter() {
   const activeLink = document.querySelector(".nav-links .nav-link.active");
-  return activeLink ? activeLink.textContent : "All";
+  return activeLink ? activeLink.textContent : "all";
 }
 
 // Add filter functionality
@@ -662,9 +678,18 @@ function filterProducts(filterType) {
   }
 
   const filteredProducts = products.filter((product) => {
-    if (filterType === "All") return true;
-    return product.ProductStatus === filterType;
+    if (filterType === "All Products" || filterType.toLowerCase() === "all") {
+      return true; // Show all products
+    } else if (filterType.toLowerCase() === "live") {
+      return product.ProductStatus === "Live"; // Show only live products
+    } else if (filterType.toLowerCase() === "pending") {
+      return product.ProductStatus === "Pending"; // Show only pending products
+    }
+    return false; // Exclude anything else
   });
+
+    // return product.ProductStatus === filterType;
+
 
   console.log("Filtered products:", filteredProducts);
 
@@ -689,7 +714,7 @@ function searchProducts(searchTerm) {
     );
 
     const matchesFilter =
-      currentFilter === "All" ? true : currentFilter === product.ProductStatus;
+      currentFilter === "all" ? true : currentFilter === product.ProductStatus;
 
     return matchesSearch && matchesFilter;
   });
@@ -911,20 +936,36 @@ function updateTables() {
     populateCompletedOrders(boothID);
 }
 
+function clearOrderTables() {
+  const pendingOrdersTable = document.querySelector("#pendingOrders tbody");
+  const completedOrdersTable = document.querySelector("#completedOrders tbody");
+  
+  if (pendingOrdersTable) {
+    pendingOrdersTable.innerHTML = '';
+  }
+  
+  if (completedOrdersTable) {
+    completedOrdersTable.innerHTML = '';
+  }
+}
+
 // Event Handlers for Navigation
 function showOrders() {
-    document.getElementById("product-section").style.display = "none";
-    document.getElementById("orders-section").style.display = "block";
-    updateTables();
+  document.getElementById("product-section").style.display = "none";
+  document.getElementById("orders-section").style.display = "block";
+  updateTables(); 
 }
 
 function showProducts() {
-    document.getElementById("product-section").style.display = "block";
-    document.getElementById("orders-section").style.display = "none";
+  document.getElementById("product-section").style.display = "block";
+  document.getElementById("orders-section").style.display = "none";
+  clearOrderTables(); // Clear order tables when switching to products
 }
+
 
 // Initialize on Page Load
 document.addEventListener("DOMContentLoaded", () => {
+  setupTabNavigation()
     const boothID = getBoothIdFromSession();
     if (boothID) {
         updateTables();
