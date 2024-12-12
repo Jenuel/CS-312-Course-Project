@@ -13,6 +13,21 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../css/vendor-products.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      // Function to show the orders section
+      function showOrders() {
+        // Hide other content and show the orders section
+        document.getElementById('orders-section').style.display = 'block';
+        document.getElementById('product-section').style.display = 'none';
+      }
+
+      // Function to show the products section
+      function showProducts() {
+        document.getElementById('orders-section').style.display = 'none';
+        document.getElementById('product-section').style.display = 'block';
+      }
+    </script>
   </head>
   <body>
     <div class="main-container container-fluid px-4 py-3">
@@ -20,61 +35,142 @@
         <nav>
           <ul class="nav nav-tabs nav-links border-0">
             <li class="nav-item">
-              <a class="nav-link active" href="#">All</a>
+              <a class="nav-link active" href="#" onclick="showProducts()">All</a>
             </li>
             <li class="nav-item"><a class="nav-link" href="#">Live</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Pending</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Sold Out</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Orders</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="showOrders()">Orders</a></li>
           </ul>
         </nav>
       </header>
 
       <div class="content-panel">
-        <section class="searchbox-wrap input-group mb-3">
-          <input
-            type="text"
-            placeholder="Search For a Product"
-            class="searchbox form-control"
-          />
-          <button class="searchBtn btn btn-primary px-4">
-            <i class="bx bx-search-alt"></i>
-          </button>
+        <!-- Product Section (Initially visible) -->
+        <section id="product-section">
+          <section class="searchbox-wrap input-group mb-3">
+            <input
+              type="text"
+              placeholder="Search For a Product"
+              class="searchbox form-control"
+            />
+            <button class="searchBtn btn btn-primary px-4">
+              <i class="bx bx-search-alt"></i>
+            </button>
+          </section>
+
+          <section class="product-indicators mb-4">
+            <div class="row align-items-center">
+              <div class="col indicator-left-panel">
+                <h3 class="mb-0">
+                  <span id="product-total">0</span>
+                  <span>Products</span>
+                </h3>
+              </div>
+              <div class="col-auto indicator-right-panel">
+                <button
+                  type="button"
+                  class="btn d-flex align-items-center gap-2"
+                >
+                  <i class="bx bx-add-to-queue"></i>
+                  <p class="mb-0">Add a New Product</p>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="product-list-container card">
+            <div class="table-head card-header">
+              <div class="row text-center">
+                <div class="col">Product Name</div>
+                <div class="col">Status</div>
+                <div class="col">Price</div>
+                <div class="col">Stock</div>
+                <div class="col">Image</div>
+                <div class="col">Options</div>
+              </div>
+            </div>
+            <div class="table-body card-body"></div>
+          </section>
         </section>
 
-        <section class="product-indicators mb-4">
-          <div class="row align-items-center">
-            <div class="col indicator-left-panel">
-              <h3 class="mb-0">
-                <span id="product-total">0</span>
-                <span>Products</span>
-              </h3>
-            </div>
-            <div class="col-auto indicator-right-panel">
-              <button
-                type="button"
-                class="btn d-flex align-items-center gap-2"
-  
-              >
-                <i class="bx bx-add-to-queue"></i>
-                <p class="mb-0">Add a New Product</p>
-              </button>
-            </div>
-          </div>
-        </section>
+        <!-- Orders Section (Initially hidden) -->
+        <section id="orders-section" style="display: none;">
+          <main class="container my-4">
+            <div class="row">
+              <!-- Pending Orders Table -->
+              <div class="col-md-6">
+                <section id="pending-orders-section">
+                  <h2 class="text-primary">Pending Orders</h2>
+                  <section class="product-list-container card">
+                    <div class="table-head card-header">
+                      <div class="row text-center">
+                        <div class="col">Order ID</div>
+                        <div class="col">Customer Name</div>
+                        <div class="col">Product Name</div>
+                        <div class="col">Quantity</div>
+                        <div class="col">Total</div>
+                        <div class="col">Action</div>
+                      </div>
+                    </div>
+                    <div class="table-body card-body">
+                      <table id="pendingOrders" class="table table-striped table-bordered">
+                        <thead class="table-primary">
+                          <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Pending orders will be dynamically added here -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                </section>
+              </div>
 
-        <section class="product-list-container card">
-          <div class="table-head card-header">
-            <div class="row text-center">
-              <div class="col">Product Name</div>
-              <div class="col">Status</div>
-              <div class="col">Price</div>
-              <div class="col">Stock</div>
-              <div class="col">Image</div>
-              <div class="col">Options</div>
+              <!-- Completed Orders Table -->
+              <div class="col-md-6">
+                <section id="completed-orders-section">
+                  <h2 class="text-success">Completed Orders</h2>
+                  <section class="product-list-container card">
+                    <div class="table-head card-header">
+                      <div class="row text-center">
+                        <div class="col">Order ID</div>
+                        <div class="col">Customer Name</div>
+                        <div class="col">Product Name</div>
+                        <div class="col">Quantity</div>
+                        <div class="col">Total</div>
+                        <div class="col">Action</div>
+                      </div>
+                    </div>
+                    <div class="table-body card-body">
+                      <table id="completedOrders" class="table table-striped table-bordered">
+                        <thead class="table-success">
+                          <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Completed orders will be dynamically added here -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                </section>
+              </div>
             </div>
-          </div>
-          <div class="table-body card-body"></div>
+          </main>
         </section>
       </div>
     </div>

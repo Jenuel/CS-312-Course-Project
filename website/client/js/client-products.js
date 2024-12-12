@@ -4,26 +4,46 @@ const boothId = urlParams.get('id');
 let box = document.querySelector(".product-list"); 
 
 function displayProducts(products) {
-    box.innerHTML = ""; 
-    products.forEach(product => {
-        const productDiv = document.createElement('div');
-        productDiv.classList.add('item'); 
-
-        productDiv.innerHTML = `
-            <div class="box">
-                <div class="image">
-                    <img src="${product.Image}" alt="${product.Name}">
-                </div>
-                <div class="product">
-                    <p id="title">${product.Name}</p>
-                </div>
-                <div class="product">
-                    <p id="status">${product.Status}</p>
-                </div>
-            </div>`;
-        box.appendChild(productDiv);
+    const container = document.querySelector(".row.gx-4.gx-lg-5.row-cols-2.row-cols-md-3.row-cols-xl-4.justify-content-center");
+    container.innerHTML = ""; // Clear any previous product cards
+  
+    products.forEach((product) => {
+      const productDiv = document.createElement("div");
+      productDiv.classList.add("col", "mb-5");
+  
+      // Convert Price to a number and handle invalid values
+      const price = product.Price ? parseFloat(product.Price) : null;
+  
+      productDiv.innerHTML = `
+        <div class="card h-100">
+          <img 
+            class="card-img-top" 
+            src="${product.Image ? `data:image/png;base64,${product.Image}` : 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'}" 
+            alt="${product.Name}" 
+          />
+          <div class="card-body p-4">
+            <div class="text-center">
+              <h5 class="fw-bolder">${product.Name}</h5>
+              <span>${price !== null ? `₱${price.toFixed(2)}` : "Price not available"}</span>
+            </div>
+          </div>
+          <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+            <div class="text-center">
+              ${product.Stocks > 0 ? `
+                <a class="btn btn-outline-primary mt-auto" href="client-specific-product.html?id=${product.ProductID}">See more</a>
+              ` : `
+                <button class="btn btn-outline-primary mt-auto" disabled>Out of Stock</button>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+  
+      container.appendChild(productDiv); // Append each product card to the container
     });
-}
+  }
+  
+  
 
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
@@ -36,12 +56,14 @@ function displayProducts(products) {
  */
 function fetchProducts(boothId,type, order ) {
 
+    type = 'name';
+    order = 'asc';
+
     fetch(`http://localhost:3000/products/booth/${boothId}?filter=active&sort=${type}:${order}`, { 
         method: 'GET',
         headers: {
             "Content-type": 'application/json',
         },
-        body: JSON.stringify({ status: 'cancelled' }), 
     })
     .then(response => {
         if (!response.ok) {
@@ -67,15 +89,7 @@ function fetchProducts(boothId,type, order ) {
         */
         console.log("Products fetched successfully:", data);
 
-        data.forEach(product => {
-            product.Name // name of the product
-            product.Status // status of the product
-
-            if (product.Image) {
-                const imgElement = base64ToImage(product.Image, 'image/png');
-                document.body.appendChild(imgElement); // Append the image to the body
-             }
-        });    
+        displayProducts(data);
     })
     .catch(error => {
         console.error("Error purchasing product:", error);
