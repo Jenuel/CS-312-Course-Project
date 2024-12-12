@@ -102,7 +102,7 @@ HTTP PUT /<productRoutes>/<orderId>
 const buyProduct = async (request, response) => {
   //PLEASE DOUBLE CHECK LOGIC
   const db = request.db;
-  const { orderID } = request.params;
+  const { orderId } = request.params;
 
   try {
     const [allPositive] = await db.query(
@@ -117,7 +117,7 @@ const buyProduct = async (request, response) => {
       JOIN order_products o ON p.ProductID = o.ProductID
       WHERE o.OrderID = ?;
       `,
-      [orderID]
+      [orderId]
     );
     
     if (allPositive.length && allPositive[0].AllPositive) {
@@ -135,7 +135,7 @@ const buyProduct = async (request, response) => {
           WHERE o.OrderID = ?
       )
       `,
-      [orderID, orderID]
+      [orderId, orderId]
     );
 
     await db.query(
@@ -150,7 +150,7 @@ const buyProduct = async (request, response) => {
       JOIN order_products p ON o.OrderID = p.OrderID
       WHERE o.OrderID = ?
       `,
-      [orderID]
+      [orderId]
     );
       response.json({
         message: "Product purchased successfully",

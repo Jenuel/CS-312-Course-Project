@@ -81,7 +81,7 @@ function addToCart(quantity, ProductID, Price) {
         const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
         addToOrder(orderId, cart);
     } else { // wala pang order
-        createOrder(boothId, cart, grandTotal);
+        createOrder(boothId, cart, grandTotal,customerID);// please assign calue for customerID
     }
 
 }
@@ -112,14 +112,14 @@ function getSpecificProduct(productId) {
         .catch(error => console.error("Error fetching product:", error));
 }
 
-function createOrder(boothID, data, totalPrice) {
-    // Parse and format product data
+function createOrder(boothID, data, totalPrice,customerID) {
     const formattedProducts = data.map(entry => {
         const [productID, quantity, totalPricePerProduct] = entry.split(',');
         return {
             productID: parseInt(productID, 10),
             quantity: parseInt(quantity, 10),
-            totalPricePerProduct: parseFloat(totalPricePerProduct), // Send as a float, not a string
+            totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
+            customerId:customerID,
         };
     });
 
