@@ -35,33 +35,30 @@ async function fetchBoothProducts() {
       },
     });
 
-    let data;
-    if (!response.ok) {
-      console.log("API unavailable, using mock data");
-      data = getMockProducts();
-    } else {
-      data = await response.json();
-    }
-
-    console.log("Raw API response:", data);
+    if (!response.ok) throw new Error("Failed to fetch products");
+    const data = await response.json();
+    console.log("Raw data from API:", data); // Debug log
 
     products = Array.isArray(data)
-      ? data.map((product) => {
-          return {
-            ProductID: product.ProductID,
-            ProductName: product.Name,
-            ProductStatus: product.Status === "active" ? "Live" : "Pending",
-            ProductPrice: Number(product.Price) || 0,
-            ProductStock: Number(product.Stocks) || 0,
-            ProductImage: ImageHandler.processFromAPI(product.Image),
-          };
-        })
+      ? data.map((product) => ({
+          ProductID: product.ProductID,
+          ProductName: product.Name,
+          ProductStatus: product.Status === "active" ? "Live" : "Pending",
+          ProductPrice: Number(product.Price) || 0,
+          ProductStock: Number(product.Stocks) || 0,
+          // Image is already base64 from TO_BASE64() in MySQL
+          ProductImage: product.Image
+            ? `data:image/jpeg;base64,${product.Image}`
+            : null,
+        }))
       : [];
 
+    console.log("Processed products:", products);
     filterProducts(getCurrentFilter());
   } catch (error) {
+    products = [];
     console.log("Error fetching products:", error);
-    products = getMockProducts();
+    products = [];
     filterProducts(getCurrentFilter());
   } finally {
     tableBody.classList.remove("loading");
@@ -74,6 +71,14 @@ async function createProduct(formData) {
   try {
     const boothId = sessionStorage.getItem("currentBoothId");
 
+    if (
+      !formData.ProductName ||
+      !formData.ProductStock ||
+      !formData.ProductPrice
+    ) {
+      throw new Error("Please fill in all required fields");
+    }
+
     const requestData = {
       boothID: parseInt(boothId),
       stocks: parseInt(formData.ProductStock) || 0,
@@ -81,7 +86,7 @@ async function createProduct(formData) {
       name: formData.ProductName,
       status: "inactive",
       image: formData.ProductImage
-        ? formData.ProductImage.split("base64,")[1]?.replace(/[\n\r\s]/g, "")
+        ? formData.ProductImage.split("base64,")[1]
         : null,
     };
 
@@ -99,14 +104,13 @@ async function createProduct(formData) {
     }
 
     const result = await response.json();
-    // Refresh products list after creation
     await fetchBoothProducts();
+    return result;
   } catch (error) {
     console.error("Failed to create product:", error);
     alert("Failed to create product. Please try again.");
   }
 }
-
 
 function editProductData(data, productContainer) {
   // modal structure for edit
@@ -200,7 +204,7 @@ function editProductData(data, productContainer) {
       ProductStock: modalElement.querySelector("#stock").value || null,
       ProductImage: imagePreview.classList.contains("d-none")
         ? null
-        : ImageHandler.prepareForUpload(imagePreview.src),
+        : imagePreview.src,
     };
     console.log(updatedData);
     updateProduct(updatedData, productContainer);
@@ -241,14 +245,10 @@ async function deleteProduct(productId) {
   }
 }
 
-async function updateProduct(updatedData, productContainer) {
+async function updateProduct(updatedData) {
   try {
-    console.log("in update Product: " + updatedData.ProductID);
     const productId = updatedData.ProductID;
-    console.log(productId);
-    if (!productId) {
-      throw new Error("Product ID not found");
-    }
+    if (!productId) throw new Error("Product ID not found");
 
     const product = [];
 
@@ -273,15 +273,11 @@ async function updateProduct(updatedData, productContainer) {
       product.push({ StocksRemaining: parseInt(updatedData.ProductStock) });
     }
 
+    // Handle image separately - just send the base64 string without prefix
     if (updatedData.ProductImage) {
-      let imageData = updatedData.ProductImage;
-
-      if (imageData.startsWith("data:image")) {
-        imageData = imageData.split("base64,")[1];
-      }
-
-      if (imageData) {
-        product.push({ Image: imageData });
+      const base64Data = updatedData.ProductImage.split("base64,")[1];
+      if (base64Data) {
+        product.push({ Image: base64Data });
       }
     }
 
@@ -295,17 +291,13 @@ async function updateProduct(updatedData, productContainer) {
       body: JSON.stringify({ product }),
     });
 
+    const responseData = await response.text();
+
     if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(
-        `HTTP error! status: ${response.status}, message: ${errorData}`
-      );
+      console.error("API response error:", responseData);
+      throw new Error(responseData);
     }
 
-    const result = await response.json();
-    console.log("Update successful:", result);
-
-    // Refresh the products list to show updated data
     await fetchBoothProducts();
   } catch (error) {
     console.error("Failed to update product:", error);
@@ -314,15 +306,7 @@ async function updateProduct(updatedData, productContainer) {
   }
 }
 
-
-
-
-
-
 // UTILITIES
-
-
-
 
 function showLoading() {
   tableBody.innerHTML = `
@@ -333,7 +317,6 @@ function showLoading() {
       </div>
   `;
 }
-
 
 function showAddProductFormData(existingData, productContainer) {
   console.log("Add Button Triggered");
@@ -438,9 +421,7 @@ function showAddProductFormData(existingData, productContainer) {
           : "Pending",
         ProductPrice: modalElement.querySelector("#price").value,
         ProductStock: modalElement.querySelector("#stock").value || null,
-        ProductImage: imagePreview.src
-          ? ImageHandler.prepareForUpload(imagePreview.src)
-          : null,
+        ProductImage: imagePreview.src,
       };
 
       if (existingData && productContainer) {
@@ -454,6 +435,8 @@ function showAddProductFormData(existingData, productContainer) {
       });
 
       modalElement.remove();
+
+      alert("Product crearted successfully");
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to save product. Please try again.");
@@ -466,69 +449,72 @@ function showAddProductFormData(existingData, productContainer) {
 }
 
 //  showProductDetail
-function showProductDetail(dataForm) {
+function showProductDetail(product) {
   const productDetailContainer = document.createElement("div");
   productDetailContainer.className = "product-detail-container mb-4";
-  productDetailContainer.id = `product-${dataForm.ProductID}`;
+  productDetailContainer.id = `product-${product.ProductID}`;
 
-  let badgeClass = "bg-warning"; // Default for Pending
-  if (dataForm.ProductStatus === "Live") {
-    badgeClass = "bg-success";
-  } else if (dataForm.ProductStatus === "Sold Out") {
-    badgeClass = "bg-danger";
-  }
-
-  console.log("Received image data:", {
-    hasImage: !!dataForm.ProductImage,
-    imageData: dataForm.ProductImage?.substring(0, 100),
-  });
-  const imageColumn = ImageHandler.createImageElement(
-    dataForm.ProductImage,
-    dataForm.ProductName,
-    "image-container"
-  );
+  const badgeClass =
+    product.ProductStatus === "Live"
+      ? "bg-success"
+      : product.ProductStatus === "Pending"
+      ? "bg-danger"
+      : "bg-warning";
 
   productDetailContainer.innerHTML = `
-        <div class="row text-center align-items-center">
-            <div class="col"><div>${dataForm.ProductName}</div></div>
-            <div class="col"><span class="badge ${badgeClass}">${dataForm.ProductStatus}</span></div>
-            <div class="col">${dataForm.ProductPrice}</div>
-            <div class="col">${dataForm.ProductStock}</div>
-            <div class="col">${imageColumn}</div>
-            <div class="col"><button type="button" class="p-edit-button"><i class='bx bx-edit'></i></button><button type="button" class="p-delete-button"><i class='bx bx-trash-alt'></i></button>
-            </div>
-        </div>`;
+    <div class="row text-center align-items-center">
+      <div class="col"><div>${product.ProductName}</div></div>
+      <div class="col"><span class="badge ${badgeClass}">${
+    product.ProductStatus
+  }</span></div>
+      <div class="col">${product.ProductPrice}</div>
+      <div class="col">${product.ProductStock}</div>
+      <div class="col">
+        ${
+          product.ProductImage
+            ? `<img src="${product.ProductImage}" 
+                alt="${product.ProductName}"
+                class="product-thumbnail"
+                style="max-width: 100px; cursor: pointer;"
+                onerror="this.parentElement.innerHTML='Image Failed to Load'">`
+            : '<div class="no-image">No Image</div>'
+        }
+      </div>
+      <div class="col">
+        <button type="button" class="p-edit-button"><i class='bx bx-edit'></i></button>
+        <button type="button" class="p-delete-button"><i class='bx bx-trash-alt'></i></button>
+      </div>
+    </div>`;
 
-  // Rest of the event remain
-  const thumbnail = productDetailContainer.querySelector(".product-thumbnail");
+  setupProductEvents(productDetailContainer, product);
+  return productDetailContainer;
+}
+
+function setupProductEvents(productContainer, product) {
+  const thumbnail = productContainer.querySelector(".product-thumbnail");
   if (thumbnail) {
     thumbnail.addEventListener("click", () =>
-      showImageModal(dataForm.ProductImage)
+      showImageModal(product.ProductImage)
     );
   }
 
-  const editBtn = productDetailContainer.querySelector(".p-edit-button");
+  const editBtn = productContainer.querySelector(".p-edit-button");
   editBtn.addEventListener("click", () =>
-    editProductData(dataForm, productDetailContainer)
+    editProductData(product, productContainer)
   );
 
-  const deleteBtn = productDetailContainer.querySelector(".p-delete-button");
+  const deleteBtn = productContainer.querySelector(".p-delete-button");
   deleteBtn.addEventListener("click", async () => {
     if (confirm("Are you sure you want to delete this product?")) {
       try {
-        await deleteProduct(dataForm.ProductID);
+        await deleteProduct(product.ProductID);
         await fetchBoothProducts();
       } catch (error) {
         console.error("Error deleting product:", error);
       }
     }
   });
-
-  tableBody.appendChild(productDetailContainer);
 }
-
-
-
 function setupEventListeners() {
   const addProductBtn = document.querySelector(".indicator-right-panel button");
   if (addProductBtn && !eventListeners.addProduct) {
@@ -575,23 +561,25 @@ function setupEventListeners() {
 
 function showImageModal(imageUrl) {
   const modalHtml = `
-      <div class="modal fade" id="imageModal" tabindex="-1">
-          <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body text-center">
-                      <img src="${ImageHandler.createImageElement(
-                        imageUrl,
-                        "Product Image",
-                        "modal-image"
-                      )}">
-                  </div>
-              </div>
+    <div class="modal fade" id="imageModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
+          <div class="modal-body text-center">
+            ${
+              imageUrl
+                ? `<img src="${imageUrl}" 
+                   alt="Product Image" 
+                   style="max-width: 100%; height: auto;"
+                   onerror="this.parentElement.innerHTML='Image Failed to Load'">`
+                : "<div>No Image Available</div>"
+            }
+          </div>
+        </div>
       </div>
-  `;
+    </div>`;
 
   document.body.insertAdjacentHTML("beforeend", modalHtml);
   const modalElement = document.getElementById("imageModal");
@@ -607,9 +595,18 @@ function setupImageUpload(imageInput, imagePreview) {
   imageInput.addEventListener("change", async (e) => {
     try {
       const file = e.target.files[0];
-      await ImageHandler.handleUpload(file, imagePreview);
+      if (!imageUtils.validateImage(file)) {
+        alert("File must be less than 5MB");
+        return;
+      }
+
+      const base64Data = await imageUtils.readFileAsBase64(file);
+      imagePreview.src = base64Data;
+      imagePreview.classList.remove("d-none");
+      imagePreview.classList.add("d-block");
     } catch (error) {
-      alert(error.message);
+      alert("Failed to load image");
+      console.error(error);
     }
   });
 }
@@ -622,6 +619,9 @@ function getCurrentFilter() {
 
 // Add filter functionality
 function filterProducts(filterType) {
+  console.log("Filtering products with type:", filterType); // Debug log
+  console.log("Current products:", products); // Debug log
+
   if (!products || !products.length) {
     tableBody.innerHTML =
       '<div class="text-center p-4">No products found</div>';
@@ -634,8 +634,15 @@ function filterProducts(filterType) {
     return product.ProductStatus === filterType;
   });
 
+  console.log("Filtered products:", filteredProducts);
+
   tableBody.innerHTML = "";
-  filteredProducts.forEach(showProductDetail);
+
+  filteredProducts.forEach((product) => {
+    const productElement = showProductDetail(product);
+    tableBody.appendChild(productElement);
+  });
+
   updateProductTotal(filteredProducts.length);
 }
 
@@ -671,6 +678,25 @@ function updateProductTotal(count = null) {
 function goBack() {
   window.location.href = "vendor-home.html";
 }
+
+// IMG UTILS
+
+const imageUtils = {
+  validateImage(file) {
+    if (!file) return false;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    return file.size <= maxSize;
+  },
+
+  readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  },
+};
 
 // Initialization of Page
 async function initializePage() {

@@ -184,8 +184,13 @@ const createProduct = async (request, response) => {
 
     console.log("Received image data length:", image ? image.length : 0);
 
+    await db.beginTransaction();
+
     let imageBuffer = null;
-    if (image) { imageBuffer = Buffer.from(image, 'base64');}
+    if (image && typeof image === 'string') {
+      const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+      imageBuffer = Buffer.from(base64Data, 'base64');
+    }
 
     const [rows] = await db.query(
       'INSERT INTO `product` (`ProductID`, `BoothID`, `StocksRemaining`, `Price`, `name`, `status`, `Image`) VALUES (NULL, ?,?, ?, ?, ?, ?)',
@@ -231,7 +236,14 @@ const editProduct = async (request, response) => {
 
     for (const field of product) {
       const key = Object.keys(field)[0];  // arraylist for keys from body, [name, price] 
-      const value = Object.values(field)[0]; // arraylist for values from body, [myName,150]
+      let value = Object.values(field)[0]; // arraylist for values from body, [myName,150]
+
+      if (key === "Image" && value) {
+        value = value.replace(/^data:image\/\w+;base64,/, '');
+        value = Buffer.from(value, 'base64');
+      }
+
+
 
       if (key === "StocksRemaining") {
         await updateStockInInventory(value, productId , db);
@@ -254,8 +266,8 @@ const editProduct = async (request, response) => {
       message: "Product updated successfully",
     });
   } catch (error) {
-    console.error("Error updating product:", error);
-    response.status(500).send("Failed to update product");
+    console.error("Error updating product:",  error.message, error.stack);
+    response.status(500).json({ error: error.message });
   }
 };
 
