@@ -97,40 +97,6 @@ function fetchProducts(boothId,type, order ) {
     });
 }
 
-/**
- * Fetch for purchasing products (PATCH)
- * @param {Integer} productID 
- * @param {String} value 
- */
-function buyProduct(productID, value) {
-
-    const data = {
-        numberOfProductSold: parseInt(value),
-    };
-
-    fetch(`http://localhost:3000/products/buy/${productID}`, { 
-        method: 'PATCH',
-        headers: {
-            "Content-type": 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        // data is just sa massage in a form of a json
-        console.log("Product purchased successfully:", data);
-        // add handling of data
-    })
-    .catch(error => {
-        console.error("Error purchasing product:", error);
-    });
-}
-
 //END FOR FETCH FUNCTIONS
 /* ----------------------------------------------------------------------------------------------------- */
 

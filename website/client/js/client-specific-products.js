@@ -75,7 +75,7 @@ function addToCart(quantity, ProductID, Price) {
 function checkout() {
     alert("Checking out products");
     const cartJSON = JSON.stringify(cart);
-    window.location.href = `client-purchases.html?cart=${encodeURIComponent(cartJSON)}&total=${encodeURIComponent(grandTotal.toFixed(2))}`;
+    window.location.href = `client-purchases.html?orderID=${orderID}`;// NEED TO FIND LIKE A SET OF VALUE GANUN
 }
 
 /*
@@ -124,6 +124,33 @@ function createOrder(boothID, data, totalPrice) {
     };
 
     fetch(`http://localhost:3000/orders/create/${boothID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+        .then(response => response.ok ? response.json() : Promise.reject(response))
+        .then(orderData => {
+            console.log("Order created successfully:", orderData);
+            sessionStorage.setItem("OrderID", orderData.id); //ETO PO YUNG PAG SAVE NG ID PAPALIT NA LANG ************************************
+        })
+        .catch(error => console.error("Error creating order:", error));
+}
+
+function addToOrder(orderID, data,) {
+    const formattedProducts = data.map(entry => {
+        const [productID, quantity, totalPricePerProduct] = entry.split(',');
+        return {
+            productID: parseInt(productID, 10),
+            quantity: parseInt(quantity, 10),
+            totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
+        };
+    });
+
+    const payload = {
+        products: formattedProducts,
+    };
+
+    fetch(`http://localhost:3000/orders/addToOrder/${orderID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

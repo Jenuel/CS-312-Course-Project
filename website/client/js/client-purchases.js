@@ -1,13 +1,8 @@
-import { getProducts } from "../../../backend/nodejs/controllers/productControllers";
+
 
 // Retrieve the parameters from the URL
 const urlParams = new URLSearchParams(window.location.search);
-const cartJSON = decodeURIComponent(urlParams.get('cart'));
-const grandTotal = parseFloat(decodeURIComponent(urlParams.get('total')));
-
-
-// Parse the cart JSON string back into an array of objects
-const cart = JSON.parse(cartJSON);
+const orderID = decodeURIComponent(urlParams.get('orderID'));
 
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
@@ -117,7 +112,7 @@ function cancelOrder(orderId) {
 }
 
 function removeProductFromDB(orderID){
-    etch(`http://localhost:3000/products/buy/${orderId}`, { // URL for updaeting product in db
+    etch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
         method: 'PATCH', 
         headers: {
             'Content-Type': 'application/json', 
