@@ -263,22 +263,22 @@ function getCart(customerId) {
                 return;
             }
 
-            localStorage.setItem('orderId', data[0]['Order ID']);
+            localStorage.setItem('orderId', data[0]['orderID']);
             
             // Map the API response to the format expected by `displayCart`
             const cartItems = data.map(product => ({
                 productID: product['Product ID'],
-                productName: product['Product Name'] || 'Unknown Product',
-                image: product['Product Image'], // If image is base64 or URL
-                quantity: product['Quantity'],
-                price: parseFloat(product['Product price']),
-                total: parseFloat(product['Total price per product']),
+                productName: product['productName'] || 'Unknown Product',
+                image: product['productImage'], // If image is base64 or URL
+                quantity: product['quantity'],
+                price: parseFloat(product['productPrice']),
+                total: parseFloat(product['totalPricePerProduct']),
             }));
 
             // Update the cart display
             displayCart(cartItems);
 
-            updateCartTotal(data.grandTotal);
+            updateCartTotal(data[0]['grandTotal']);
             
         })
         .catch(error => {
