@@ -1,21 +1,24 @@
 // Retrieve the parameters from the URL
 const urlParams = new URLSearchParams(window.location.search);
-let boothId = urlParams.get('boothId'); 
-let custID=0;
-if((urlParams.get('id'))==="none"){
+let boothId = 0;
+if((urlParams.get('boothId'))==="none"){
 
-  const localStorageId = localStorage.getItem('id');// get user id 
-  getCustomerID(localStorageId)
-
-  const hasCart =  getCart(custID); //  result of getCart
-
-  if(hasCart){// a pedning order exists
-    console.log("customer has existing cart")
+    const localStorageId = localStorage.getItem('id');// get customer id 
+  
+    const hasCart =  getCart(localStorageId); //  result of getCart
+  
+    if(hasCart){// a pedning order exists
+      console.log("customer has existing cart")
+    }else{
+      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+    }
+  
   }else{
-    window.location.href = 'http://localhost:8080/client/html/client-home.html';
+    // boothId = urlParams.get('boothId');
+    boothId = localStorage.getItem('BoothId');
   }
 
-}
+  
 
 
 
@@ -261,50 +264,6 @@ function createOrder(boothID, data, totalPrice) {
         .catch(error => console.error("Error creating order:", error));
 }
 
-function getCustomerID(id){
-    fetch(`http://localhost:3000/orders/getCustomerID/${id}`, { // URL for Cancel order
-      method: 'GET', 
-      headers: {
-          'Content-Type': 'application/json', 
-      },
-      body: JSON.stringify({ status: 'cancelled' }), 
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        // add handling of data 
-        if (data.error) {
-          // Handle the error message if the response contains an error
-          console.error("Error:", data.error);
-          return null;
-      } else {
-        /*
-        date output:
-        [
-          {
-              "Customer ID": 12345
-          }
-        ]
-        */
-        if (data.length > 0) {
-          custID = data[0]['Customer ID'];
-          console.log("Customer ID:", custID);
-        } else {
-          console.log("No customer found.");
-        }
-  
-       
-      }
-    })
-    .catch(error => {
-        console.error("Error cancelling order:", error);
-    });
-  
-  }
   
 
 function getCart(customerId) {
@@ -324,8 +283,6 @@ function getCart(customerId) {
                 console.error("Error:", data.error);
                 return;
             }
-
-            localStorage.setItem('OrderId', data[0]['orderID']);
             
             // Map the API response to the format expected by `displayCart`
             const cartItems = data.map(product => ({
@@ -336,6 +293,9 @@ function getCart(customerId) {
                 price: parseFloat(product['productPrice']),
                 total: parseFloat(product['totalPricePerProduct']),
             }));
+
+            localStorage.setItem('BoothId',data[0]['Booth ID']);
+            localStorage.setItem("OrderId",data[0]['Order ID']);
 
             // Update the cart display
             displayCart(cartItems);

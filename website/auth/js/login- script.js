@@ -34,14 +34,14 @@ function handleLogin(event) {
             if(data.role == "vendor"){ //checks the role of the newly authenticated user
                 const id = data.UserID;
                 // set your values in the first page
-                localStorage.setItem('id', id);
-                console.log("ID : ", id);
+                localStorage.setItem('id', id.toString);
+                console.log("ID : ", localStorage.getItem('id'));
                 window.location.href = 'http://localhost:8080/vendor/html/vendor-home.html';//redirect to vendor side
               
             } else {
                 const id = data.UserID;
                 localStorage.setItem('id', id);
-                console.log("ID customer : ", id);
+                alert("from auth ID customer : "+ localStorage.getItem('id'));
                 if(localStorage.getItem("Status") === "client-purchases.html"){
                     window.location.href = 'http://localhost:8080/client/html/client-purchases.html?orderID=none';
                 }

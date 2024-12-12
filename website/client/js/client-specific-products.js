@@ -4,14 +4,12 @@ let grandTotal = sessionStorage.getItem("Grandtotal")
     : 0.0;
 
 const urlParams = new URLSearchParams(window.location.search);
-const boothId = urlParams.get('boothID');
-let custID=0;
-if((urlParams.get('id'))==="none"){
+let boothId = 0;
+if((urlParams.get('boothId'))==="none"){
 
-    const localStorageId = localStorage.getItem('id');// user id
-    getCustomerID(localStorageId)
+    const localStorageId = localStorage.getItem('id');// get customer id 
   
-    const hasCart =  getCart(custID); //  result of getCart
+    const hasCart =  getCart(localStorageId); //  result of getCart
   
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
@@ -19,7 +17,12 @@ if((urlParams.get('id'))==="none"){
       window.location.href = 'http://localhost:8080/client/html/client-home.html';
     }
   
+  }else{
+    // boothId = urlParams.get('boothId');
+    boothId = localStorage.getItem('BoothId');
+    alert("boothid = "+ boothId);
   }
+  alert("from specs boothid" + localStorage.getItem('BoothId'));
   
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -93,17 +96,19 @@ function addToCart(quantity, ProductID, Price) {
 
     if (localStorage.getItem("OrderID")) { // there is an existing order
         const orderId = parseInt(localStorage.getItem("OrderID"), 10);
+        alert("add to order, ordeid : " + orderId);
         addToOrder(orderId, cart);
     } else { // wala pang order
-        const cid = localStorage.getItem('id');// get user id
-        createOrder(boothId, cart, grandTotal,getCustomerID(cid));
+        const cid = localStorage.getItem('id');// get customer id
+        alert("user id is 000: "+ localStorage.getItem('id'));
+        alert("user id is 123: "+ cid);
+        createOrder(localStorage.getItem('BoothId'), cart, grandTotal,cid);
     }
 
 }
 
 function checkout() {
     alert("Checking out products");
-    const cartJSON = JSON.stringify(cart);
     window.location.href = `client-purchases.html?orderID=${sessionStorage.getItem("OrderID")}`;// NEED TO FIND LIKE A SET OF VALUE GANUN
 }
 
@@ -128,6 +133,8 @@ function getSpecificProduct(productId) {
 }
 
 function createOrder(boothID, data, totalPrice,customerID) {
+
+    console.log(customerID);
     const formattedProducts = data.map(entry => {
         const [productID, quantity, totalPricePerProduct] = entry.split(',');
         return {
@@ -249,6 +256,7 @@ function getCustomerID(id){
         */
         if (data.length > 0) {
           custID = data[0]['Customer ID'];
+          alert("SUCCESS"+ custID)
           console.log("Customer ID:", custID);
           return data[0]['Customer ID'];
         } else {
@@ -340,6 +348,8 @@ function getCustomerID(id){
   
             const orderId = data[0]['Order ID'];
             localStorage.setItem("OrderId",orderId);
+
+            localStorage.setItem('BoothId',data[0]['Booth ID']);
       }
     })
     .catch(error => {

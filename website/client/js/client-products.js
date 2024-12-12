@@ -1,21 +1,26 @@
 const urlParams = new URLSearchParams(window.location.search);
-let boothId = urlParams.get('id'); 
-let custID=0;
+let boothId = 0;
 if((urlParams.get('id'))==="none"){
 
-  const localStorageId = localStorage.getItem('id');// user id
-  getCustomerID(localStorageId)
-
-  const hasCart =  getCart(custID); //  result of getCart
-
-  if(hasCart){// a pedning order exists
-    console.log("customer has existing cart")
+    const localStorageId = localStorage.getItem('id');// get customer id 
+  
+    const hasCart =  getCart(localStorageId); //  result of getCart
+  
+    if(hasCart){// a pedning order exists
+      console.log("customer has existing cart")
+    }else{
+      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+    }
+  
   }else{
-    window.location.href = 'http://localhost:8080/client/html/client-home.html';
+    boothId = urlParams.get('id');
+    alert("from products bothid: "+boothId);
+    localStorage.setItem('BoothId',boothId);
+    alert("from products bothid storage: "+localStorage.getItem('BoothId'));
+
   }
 
-}
-
+  
 
 
     // Function to dynamically set the "My Purchases" URL
@@ -150,51 +155,6 @@ function cancelOrder(orderId) {
   });
 }
 
-function getCustomerID(id){
-  fetch(`http://localhost:3000/orders/getCustomerID/${id}`, { // URL for Cancel order
-    method: 'GET', 
-    headers: {
-        'Content-Type': 'application/json', 
-    },
-    body: JSON.stringify({ status: 'cancelled' }), 
-  })
-  .then(response => {
-      if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-  })
-  .then(data => {
-      // add handling of data 
-      if (data.error) {
-        // Handle the error message if the response contains an error
-        console.error("Error:", data.error);
-        return null;
-    } else {
-      /*
-      date output:
-      [
-        {
-            "Customer ID": 12345
-        }
-      ]
-      */
-      if (data.length > 0) {
-        custID = data[0]['Customer ID'];
-        console.log("Customer ID:", custID);
-      } else {
-        console.log("No customer found.");
-      }
-
-     
-    }
-  })
-  .catch(error => {
-      console.error("Error cancelling order:", error);
-  });
-
-}
-
 function getCart(customerId){
   let cid = parseInt(customerId);
   fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
@@ -265,8 +225,10 @@ function getCart(customerId){
            });
       */
            
-          const boothIdData = data[0]['Booth ID'];
           
+          localStorage.setItem('BoothId',data[0]['Booth ID']);
+
+          const boothIdData = data[0]['Booth ID'];
           boothId =boothIdData;
 
           const orderId = data[0]['Order ID'];
