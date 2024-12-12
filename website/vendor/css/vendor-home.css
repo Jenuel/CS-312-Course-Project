@@ -36,6 +36,8 @@ body {
   display: block;
 }
 
+
+
 /* Main Booth Container */
 .booth-container {
   padding: 2rem;
@@ -53,6 +55,7 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
+  justify-items: center;
   justify-content: flex-start;
   gap: 2rem;
   flex-wrap: wrap;
@@ -67,6 +70,34 @@ body {
 .filters-container .btn-dark i {
   font-size: 1.2rem;
 }
+
+.first-container {
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    /* justify-items: center; */
+    justify-content: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+    flex: 0.3;
+}
+
+/* .searchbox-wrap {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    width: 100%;
+    gap: 0.5rem; 
+  } */
+  
+  .search {
+    flex: 2;
+    flex-grow: 1;
+  }
+  
+  .searchBtn {
+    flex-shrink: 0;
+  }
 
 /* Dropdown Buttons */
 .filters-container .dropdown {
