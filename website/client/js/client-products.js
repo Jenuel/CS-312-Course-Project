@@ -270,7 +270,7 @@ function getCart(customerId){
           boothId =boothIdData;
 
           const orderId = data[0]['Order ID'];
-          localStorage.setItem("OrderID",orderId);
+          localStorage.setItem("OrderId",orderId);
     }
   })
   .catch(error => {
