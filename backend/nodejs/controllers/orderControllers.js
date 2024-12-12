@@ -102,10 +102,7 @@ const createOrder = async (request, response) => {
         }
             */
 
-        const { orderQuery } = await db.query(`
-            INSERT INTO \`order\` 
-            (\`OrderID\`, \`BoothID\`, \`Status\`, \`DateOrdered\`, \`DatePaid\`, \`Price\`, \`customerID\`) 
-            VALUES (NULL, ?, "Pending", ?, NULL, ?,?)`,
+        const { orderQuery } = await db.query("INSERT INTO `order` (`OrderID`, `BoothID`, `Status`, `DateOrdered`, `DatePaid`, `Price`, `customerID`) VALUES (NULL, ?, 'Pending',?, NULL, ?, ?)",
             [boothId, date, totalPrice,customerId]);
         
 
@@ -117,8 +114,8 @@ const createOrder = async (request, response) => {
             const { productId, quantity, totalPricePerProduct } = fields; // Destructure fields
 
             // Execute the query for each product update
-            const [insertResult] = await db.query('INSERT INTO `order_products` (`ProductID`, ' + 
-                ' `OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
+            const [insertResult] = await db.query(
+                'INSERT INTO `order_products` (`ProductID`,`OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
                 [productId, latestOrderID,quantity, totalPricePerProduct]);
 
             if (insertResult.affectedRows === 0) {
@@ -160,8 +157,8 @@ const addToOrder = async (request, response) => {
             return response.status(400).send('Invalid totalPrice');
         }
 
-        const [insertResult] = await db.query('INSERT INTO `order_products` (`ProductID`, ' + 
-            ' `OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
+        const [insertResult] = await db.query(
+            'INSERT INTO `order_products` (`ProductID`,`OrderID`, `Quantity`, `Total`) VALUES (?, ?, ?, ?)',
             [productId, orderId,quantity, totalPricePerProduct]);
 
         // Additional processing for totalPrice if needed

@@ -61,6 +61,9 @@ function displayProducts(products) {
     });
   }
   
+  function cancelOrders(){
+    cancelOrder(orderID);
+  }
   
 
 /* ----------------------------------------------------------------------------------------------------- */
@@ -112,6 +115,30 @@ function fetchProducts(boothId,type, order ) {
     .catch(error => {
         console.error("Error purchasing product:", error);
     });
+}
+
+
+function cancelOrder(orderId) {
+  fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+      method: 'PATCH', 
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify({ status: 'cancelled' }), 
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      // data is a json massgae no parsing needed
+      console.log("Order cancelled successfully:", data);
+  })
+  .catch(error => {
+      console.error("Error cancelling order:", error);
+  });
 }
 
 //END FOR FETCH FUNCTIONS
