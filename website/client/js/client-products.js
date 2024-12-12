@@ -164,7 +164,8 @@ function getCart(customerId){
             "Quantity": 2,
             "Total price per product": 30.00,
             "Product Name": "Product A",
-            "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)"
+            "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)",
+            "Product price": 69.0
         },
         {
             "Booth ID": 2,
@@ -174,7 +175,8 @@ function getCart(customerId){
             "Quantity": 3,
             "Total price per product": 60.00,
             "Product Name": "Product B",
-            "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)"
+            "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)",
+            "Product price": 69.0
         }
       ]
 
@@ -188,6 +190,7 @@ function getCart(customerId){
            const totals = [];
            const name = [];
            const image = [];
+           const price = [];
  
            // Loop through the response data and extract the required values
            data.forEach(product => {
@@ -196,6 +199,7 @@ function getCart(customerId){
                totals.push(product['Total price per product']);
                name.push(product['Product Name']);
                image.push(product['Product Image']);
+               price.push(product['Product price']);
            });
  
     }
