@@ -1,115 +1,234 @@
-body{
-    margin: 0;
-    text-align: center;
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: #f8f9fa;
 }
-
-
-/**GENERAL*/
-
-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/**BOOTH CONTAINERS AND BOOTH CONTAINER ITEMS*/
 
 .content-wrapper {
-    width: 100%;
-    height: calc(100vh - 100px); 
-    position: relative;
+  width: 100%;
+  min-height: calc(100vh - 56px);
+  position: relative;
 }
 
 #page-frame {
-    width: 100%;
-    height: 100%;
-    border: none;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 .page-content {
-    display: none;
-    width: 100%;
-    height: 100%;
+  display: none;
+  width: 100%;
+  height: 100%;
 }
 
 .page-content.active {
-    display: block;
+  display: block;
 }
 
-
-.booth-container{
-    display: flex;
-    flex-wrap: wrap;
-    margin: 30px;
-    justify-content: center; 
-    align-items: center; 
+/* Main Booth Container */
+.booth-container {
+  padding: 2rem;
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
 }
 
+/* Filters Section */
 .filters-container {
-    display: flex; 
-    justify-content: flex-end; 
-    gap: 20px; 
-    align-items: center; 
-    width: 100%;
+  background-color: white;
+  padding: 2rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: 9px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
+/* Add New Booth Button */
+.filters-container .btn-dark {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+.filters-container .btn-dark i {
+  font-size: 1.2rem;
+}
+
+/* Dropdown Buttons */
+.filters-container .dropdown {
+  min-width: 150px;
+}
+
+.filters-container .btn-outline-secondary {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Grid Layout for Booths */
 .box {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between; 
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+  gap: 2rem;
+  padding: 0 1rem;
 }
 
-.box > * {
-    flex: 1 1 calc(33.33% - 20px); 
-    box-sizing: border-box;
-    /* border: 2px solid black;  */
-    padding: 10px; 
-    border-radius: 5px; 
+/* Card Styles */
+.booth-card {
+  height: 500px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: white;
 }
 
+.booth-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.booth-image {
+  height: 250px !important;
+  width: 100%;
+  object-fit: cover;
+  border-top-left-radius: calc(0.375rem - 1px);
+  border-top-right-radius: calc(0.375rem - 1px);
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem !important;
+}
+
+.description-container {
+  flex-grow: 1;
+  margin-bottom: 1rem;
+}
+
+.booth-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #6c757d;
+}
+
+.booth-location,
+.booth-schedule {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.card-footer {
+  background-color: transparent;
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 1rem 1.5rem !important;
+}
+
+.booth-buttons {
+  gap: 0.5rem;
+}
+
+.booth-buttons .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Modal Styles */
 .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.778);
-    z-index: 1040;
-    display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+  display: none;
 }
 
 .modal-backdrop.show {
-    display: block;
+  display: block;
 }
-
 
 body.modal-open {
-    overflow: hidden;
+  overflow: hidden;
 }
+
+/* Create/Edit Booth Forms */
 .create-booth,
 .edit-booth {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    z-index: 1050;
-    max-height: 90vh;
-    overflow-y: auto;
-    width: 90%;
-    max-width: 600px;
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  z-index: 1050;
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-
-
-/**JAVASCRIPT RELATED CLASSES*/
-
-.open-createBooth  ,
+.open-createBooth,
 .open-editBooth {
-    display: block !important;
-    border-radius: 2px;
+  display: block !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+  .booth-container {
+    padding: 1.5rem;
+  }
+
+  .box {
+    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .booth-container {
+    padding: 1rem;
+  }
+
+  .filters-container {
+    padding: 1rem;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .filters-container > div {
+    width: 100%;
+  }
+
+  .box {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .booth-card {
+    height: auto !important;
+    min-height: 450px;
+  }
 }
