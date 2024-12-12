@@ -1,5 +1,7 @@
 let cart = []; 
 let grandTotal= 0.0;
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get('id');
 
 function displaySpecficProduct(product) {
     const container = document.querySelector(".container px-4 px-lg-5 my-5");
@@ -115,4 +117,4 @@ function base64ToImage(base64, mimeType = 'image/png') {
 }
 
 
-displayBooths();
+getSpecificProduct(productId);
