@@ -120,7 +120,6 @@ function createOrder(boothID, data, totalPrice,customerID) {
             productID: parseInt(productID, 10),
             quantity: parseInt(quantity, 10),
             totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
-            customerId:customerID,
         };
     });
 
@@ -134,7 +133,7 @@ function createOrder(boothID, data, totalPrice,customerID) {
         products: formattedProducts,
         totalPrice: formattedTotalPrice, // Send as a number, not a string
         date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        customerId: customerID,
+        customerId:parseInt(customerID, 10),
     };
 
     fetch(`http://localhost:3000/orders/create/${boothID}`, {
