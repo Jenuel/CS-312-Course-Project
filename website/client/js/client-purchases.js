@@ -70,7 +70,6 @@ function createOrder(boothID, Data, totalPriceInput) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
         .then(response => {
             if (!response.ok) {
