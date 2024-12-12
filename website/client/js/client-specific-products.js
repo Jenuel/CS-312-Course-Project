@@ -5,6 +5,22 @@ let grandTotal = sessionStorage.getItem("Grandtotal")
 
 const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('boothID');
+let custID=0;
+if((urlParams.get('id'))==="none"){
+
+    const localStorageId = localStorage.getItem('id');// user id
+    getCustomerID(localStorageId)
+  
+    const hasCart =  getCart(custID); //  result of getCart
+  
+    if(hasCart){// a pedning order exists
+      console.log("customer has existing cart")
+    }else{
+      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+    }
+  
+  }
+  
 
 document.addEventListener("DOMContentLoaded", () => {
     const backToProductsButton = document.getElementById('backToProducts');
@@ -74,7 +90,7 @@ function addToCart(quantity, ProductID, Price) {
     grandTotal += totalPrice;
     sessionStorage.setItem("Grandtotal", grandTotal.toFixed(2));
 
-    if (sessionStorage.getItem("OrderID")) { // there is an existing order
+    if (localStorage.getItem("OrderID")) { // there is an existing order
         const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
         addToOrder(orderId, cart);
     } else { // wala pang order

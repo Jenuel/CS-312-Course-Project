@@ -51,7 +51,7 @@ function handleLogin(event) {
                 if(localStorage.getItem("Status") === "client-product.html"){
                     window.location.href = 'client-products.html?id=none';
                 }else{
-                    window.location.href = ''; //redirect to customer side
+                    window.location.href = 'http://localhost:8080/client/html/client-home.html'; //redirect to customer side
                 }
                 
                 

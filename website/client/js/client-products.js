@@ -1,9 +1,19 @@
 const urlParams = new URLSearchParams(window.location.search);
 let boothId = urlParams.get('id'); 
 let custID=0;
-if(!(urlParams.get('id'))){
-  getCustomerID(localStorage.getItem('id'))
-  getCart(custID);
+if((urlParams.get('id'))==="none"){
+
+  const localStorageId = localStorage.getItem('id');// user id
+  getCustomerID(localStorageId)
+
+  const hasCart =  getCart(custID); //  result of getCart
+
+  if(hasCart){// a pedning order exists
+    console.log("customer has existing cart")
+  }else{
+    window.location.href = 'http://localhost:8080/client/html/client-home.html';
+  }
+
 }
 
 
@@ -159,6 +169,7 @@ function getCustomerID(id){
       if (data.error) {
         // Handle the error message if the response contains an error
         console.error("Error:", data.error);
+        return null;
     } else {
       /*
       date output:
@@ -185,7 +196,8 @@ function getCustomerID(id){
 }
 
 function getCart(customerId){
-  fetch(`http://localhost:3000/orders/checkPendingOrder/${customerId}`, { // URL for Cancel order
+  let cid = parseInt(customerId);
+  fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
     method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 
@@ -254,8 +266,11 @@ function getCart(customerId){
       */
            
           const boothIdData = data[0]['Booth ID'];
+          
           boothId =boothIdData;
- 
+
+          const orderId = data[0]['Order ID'];
+          localStorage.setItem("OrderID",orderId);
     }
   })
   .catch(error => {
