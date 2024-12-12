@@ -7,6 +7,13 @@ const addProductBtn = document.querySelector(".indicator-right-panel button");
 const searchBox = document.querySelector(".searchbox");
 let products = [];
 
+const eventListeners = {
+  addProduct: false,
+  search: false,
+  navLinks: false,
+  back: false,
+};
+
 function getSessionId() {
   return document.cookie
     .split(";")
@@ -14,91 +21,51 @@ function getSessionId() {
     ?.split("=")[1];
 }
 
-function getMockProducts() {
-  return [
-    {
-      ProductID: 1,
-      ProductName: "Sample Product 1",
-      ProductStatus: "Live",
-      ProductPrice: 59.9,
-      ProductStock: 100,
-      ProductSales: "10",
-      ProductImage: null,
-      ProductDescription: "Sample description 1",
-    },
-    {
-      ProductID: 2,
-      ProductName: "Sample Product 2",
-      ProductStatus: "Pending",
-      ProductPrice: 29.9,
-      ProductStock: 50,
-      ProductSales: "5",
-      ProductImage: null,
-      ProductDescription: "Sample description 2",
-    },
-  ];
-}
-
 // Modify fetchBoothProducts to use mock data when API is unavailable
 async function fetchBoothProducts() {
   showLoading();
   try {
-      // Note the updated endpoint to match your productRoutes.js
-      const response = await fetch(`${API_BASE_URL}/booth/${boothId}`, {
-          method: 'GET',
-          credentials: 'include', // Important for cookies
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${getSessionId()}`
-          }
-      });
+    // Note the updated endpoint to match your productRoutes.js
+    const response = await fetch(`${API_BASE_URL}/booth/${boothId}`, {
+      method: "GET",
+      credentials: "include", // Important for cookies
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getSessionId()}`,
+      },
+    });
 
-      let data;
-      if (!response.ok) {
-          console.log("API unavailable, using mock data");
-          data = getMockProducts();
-      } else {
-          data = await response.json();
-      }
+    let data;
+    if (!response.ok) {
+      console.log("API unavailable, using mock data");
+      data = getMockProducts();
+    } else {
+      data = await response.json();
+    }
 
     console.log("Raw API response:", data);
 
     products = Array.isArray(data)
       ? data.map((product) => {
           return {
-            ProductID: product.ProductID || product.id,
-            ProductName: product.Name || product.name,
+            ProductID: product.ProductID,
+            ProductName: product.Name,
             ProductStatus: product.Status === "active" ? "Live" : "Pending",
-            ProductPrice: Number(product.Price) || Number(product.price) || 0,
-            ProductStock:
-              Number(product.StocksRemaining) || Number(product.Stocks) || 0,
-            ProductImage: product.Image
-              ? `data:image/png;base64,${product.Image}`
-              : null,
-            ProductDescription:
-              product.Description || product.description || "",
+            ProductPrice: Number(product.Price) || 0,
+            ProductStock: Number(product.Stocks) || 0,
+            ProductImage: ImageHandler.processFromAPI(product.Image),
           };
         })
       : [];
 
-      filterProducts(getCurrentFilter());
+    filterProducts(getCurrentFilter());
   } catch (error) {
-      console.log("Error fetching products:", error);
-      products = getMockProducts();
-      filterProducts(getCurrentFilter());
+    console.log("Error fetching products:", error);
+    products = getMockProducts();
+    filterProducts(getCurrentFilter());
   } finally {
-      tableBody.classList.remove("loading");
+    tableBody.classList.remove("loading");
   }
-}
-
-function showLoading() {
-  tableBody.innerHTML = `
-      <div class="text-center p-4">
-          <div class="spinner-border" role="status">
-              <span class="visually-hidden">Loading...</span>
-          </div>
-      </div>
-  `;
 }
 
 async function createProduct(formData) {
@@ -113,7 +80,9 @@ async function createProduct(formData) {
       price: parseFloat(formData.ProductPrice) || 0,
       name: formData.ProductName,
       status: "inactive",
-      image: cleanImageData(formData.ProductImage),
+      image: formData.ProductImage
+        ? formData.ProductImage.split("base64,")[1]?.replace(/[\n\r\s]/g, "")
+        : null,
     };
 
     const response = await fetch(`${API_BASE_URL}/create`, {
@@ -131,86 +100,12 @@ async function createProduct(formData) {
 
     const result = await response.json();
     // Refresh products list after creation
-    await fetchBoothProducts(formData.boothID);
+    await fetchBoothProducts();
   } catch (error) {
     console.error("Failed to create product:", error);
     alert("Failed to create product. Please try again.");
   }
 }
-
-function cleanImageData(data) {
-  if (!data) return null;
-  const imageData = data.ProductImage || data;
-  if (!imageData) return null;
-
-
-  return imageData.includes("base64") ? imageData.split(",")[1] : imageData;
-}
-
-
-async function updateProduct(updatedData, productContainer) {
-  try {
-    console.log("in update Product: " + updatedData.ProductID);
-    const productId = updatedData.ProductID;
-    console.log(productId);
-    if (!productId) {
-      throw new Error("Product ID not found");
-    }
-
-    const product = [];
-    
-    if (updatedData.ProductName) {
-      product.push({ name: updatedData.ProductName });
-    }
-    
-    if (updatedData.ProductPrice) {
-      product.push({ price: parseFloat(updatedData.ProductPrice) });
-    }
-    
-    if (updatedData.ProductStatus) {
-      product.push({ status: updatedData.ProductStatus.toLowerCase() === 'live' ? 'active' : 'inactive' });
-    }
-    
-    if (updatedData.ProductStock) {
-      product.push({ StocksRemaining: parseInt(updatedData.ProductStock) });
-    }
-    
-    if (updatedData.ProductImage) {
-      const imageData = updatedData.ProductImage.includes('base64,') 
-        ? updatedData.ProductImage.split('base64,')[1] 
-        : updatedData.ProductImage;
-      product.push({ Image: imageData });
-    }
-
-    const response = await fetch(`${API_BASE_URL}/edit/${productId}`, {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getSessionId()}`
-      },
-      body: JSON.stringify({ product })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorData}`);
-    }
-
-    const result = await response.json();
-    console.log("Update successful:", result);
-    
-    // Refresh the products list to show updated data
-    await fetchBoothProducts();
-    
-  } catch (error) {
-    console.error("Failed to update product:", error);
-    alert("Failed to update product. Please try again.");
-    throw error;
-  }
-}
-
-//end of fetch funtions
 
 
 function editProductData(data, productContainer) {
@@ -292,18 +187,7 @@ function editProductData(data, productContainer) {
   const imageInput = modalElement.querySelector("#product-image");
   const imagePreview = modalElement.querySelector("#image-preview");
 
-  imageInput.addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        imagePreview.src = event.target.result;
-        imagePreview.classList.remove("d-none");
-        imagePreview.classList.add("d-block");
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+  setupImageUpload(imageInput, imagePreview);
 
   console.log("Product ID: " + data.ProductID);
   const updateBtn = modalElement.querySelector(".update-button");
@@ -316,7 +200,7 @@ function editProductData(data, productContainer) {
       ProductStock: modalElement.querySelector("#stock").value || null,
       ProductImage: imagePreview.classList.contains("d-none")
         ? null
-        : imagePreview.src,
+        : ImageHandler.prepareForUpload(imagePreview.src),
     };
     console.log(updatedData);
     updateProduct(updatedData, productContainer);
@@ -332,83 +216,124 @@ function editProductData(data, productContainer) {
   });
 }
 
+async function deleteProduct(productId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/delete/${productId}`, {
+      method: "DELETE",
+      credentials: "include", // Important for cookies
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getSessionId()}`,
+      },
+    });
+    const data = await response.json();
 
-function showImageModal(imageUrl) {
-  const modalHtml = `
-      <div class="modal fade" id="imageModal" tabindex="-1">
-          <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body text-center">
-                      <img src="${imageUrl}" class="img-fluid" alt="Product Image">
-                  </div>
-              </div>
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to delete product");
+    }
+
+    await fetchBoothProducts();
+
+    alert("Product deleted successfully");
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    alert(error.message || "Failed to delete product. Please try again.");
+  }
+}
+
+async function updateProduct(updatedData, productContainer) {
+  try {
+    console.log("in update Product: " + updatedData.ProductID);
+    const productId = updatedData.ProductID;
+    console.log(productId);
+    if (!productId) {
+      throw new Error("Product ID not found");
+    }
+
+    const product = [];
+
+    if (updatedData.ProductName) {
+      product.push({ name: updatedData.ProductName });
+    }
+
+    if (updatedData.ProductPrice) {
+      product.push({ price: parseFloat(updatedData.ProductPrice) });
+    }
+
+    if (updatedData.ProductStatus) {
+      product.push({
+        status:
+          updatedData.ProductStatus.toLowerCase() === "live"
+            ? "active"
+            : "inactive",
+      });
+    }
+
+    if (updatedData.ProductStock) {
+      product.push({ StocksRemaining: parseInt(updatedData.ProductStock) });
+    }
+
+    if (updatedData.ProductImage) {
+      let imageData = updatedData.ProductImage;
+
+      if (imageData.startsWith("data:image")) {
+        imageData = imageData.split("base64,")[1];
+      }
+
+      if (imageData) {
+        product.push({ Image: imageData });
+      }
+    }
+
+    const response = await fetch(`${API_BASE_URL}/edit/${productId}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getSessionId()}`,
+      },
+      body: JSON.stringify({ product }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(
+        `HTTP error! status: ${response.status}, message: ${errorData}`
+      );
+    }
+
+    const result = await response.json();
+    console.log("Update successful:", result);
+
+    // Refresh the products list to show updated data
+    await fetchBoothProducts();
+  } catch (error) {
+    console.error("Failed to update product:", error);
+    alert("Failed to update product. Please try again.");
+    throw error;
+  }
+}
+
+
+
+
+
+
+// UTILITIES
+
+
+
+
+function showLoading() {
+  tableBody.innerHTML = `
+      <div class="text-center p-4">
+          <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
           </div>
       </div>
   `;
-
-  document.body.insertAdjacentHTML("beforeend", modalHtml);
-  const modalElement = document.getElementById("imageModal");
-  const modal = new bootstrap.Modal(modalElement);
-
-  modal.show();
-  modalElement.addEventListener("hidden.bs.modal", () => {
-    modalElement.remove();
-  });
 }
 
-const eventListeners = {
-  addProduct: false,
-  search: false,
-  navLinks: false,
-  back: false,
-};
-
-function setupEventListeners() {
-  const addProductBtn = document.querySelector(".indicator-right-panel button");
-  if (addProductBtn && !eventListeners.addProduct) {
-    console.log("Setting up Add Product button listener - first time only");
-    const newBtn = addProductBtn.cloneNode(true);
-    addProductBtn.parentNode.replaceChild(newBtn, addProductBtn);
-    newBtn.addEventListener("click", () => showAddProductFormData());
-    eventListeners.addProduct = true;
-  }
-
-  const searchBox = document.querySelector(".searchbox");
-  if (searchBox && !eventListeners.search) {
-    const newSearchBox = searchBox.cloneNode(true);
-    searchBox.parentNode.replaceChild(newSearchBox, searchBox);
-    newSearchBox.addEventListener("input", (e) => {
-      searchProducts(e.target.value);
-    });
-    eventListeners.search = true;
-  }
-
-  const navLinks = document.querySelectorAll(".nav-links .nav-link");
-  if (navLinks && !eventListeners.navLinks) {
-    navLinks.forEach((link) => {
-      const newLink = link.cloneNode(true);
-      link.parentNode.replaceChild(newLink, link);
-      newLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        navLinks.forEach((l) => l.classList.remove("active"));
-        newLink.classList.add("active");
-        filterProducts(newLink.textContent);
-      });
-    });
-    eventListeners.navLinks = true;
-  }
-
-  const backButton = document.querySelector(".arrow-back-btn");
-  if (backButton && !eventListeners.back) {
-    const newBackBtn = backButton.cloneNode(true);
-    backButton.parentNode.replaceChild(newBackBtn, backButton);
-    newBackBtn.addEventListener("click", goBack);
-    eventListeners.back = true;
-  }
-}
 
 function showAddProductFormData(existingData, productContainer) {
   console.log("Add Button Triggered");
@@ -492,69 +417,43 @@ function showAddProductFormData(existingData, productContainer) {
   const imageInput = modalElement.querySelector("#product-image");
   const imagePreview = modalElement.querySelector("#image-preview");
 
-  imageInput.addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        imagePreview.src = event.target.result;
-        imagePreview.classList.remove("d-none");
-        imagePreview.classList.add("d-block");
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+  setupImageUpload(imageInput, imagePreview);
 
   // magsubmit
   const submitBtn = modalElement.querySelector(".submit-button");
-  submitBtn.addEventListener("click", () => {
-    const formData = {
-      ProductName: modalElement.querySelector("#product-name").value,
-      ProductStatus: existingData
-        ? modalElement.querySelector("#status").value
-        : "Pending", // Default to Pending for new products
-      ProductDescription: modalElement.querySelector("#description").value,
-      ProductPrice: modalElement.querySelector("#price").value,
-      ProductStock: modalElement.querySelector("#stock").value || null,
-      ProductSales: existingData ? existingData.ProductSales : null,
-      ProductImage: imagePreview.classList.contains("d-none")
-        ? null
-        : imagePreview.src,
-    }
-});
   let submitHandled = false;
-  
+
   submitBtn.addEventListener("click", async () => {
     console.log("submit initialized");
     if (submitHandled) return;
     submitHandled = true;
     submitBtn.disabled = true;
-    
-    try {
-        const formData = {
-          boothID: parseInt(sessionStorage.getItem("currentBoothId")),
-          ProductName: modalElement.querySelector("#product-name").value,
-          ProductStatus: existingData
-            ? modalElement.querySelector("#status").value
-            : "Pending",
-          ProductPrice: modalElement.querySelector("#price").value,
-          ProductStock: modalElement.querySelector("#stock").value || null,
-          ProductImage: imagePreview.classList.contains("d-none")
-            ? null
-            : imagePreview.src,
-        };
-        if (existingData && productContainer) {
-        } else {
-          await createProduct(formData);
-        }
 
-        modal.hide();
-        modalElement.addEventListener("hidden.bs.modal", () => {
-          modalElement.remove();
+    try {
+      const formData = {
+        boothID: parseInt(sessionStorage.getItem("currentBoothId")),
+        ProductName: modalElement.querySelector("#product-name").value,
+        ProductStatus: existingData
+          ? modalElement.querySelector("#status").value
+          : "Pending",
+        ProductPrice: modalElement.querySelector("#price").value,
+        ProductStock: modalElement.querySelector("#stock").value || null,
+        ProductImage: imagePreview.src
+          ? ImageHandler.prepareForUpload(imagePreview.src)
+          : null,
+      };
+
+      if (existingData && productContainer) {
+      } else {
+        await createProduct(formData);
+      }
+
+      modal.hide();
+      modalElement.addEventListener("hidden.bs.modal", () => {
+        modalElement.remove();
       });
 
-        modal.hide();
-        modalElement.remove();
+      modalElement.remove();
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to save product. Please try again.");
@@ -566,13 +465,156 @@ function showAddProductFormData(existingData, productContainer) {
   modal.show();
 }
 
-function getProductStatus(product) {
-  if (Number(product.ProductStock) === 0) {
-    return "Sold Out";
+//  showProductDetail
+function showProductDetail(dataForm) {
+  const productDetailContainer = document.createElement("div");
+  productDetailContainer.className = "product-detail-container mb-4";
+  productDetailContainer.id = `product-${dataForm.ProductID}`;
+
+  let badgeClass = "bg-warning"; // Default for Pending
+  if (dataForm.ProductStatus === "Live") {
+    badgeClass = "bg-success";
+  } else if (dataForm.ProductStatus === "Sold Out") {
+    badgeClass = "bg-danger";
   }
-  return product.ProductStatus;
+
+  console.log("Received image data:", {
+    hasImage: !!dataForm.ProductImage,
+    imageData: dataForm.ProductImage?.substring(0, 100),
+  });
+  const imageColumn = ImageHandler.createImageElement(
+    dataForm.ProductImage,
+    dataForm.ProductName,
+    "image-container"
+  );
+
+  productDetailContainer.innerHTML = `
+        <div class="row text-center align-items-center">
+            <div class="col"><div>${dataForm.ProductName}</div></div>
+            <div class="col"><span class="badge ${badgeClass}">${dataForm.ProductStatus}</span></div>
+            <div class="col">${dataForm.ProductPrice}</div>
+            <div class="col">${dataForm.ProductStock}</div>
+            <div class="col">${imageColumn}</div>
+            <div class="col"><button type="button" class="p-edit-button"><i class='bx bx-edit'></i></button><button type="button" class="p-delete-button"><i class='bx bx-trash-alt'></i></button>
+            </div>
+        </div>`;
+
+  // Rest of the event remain
+  const thumbnail = productDetailContainer.querySelector(".product-thumbnail");
+  if (thumbnail) {
+    thumbnail.addEventListener("click", () =>
+      showImageModal(dataForm.ProductImage)
+    );
+  }
+
+  const editBtn = productDetailContainer.querySelector(".p-edit-button");
+  editBtn.addEventListener("click", () =>
+    editProductData(dataForm, productDetailContainer)
+  );
+
+  const deleteBtn = productDetailContainer.querySelector(".p-delete-button");
+  deleteBtn.addEventListener("click", async () => {
+    if (confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(dataForm.ProductID);
+        await fetchBoothProducts();
+      } catch (error) {
+        console.error("Error deleting product:", error);
+      }
+    }
+  });
+
+  tableBody.appendChild(productDetailContainer);
 }
 
+
+
+function setupEventListeners() {
+  const addProductBtn = document.querySelector(".indicator-right-panel button");
+  if (addProductBtn && !eventListeners.addProduct) {
+    console.log("Setting up Add Product button listener - first time only");
+    const newBtn = addProductBtn.cloneNode(true);
+    addProductBtn.parentNode.replaceChild(newBtn, addProductBtn);
+    newBtn.addEventListener("click", () => showAddProductFormData());
+    eventListeners.addProduct = true;
+  }
+
+  const searchBox = document.querySelector(".searchbox");
+  if (searchBox && !eventListeners.search) {
+    const newSearchBox = searchBox.cloneNode(true);
+    searchBox.parentNode.replaceChild(newSearchBox, searchBox);
+    newSearchBox.addEventListener("input", (e) => {
+      searchProducts(e.target.value);
+    });
+    eventListeners.search = true;
+  }
+
+  const navLinks = document.querySelectorAll(".nav-links .nav-link");
+  if (navLinks && !eventListeners.navLinks) {
+    navLinks.forEach((link) => {
+      const newLink = link.cloneNode(true);
+      link.parentNode.replaceChild(newLink, link);
+      newLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        navLinks.forEach((l) => l.classList.remove("active"));
+        newLink.classList.add("active");
+        filterProducts(newLink.textContent);
+      });
+    });
+    eventListeners.navLinks = true;
+  }
+
+  const backButton = document.querySelector(".arrow-back-btn");
+  if (backButton && !eventListeners.back) {
+    const newBackBtn = backButton.cloneNode(true);
+    backButton.parentNode.replaceChild(newBackBtn, backButton);
+    newBackBtn.addEventListener("click", goBack);
+    eventListeners.back = true;
+  }
+}
+
+function showImageModal(imageUrl) {
+  const modalHtml = `
+      <div class="modal fade" id="imageModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body text-center">
+                      <img src="${ImageHandler.createImageElement(
+                        imageUrl,
+                        "Product Image",
+                        "modal-image"
+                      )}">
+                  </div>
+              </div>
+          </div>
+      </div>
+  `;
+
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+  const modalElement = document.getElementById("imageModal");
+  const modal = new bootstrap.Modal(modalElement);
+
+  modal.show();
+  modalElement.addEventListener("hidden.bs.modal", () => {
+    modalElement.remove();
+  });
+}
+
+function setupImageUpload(imageInput, imagePreview) {
+  imageInput.addEventListener("change", async (e) => {
+    try {
+      const file = e.target.files[0];
+      await ImageHandler.handleUpload(file, imagePreview);
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
+
+// Add Filtration feature
 function getCurrentFilter() {
   const activeLink = document.querySelector(".nav-links .nav-link.active");
   return activeLink ? activeLink.textContent : "All";
@@ -620,83 +662,18 @@ function searchProducts(searchTerm) {
   updateProductTotal(searchResults.length);
 }
 
+// Add Total products functionality
 function updateProductTotal(count = null) {
   const total = count !== null ? count : products.length;
   productTotal.textContent = total;
 }
-
-//  showProductDetail
-function showProductDetail(dataForm) {
-  const productDetailContainer = document.createElement("div");
-  productDetailContainer.className = "product-detail-container mb-4";
-  productDetailContainer.id = `product-${dataForm.ProductID}`;
-
-  let badgeClass = "bg-warning"; // Default for Pending
-  if (dataForm.ProductStatus === "Live") {
-    badgeClass = "bg-success";
-  } else if (dataForm.ProductStatus === "Sold Out") {
-    badgeClass = "bg-danger";
-  }
-
-  productDetailContainer.innerHTML = `
-        <div class="row text-center align-items-center">
-            <div class="col">
-                <div>${dataForm.ProductName}</div>
-            </div>
-            <div class="col">
-                <span class="badge ${badgeClass}">${
-    dataForm.ProductStatus
-  }</span>
-            </div>
-            <div class="col">${dataForm.ProductPrice}</div>
-            <div class="col">${dataForm.ProductStock}</div>
-            <div class="col">
-                ${
-                  dataForm.ProductImage
-                    ? `<img src="${dataForm.ProductImage}" alt="Product" class="product-thumbnail rounded">`
-                    : "No Image"
-                }
-            </div>
-            <div class="col">
-                <button type="button" class="p-edit-button">
-                    <i class='bx bx-edit'></i>
-                </button>
-                <button type="button" class="p-delete-button">
-                    <i class='bx bx-trash-alt'></i>
-                </button>
-            </div>
-        </div>`;
-
-  // Rest of the event remain
-  const thumbnail = productDetailContainer.querySelector(".product-thumbnail");
-  if (thumbnail) {
-    thumbnail.addEventListener("click", () =>
-      showImageModal(dataForm.ProductImage)
-    );
-  }
-
-  const editBtn = productDetailContainer.querySelector(".p-edit-button");
-  editBtn.addEventListener("click", () =>
-    editProductData(dataForm, productDetailContainer)
-  );
-
-  const deleteBtn = productDetailContainer.querySelector(".p-delete-button");
-  deleteBtn.addEventListener("click", () => {
-    // Remove from products array
-    products = products.filter((p) => p.ProductName !== dataForm.ProductName);
-    productDetailContainer.remove();
-    updateProductTotal();
-  });
-
-  tableBody.appendChild(productDetailContainer);
-}
-
+// Add navigation to homess
 function goBack() {
   window.location.href = "vendor-home.html";
 }
 
+// Initialization of Page
 async function initializePage() {
-  // Check for booth ID
   if (!boothId) {
     alert("No booth selected");
     window.location.href = "vendor-home.html";
@@ -715,8 +692,7 @@ async function initializePage() {
   // Check session
   const sessionId = getSessionId();
   if (!sessionId) {
-    window.location.href =
-      "/CS-312-Course-Project/website/auth/html/login.html";
+    window.location.href = "localhost:8080/auth/html/index.html";
     return;
   }
 
