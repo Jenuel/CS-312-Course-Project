@@ -113,7 +113,6 @@ async function createProduct(formData) {
 }
 
 function editProductData(data, productContainer) {
-  // modal structure for edit
   const modalHtml = `
     <div class="modal fade" id="editProductModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
@@ -128,32 +127,22 @@ function editProductData(data, productContainer) {
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="product-name" class="form-label">Product Name</label>
-                  <input type="text" class="form-control" id="product-name" value="${
-                    data.ProductName || ""
-                  }">
+                  <input type="text" class="form-control" id="product-name" value="${data.ProductName || ""}">
                 </div>
                 <div class="mb-3">
                   <label for="status" class="form-label">Status</label>
                   <select class="form-select" id="status">
-                    <option ${
-                      data.ProductStatus === "Live" ? "selected" : ""
-                    }>Live</option>
-                    <option ${
-                      data.ProductStatus === "Pending" ? "selected" : ""
-                    }>Pending</option>
+                    <option ${data.ProductStatus === "Live" ? "selected" : ""}>Live</option>
+                    <option ${data.ProductStatus === "Pending" ? "selected" : ""}>Pending</option>
                   </select>
                 </div>
                 <div class="mb-3">
                   <label for="stock" class="form-label">Stock</label>
-                  <input type="number" class="form-control" id="stock" value="${
-                    data.ProductStock || ""
-                  }">
+                  <input type="number" class="form-control" id="stock" value="${data.ProductStock || ""}">
                 </div>
                 <div class="mb-3">
                   <label for="price" class="form-label">Price</label>
-                  <input type="number" class="form-control" id="price" value="${
-                    data.ProductPrice || ""
-                  }">
+                  <input type="number" class="form-control" id="price" value="${data.ProductPrice || ""}">
                 </div>
               </div>
               <!-- Right Column -->
@@ -166,6 +155,7 @@ function editProductData(data, productContainer) {
                       ? `<div class="mt-2">
                       <p class="mb-1">Current Image:</p>
                       <img id="image-preview" src="${data.ProductImage}" class="d-block" style="max-width: 100px;">
+                      <input type="hidden" id="original-image" value="${data.ProductImage}">
                     </div>`
                       : '<img id="image-preview" class="d-none" style="max-width: 100px;">'
                   }
@@ -182,18 +172,36 @@ function editProductData(data, productContainer) {
     </div>
   `;
 
+
   document.body.insertAdjacentHTML("beforeend", modalHtml);
 
   const modalElement = document.getElementById("editProductModal");
   const modal = new bootstrap.Modal(modalElement);
-
-  // Image preview functionality
   const imageInput = modalElement.querySelector("#product-image");
   const imagePreview = modalElement.querySelector("#image-preview");
+  const originalImage = modalElement.querySelector("#original-image");
+  let imageChanged = false;
 
-  setupImageUpload(imageInput, imagePreview);
+  // Modified setupImageUpload to track changes
+  imageInput.addEventListener("change", async (e) => {
+    try {
+      const file = e.target.files[0];
+      if (!imageUtils.validateImage(file)) {
+        alert("File must be less than 5MB");
+        return;
+      }
 
-  console.log("Product ID: " + data.ProductID);
+      const base64Data = await imageUtils.readFileAsBase64(file);
+      imagePreview.src = base64Data;
+      imagePreview.classList.remove("d-none");
+      imagePreview.classList.add("d-block");
+      imageChanged = true;
+    } catch (error) {
+      alert("Failed to load image");
+      console.error(error);
+    }
+  });
+
   const updateBtn = modalElement.querySelector(".update-button");
   updateBtn.addEventListener("click", () => {
     const updatedData = {
@@ -202,19 +210,15 @@ function editProductData(data, productContainer) {
       ProductStatus: modalElement.querySelector("#status").value,
       ProductPrice: modalElement.querySelector("#price").value,
       ProductStock: modalElement.querySelector("#stock").value || null,
-      ProductImage: imagePreview.classList.contains("d-none")
-        ? null
-        : imagePreview.src,
+      ProductImage: imageChanged ? imagePreview.src : originalImage?.value || null
     };
-    console.log(updatedData);
-    updateProduct(updatedData, productContainer);
+    
+    updateProduct(updatedData, imageChanged);
     modal.hide();
   });
 
-  // Show modal
   modal.show();
 
-  // Cleanup on hide
   modalElement.addEventListener("hidden.bs.modal", () => {
     modalElement.remove();
   });
@@ -245,7 +249,7 @@ async function deleteProduct(productId) {
   }
 }
 
-async function updateProduct(updatedData) {
+async function updateProduct(updatedData, imageChanged) {
   try {
     const productId = updatedData.ProductID;
     if (!productId) throw new Error("Product ID not found");
@@ -262,10 +266,7 @@ async function updateProduct(updatedData) {
 
     if (updatedData.ProductStatus) {
       product.push({
-        status:
-          updatedData.ProductStatus.toLowerCase() === "live"
-            ? "active"
-            : "inactive",
+        status: updatedData.ProductStatus.toLowerCase() === "live" ? "active" : "inactive"
       });
     }
 
@@ -273,8 +274,7 @@ async function updateProduct(updatedData) {
       product.push({ StocksRemaining: parseInt(updatedData.ProductStock) });
     }
 
-    // Handle image separately - just send the base64 string without prefix
-    if (updatedData.ProductImage) {
+    if (imageChanged && updatedData.ProductImage) {
       const base64Data = updatedData.ProductImage.split("base64,")[1];
       if (base64Data) {
         product.push({ Image: base64Data });
@@ -286,9 +286,9 @@ async function updateProduct(updatedData) {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${getSessionId()}`,
+        Authorization: `Bearer ${getSessionId()}`
       },
-      body: JSON.stringify({ product }),
+      body: JSON.stringify({ product })
     });
 
     const responseData = await response.text();
@@ -307,6 +307,34 @@ async function updateProduct(updatedData) {
 }
 
 // UTILITIES
+
+function setupTabNavigation() {
+  const navLinks = document.querySelectorAll('.nav-link.tab-link');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Remove active class from all tabs
+      navLinks.forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Add active class to clicked tab
+      link.classList.add('active');
+      
+      const tabType = link.getAttribute('data-tab');
+      
+      // Handle tab switching logic
+      if (tabType === 'Orders') {
+        showOrders();
+      } else {
+        showProducts();
+        filterProducts(tabType);
+      }
+    });
+  });
+}
 
 function showLoading() {
   tableBody.innerHTML = `
@@ -726,7 +754,10 @@ async function initializePage() {
   await fetchBoothProducts();
   setupEventListeners();
 }
-document.addEventListener("DOMContentLoaded", initializePage);
+document.addEventListener("DOMContentLoaded", () => {
+  setupTabNavigation()
+  initializePage()
+});
 
 
 

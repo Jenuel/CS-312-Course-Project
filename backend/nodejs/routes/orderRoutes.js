@@ -1,18 +1,16 @@
 import express from "express";
 import {
-  getPendingOrders,
   getCompletedOrders,
-  getAllOrdersByBooth,
   createOrder,
   cancelOrder,
   approveOrder,
   addToOrder,
+  getReservedOrders,
 } from "../controllers/orderControllers.js";
 const router = express.Router();
 
-router.get("/pending/:boothId", getPendingOrders); // vendor *
+router.get("/reserved/:boothId", getReservedOrders); // vendor *
 router.get("/complete/:boothId", getCompletedOrders); // vendor *
-router.get("/complete/:boothId", getAllOrdersByBooth); //client *
 router.post("/create/:boothId", createOrder); // customer *
 router.patch("/cancel/:orderId", cancelOrder); // customer *
 router.patch("/approve/:orderId", approveOrder); // vendor *

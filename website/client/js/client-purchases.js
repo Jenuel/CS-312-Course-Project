@@ -1,16 +1,8 @@
-import { getProducts } from "../../../backend/nodejs/controllers/productControllers";
+
 
 // Retrieve the parameters from the URL
 const urlParams = new URLSearchParams(window.location.search);
-const cartJSON = decodeURIComponent(urlParams.get('cart'));
-const grandTotal = parseFloat(decodeURIComponent(urlParams.get('total')));
-const boothId = urlParams.get('id'); 
-
-const customerID = localStorage.getItem('id');
-document.cookie = "customerID=" + customerID ;
-
-// Parse the cart JSON string back into an array of objects
-const cart = JSON.parse(cartJSON);
+const orderID = decodeURIComponent(urlParams.get('orderID'));
 
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
@@ -119,6 +111,32 @@ function cancelOrder(orderId) {
     });
 }
 
+function removeProductFromDB(orderID){
+    etch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
+        method: 'PATCH', 
+        headers: {
+            'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify({ status: 'cancelled' }), 
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // data is a json massgae no parsing needed
+        console.log("Order cancelled successfully:", data);
+    })
+    .catch(error => {
+        console.error("Error cancelling order:", error);
+    });
+
+}
+
+
+
 //END FOR FETCH FUNCTIONS
 /* ----------------------------------------------------------------------------------------------------- */
 
@@ -208,13 +226,8 @@ function createOrder(boothID, data, totalPrice) {
 }
 
 
-function fetchCartData(boothid) {
-    fetch('http://localhost:3000/complete/${boothid}', {
-        method: 'GET',
-        headers: {
-            "Content-type": 'application/json',
-        },
-    })
+function fetchCartData() {
+    fetch("http://localhost:3000/cart")
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -232,4 +245,4 @@ function fetchCartData(boothid) {
     });
 }
 
-fetchCartData(boothId);
+fetchCartData();

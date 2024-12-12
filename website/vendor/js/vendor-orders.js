@@ -20,8 +20,8 @@ function getBoothIdFromSession() {
 }
 
 // Populate Pending Orders
-function populatePendingOrders(boothID) {
-    fetch(`http://localhost:3000/orders/pending/${boothID}`, {
+function populateReservedOrders(boothID) {
+    fetch(`http://localhost:3000/orders/reserved/${boothID}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
