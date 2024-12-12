@@ -308,6 +308,34 @@ async function updateProduct(updatedData, imageChanged) {
 
 // UTILITIES
 
+function setupTabNavigation() {
+  const navLinks = document.querySelectorAll('.nav-link.tab-link');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Remove active class from all tabs
+      navLinks.forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Add active class to clicked tab
+      link.classList.add('active');
+      
+      const tabType = link.getAttribute('data-tab');
+      
+      // Handle tab switching logic
+      if (tabType === 'Orders') {
+        showOrders();
+      } else {
+        showProducts();
+        filterProducts(tabType);
+      }
+    });
+  });
+}
+
 function showLoading() {
   tableBody.innerHTML = `
       <div class="text-center p-4">
@@ -726,7 +754,10 @@ async function initializePage() {
   await fetchBoothProducts();
   setupEventListeners();
 }
-document.addEventListener("DOMContentLoaded", initializePage);
+document.addEventListener("DOMContentLoaded", () => {
+  setupTabNavigation()
+  initializePage()
+});
 
 
 
