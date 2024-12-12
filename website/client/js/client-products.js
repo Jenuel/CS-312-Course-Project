@@ -259,7 +259,7 @@ function logout() {
       alert("Logout failed. Please try again.");
     });
 
-    localStorage.setItem("Status", "client-product.html")  // adding status
+    localStorage.setItem("Status", "client-product.html");  // adding status
 }
 
 document.addEventListener("DOMContentLoaded", () => {
