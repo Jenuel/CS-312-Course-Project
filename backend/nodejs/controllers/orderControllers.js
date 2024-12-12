@@ -10,17 +10,17 @@ const getReservedOrders = async (request, response) => {
     const{boothId} = request.params;
     try {
         // Validate boothID
-        if (!boothID || isNaN(boothID)) {
+        if (!boothId || isNaN(boothId)) {
             return response.status(400).json({ error: 'Invalid booth ID' });
         }
         
         const [rows] = await db.query(`
             SELECT 
-                o.OrderID AS "order id", 
-                o.Price AS "Total Price", 
+                o.OrderID AS "OrderId", 
+                o.Price AS "TotalPrice", 
                 o.Status AS "Status", 
-                p.Quantity AS "Product Quantity", 
-                c.Name AS "Product Name" 
+                p.Quantity AS "Quantity", 
+                c.Name AS "ProductName" 
             FROM 
                 \`order\` o 
             JOIN 
@@ -53,11 +53,11 @@ const getCompletedOrders = async (request, response) => {
     try {
         const [rows] = await db.query(`
             SELECT 
-                o.OrderID AS "order id", 
-                o.Price AS "Total Price", 
+                o.OrderID AS "OrderId", 
+                o.Price AS "TotalPrice", 
                 o.Status AS "Status", 
-                p.Quantity AS "Product Quantity", 
-                c.Name AS "Product Name" 
+                p.Quantity AS "Quantity", 
+                c.Name AS "ProductName" 
             FROM 
                 \`order\` o 
             JOIN 
@@ -245,6 +245,21 @@ const approveOrder = async (request, response) => {
     const {datePaid}= request.body;
 
     try {
+        // First check if order exists and is not already completed
+        const [orderCheck] = await db.query(
+            'SELECT Status FROM `order` WHERE OrderID = ?',
+            [orderId]
+        );
+
+        if (!orderCheck.length) {
+            return response.status(404).json({ error: 'Order not found' });
+        }
+
+        if (orderCheck[0].Status === 'Complete') {
+            return response.status(400).json({ error: 'Order is already completed' });
+        }
+
+
         const [rows] = await db.query('UPDATE `order` SET `Status` = "Complete", `DatePaid` = ? WHERE `order`.`OrderID` = ?',
             [datePaid, orderId]);
         res.json(rows);
