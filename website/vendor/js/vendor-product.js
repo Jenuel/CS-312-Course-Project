@@ -813,10 +813,10 @@ function populatePendingOrders(boothId) {
                 const row = `
                     <tr>
                         <td>${order.OrderId}</td>
+                        <td>${order.customerID}</td>
                         <td>${order.ProductName}</td>
                         <td>${order.Quantity}</td>
                         <td>₱${order.TotalPrice}</td>
-                        <td>${order.Status}</td>
                         <td><button class="btn btn-sm btn-success" onclick="markAsCompleted('${order.OrderId}')">Complete</button></td>
                     </tr>`;
                 pendingOrdersTable.insertAdjacentHTML("beforeend", row);
@@ -845,11 +845,10 @@ function populateCompletedOrders(boothId) {
         const row = `
             <tr>
                 <td>${order.OrderId}</td>
+                <td>${order.customerID}</td>
                 <td>${order.ProductName}</td>
                 <td>${order.Quantity}</td>
                 <td>₱${order.TotalPrice}</td>
-                <td>${order.Status}</td>
-                <td>Completed</td>
                 // <td><button class="btn btn-sm btn-danger" onclick="removeCompletedOrder('${order.OrderId}')">Remove</button></td>
             </tr>`;
         completedOrdersTable.insertAdjacentHTML("beforeend", row);
