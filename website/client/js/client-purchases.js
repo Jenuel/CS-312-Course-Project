@@ -164,9 +164,6 @@ const getCurrentDateWithMicroseconds = () => {
       
 
 
-
-displayBooths();
-
 function openProfile() {
     const profile = document.getElementById("profile");
     profile.classList.add("open-profile");

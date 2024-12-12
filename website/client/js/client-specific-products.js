@@ -69,19 +69,12 @@ function addToCart(quantity, ProductID, Price) {
     grandTotal += totalPrice;
     sessionStorage.setItem("Grandtotal", grandTotal.toFixed(2));
 
-    if (sessionStorage.getItem("OrderID")) {
-        const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
-        addToOrder(orderId, cart);
-    } else {
-        createOrder(boothId, cart, grandTotal);
-    }
-    console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
-
     if (sessionStorage.getItem("OrderID")) { // there is an existing order
         const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
         addToOrder(orderId, cart);
     } else { // wala pang order
-        createOrder(boothId, cart, grandTotal,customerID);// please assign calue for customerID
+        const cid = localStorage.getItem('id');
+        createOrder(boothId, cart, grandTotal,cid);// please assign calue for customerID
     }
 
 }
@@ -119,19 +112,25 @@ function createOrder(boothID, data, totalPrice,customerID) {
             productID: parseInt(productID, 10),
             quantity: parseInt(quantity, 10),
             totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
-            customerId:customerID,
         };
     });
 
+    console.log("id: " ,boothId);
+    console.log("id: " ,customerID);
+    
+    // Ensure the total price is a float (not a string)
     // Ensure the total price is a float (not a string)
     const formattedTotalPrice = parseFloat(totalPrice); 
+    const id = parseInt(customerID, 10);
 
     const payload = {
         products: formattedProducts,
         totalPrice: formattedTotalPrice, // Send as a number, not a string
         date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        customerId:id,
     };
 
+    console.log("payload: ", payload);
     fetch(`http://localhost:3000/orders/create/${boothID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

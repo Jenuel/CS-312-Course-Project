@@ -318,19 +318,23 @@ function setupTabNavigation() {
       // Remove active class from all tabs
       navLinks.forEach(tab => {
         tab.classList.remove('active');
+        tab.style.color = 'rgb(98, 97, 97)';  
+        tab.style.borderBottom = 'none';       
       });
       
       // Add active class to clicked tab
       link.classList.add('active');
+      link.style.color = '#0d6efd';           
+      link.style.borderBottom = '2px solid #0d6efd';  // Add active border
       
       const tabType = link.getAttribute('data-tab');
       
-      // Handle tab switching logic
-      if (tabType === 'Orders') {
+      if (link.getAttribute('data-section') === 'orders') {
         showOrders();
       } else {
         showProducts();
-        filterProducts(tabType);
+        const filterValue = link.getAttribute('data-filter') || link.textContent;
+        filterProducts(filterValue);
       }
     });
   });
@@ -756,18 +760,26 @@ async function initializePage() {
 }
 document.addEventListener("DOMContentLoaded", () => {
   setupTabNavigation()
+  const activeTab = document.querySelector('.nav-link.tab-link.active');
+  if (activeTab) {
+    activeTab.style.color = '#0d6efd';
+    activeTab.style.borderBottom = '2px solid #0d6efd';
+  }
   initializePage()
 });
 
 
 
 
-// For Orders
+
+
+
+// THE ORDERS TAB
 
 // DOM Elements
 const pendingOrdersTable = document.querySelector("#pendingOrders tbody");
 const completedOrdersTable = document.querySelector("#completedOrders tbody");
-const completedOrders = [];
+
 
 // Helper: Get current date with microseconds
 function getCurrentDateWithMicroseconds() {
@@ -779,15 +791,11 @@ function getCurrentDateWithMicroseconds() {
 
 // Helper: Get booth ID from session
 function getBoothIdFromSession() {
-    return document.cookie
-        .split(";")
-        .find((cookie) => cookie.trim().startsWith("PHPSESSID="))
-        ?.split("=")[1];
+  return sessionStorage.getItem("currentBoothId");
 }
-
 // Populate Pending Orders
-function populatePendingOrders(boothID) {
-    fetch(`http://localhost:3000/orders/pending/${boothID}`, {
+function populatePendingOrders(boothId) {
+    fetch(`http://localhost:3000/orders/reserved/${boothId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
@@ -804,12 +812,12 @@ function populatePendingOrders(boothID) {
             orders.forEach((order) => {
                 const row = `
                     <tr>
-                        <td>${order.orderId}</td>
-                        <td>${order.customerName}</td>
-                        <td>${order.productName}</td>
-                        <td>${order.quantity}</td>
-                        <td>₱${order.total}</td>
-                        <td><button class="btn btn-sm btn-success" onclick="markAsCompleted('${order.orderId}')">Complete</button></td>
+                        <td>${order.OrderId}</td>
+                        <td>${order.ProductName}</td>
+                        <td>${order.Quantity}</td>
+                        <td>₱${order.TotalPrice}</td>
+                        <td>${order.Status}</td>
+                        <td><button class="btn btn-sm btn-success" onclick="markAsCompleted('${order.OrderId}')">Complete</button></td>
                     </tr>`;
                 pendingOrdersTable.insertAdjacentHTML("beforeend", row);
             });
@@ -818,31 +826,42 @@ function populatePendingOrders(boothID) {
 }
 
 // Populate Completed Orders
-function populateCompletedOrders() {
+function populateCompletedOrders(boothId) {
+  fetch(`http://localhost:3000/orders/complete/${boothId}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+})
+    .then((response) => {
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.json();
+    })
+    .then((orders) => {
     completedOrdersTable.innerHTML = ""; // Clear existing rows
     if (completedOrders.length === 0) {
         completedOrdersTable.innerHTML = "<tr><td colspan='6'>No completed orders yet.</td></tr>";
         return;
     }
-    completedOrders.forEach((order) => {
+    orders.forEach((order) => {
         const row = `
             <tr>
-                <td>${order.orderId}</td>
-                <td>${order.customerName}</td>
-                <td>${order.productName}</td>
-                <td>${order.quantity}</td>
-                <td>₱${order.total}</td>
-                <td><button class="btn btn-sm btn-danger" onclick="removeCompletedOrder('${order.orderId}')">Remove</button></td>
+                <td>${order.OrderId}</td>
+                <td>${order.ProductName}</td>
+                <td>${order.Quantity}</td>
+                <td>₱${order.TotalPrice}</td>
+                <td>${order.Status}</td>
+                <td>Completed</td>
+                // <td><button class="btn btn-sm btn-danger" onclick="removeCompletedOrder('${order.OrderId}')">Remove</button></td>
             </tr>`;
         completedOrdersTable.insertAdjacentHTML("beforeend", row);
     });
+  });
 }
 
 // Mark an Order as Completed
 function markAsCompleted(orderId) {
     if (!confirm("Mark this order as completed?")) return;
 
-    fetch(`http://localhost:3000/orders/update/${orderId}`, {
+    fetch(`http://localhost:3000/orders/approve/${orderId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -854,8 +873,7 @@ function markAsCompleted(orderId) {
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
-        .then((order) => {
-            completedOrders.push(order);
+        .then(() => {
             updateTables();
         })
         .catch((error) => console.error("Error marking order as completed:", error));
@@ -873,12 +891,13 @@ function removeCompletedOrder(orderId) {
 // Update Tables
 function updateTables() {
     const boothID = getBoothIdFromSession();
+    console.log("Updating tables with booth Id (orders): " + boothID)
     if (!boothID) {
         console.error("Booth ID is missing or invalid.");
         return;
     }
     populatePendingOrders(boothID);
-    populateCompletedOrders();
+    populateCompletedOrders(boothID);
 }
 
 // Event Handlers for Navigation
@@ -897,7 +916,7 @@ function showProducts() {
 document.addEventListener("DOMContentLoaded", () => {
     const boothID = getBoothIdFromSession();
     if (boothID) {
-        populatePendingOrders(boothID);
+        updateTables();
     } else {
         console.error("No valid booth ID found. Please check session or cookies.");
     }
