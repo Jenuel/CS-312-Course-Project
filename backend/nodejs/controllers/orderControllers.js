@@ -96,9 +96,11 @@ const createOrder = async (request, response) => {
 
     try {
         // Validate totalPrice if needed
+        /*
         if (!totalPrice || typeof totalPrice !== 'number' || totalPrice < 0) {
             return response.status(400).send('Invalid totalPrice');
         }
+            */
 
         const { orderQuery } = await db.query(`
             INSERT INTO \`order\` 
