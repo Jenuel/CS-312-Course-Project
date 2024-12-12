@@ -136,8 +136,10 @@ function cancelOrder(orderId) {
     });
 }
 
-function checkoutProducts(orderID){
-    etch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
+function checkoutProducts(){
+
+    let orderID = localStorage.getItem('orderId');
+    fetch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
         method: 'PATCH', 
         headers: {
             'Content-Type': 'application/json', 
@@ -151,8 +153,20 @@ function checkoutProducts(orderID){
         return response.json();
     })
     .then(data => {
+
+        const cartList = document.getElementById('purchase-list');
+
+        if (!cartList) {
+            console.error("Cart list container not found.");
+            return;
+        }
+    
+        // Clear existing rows
+        cartList.innerHTML = "";
+        
         // data is a json massgae no parsing needed
-        console.log("Order cancelled successfully:", data);
+        console.log("Order bought succefully:", data);
+
     })
     .catch(error => {
         console.error("Error cancelling order:", error);
@@ -196,11 +210,7 @@ function closeProfile() {
     profile.classList.remove("open-profile");
 }
 
-function checkout() { 
-    alert("checking out products");
-    const cartJSON = JSON.stringify(cart);
-    window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
-}
+
 
 
 function createOrder(boothID, data, totalPrice) {
@@ -253,6 +263,7 @@ function getCart(customerId) {
                 return;
             }
 
+            localStorage.setItem('orderId', data.orderId);
             
             // Map the API response to the format expected by `displayCart`
             const cartItems = data.map(product => ({
@@ -277,7 +288,7 @@ function getCart(customerId) {
 
 function updateCartTotal(total) {
     const totalElement = document.getElementById('cart-total');
-    totalElement.textContent = total.toFixed(2);
+    totalElement.textContent = parseFloat(total);
 }
 
 getCart(localStorage.getItem('id'));
