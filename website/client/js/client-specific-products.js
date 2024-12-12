@@ -69,6 +69,13 @@ function addToCart(quantity, ProductID, Price) {
     grandTotal += totalPrice;
     sessionStorage.setItem("Grandtotal", grandTotal.toFixed(2));
 
+    if (sessionStorage.getItem("OrderID")) {
+        const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
+        addToOrder(orderId, cart);
+    } else {
+        createOrder(boothId, cart, grandTotal);
+    }
+    
     console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
 }
 
