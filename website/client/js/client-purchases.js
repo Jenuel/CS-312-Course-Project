@@ -30,7 +30,7 @@ function displayCart(cartItems) {
     cartItems.forEach((item, index) => {
         const row = document.createElement('tr');
 
-        // Add content dynamically based on item properties
+        // Ensure proper data handling and dynamic row rendering
         row.innerHTML = `
             <th scope="row">${index + 1}</th>
             <td>
@@ -62,6 +62,21 @@ function displayCart(cartItems) {
     // Update the cart total after rendering
     updateCartTotal(cartItems);
 }
+
+function updateCartTotal(cartItems) {
+    const cartTotalElement = document.getElementById('cart-total');
+    if (!cartTotalElement) {
+        console.error("Cart total element not found.");
+        return;
+    }
+
+    const totalAmount = cartItems.reduce((total, item) => {
+        return total + (item.price * item.quantity || 0);
+    }, 0);
+
+    cartTotalElement.textContent = `₱${totalAmount.toFixed(2)}`;
+}
+
 
 
 // Function to update the total amount dynamically
@@ -216,7 +231,8 @@ function createOrder(boothID, data, totalPrice) {
 
 
 function getCart(customerId) {
-    fetch(`http://localhost:3000/orders/checkPendingOrder/${customerId}`, {
+    let cid = parseInt(customerId);
+    fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, {
         method: 'GET', // Fetching pending orders
         headers: { 'Content-Type': 'application/json' },
     })
@@ -233,7 +249,7 @@ function getCart(customerId) {
             }
 
             // Map the API response to the format expected by `displayCart`
-            const cartItems = data.map(product => ({
+            const cartItems = data[0].map(product => ({
                 productID: product['Product ID'],
                 productName: product['Product Name'] || 'Unknown Product',
                 image: product['Image'], // If image is base64 or URL
@@ -251,4 +267,4 @@ function getCart(customerId) {
 }
 
 
-getCart(boothId);
+getCart(localStorage.getItem('id'));
