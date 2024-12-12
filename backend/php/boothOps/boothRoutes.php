@@ -126,6 +126,7 @@ else {
         $location = $input['location'];
         $boothIcon = null;
         $status = 'open';
+        $boothIcon = isset($input['boothIcon']) && !empty($input['boothIcon']) ? $input['boothIcon'] : file_get_contents("./vendor/res/booth.png");
         
         if ($input['boothIcon']) {
             $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $input['boothIcon']));
@@ -133,9 +134,9 @@ else {
         }
 
 
-        $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?,?,?)";
+        $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID,BoothIcon ) VALUES (?, ?, ?, ?, ?,?,?,?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssssssi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID);
+        $insertStmt->bind_param("ssssssib", $title, $description, $schedules, $location, $boothIcon, $status, $orgID,$boothIcon);
         if ($insertStmt->execute()) {
             http_response_code(201); 
             echo json_encode(["success" => true]); 

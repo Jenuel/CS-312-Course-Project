@@ -96,7 +96,7 @@ HTTP PUT /<orderRoutes>/<boothId>
 */ 
 const createOrder = async (request, response) => {
     const db = request.db;
-    const{boothId} = request.params;
+    const{boothID} = request.params;
     const { products, totalPrice, date ,customerId} = request.body; // Extract updates map and total price
 
     try {
@@ -107,11 +107,22 @@ const createOrder = async (request, response) => {
         }
             */
 
+        console.log("customer id", customerId);
+
+        if (!boothID || isNaN(boothID)) {
+            return response.status(400).send('Invalid boothID');
+        }
+        console.log('Received boothID:', boothID);
+        console.log('Received products:', products);
+        console.log('Received price:', totalPrice);
+        console.log('Received date:', date);
+
+
         const { orderQuery } = await db.query(`
             INSERT INTO \`order\` 
             (\`OrderID\`, \`BoothID\`, \`Status\`, \`DateOrdered\`, \`DatePaid\`, \`Price\`, \`customerID\`) 
             VALUES (NULL, ?, "Pending", ?, NULL, ?,?)`,
-            [boothId, date, totalPrice,customerId]);
+            [boothID, date, totalPrice,customerId]);
         
 
         const latestOrderID = orderQuery.insertId;
