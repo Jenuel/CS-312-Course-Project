@@ -146,7 +146,47 @@ function checkoutProducts(orderID){
         return response.json();
     })
     .then(data => {
-        // data is a json massgae no parsing needed
+        /*
+        data output sample:
+        [
+            {
+                "order id": 1,
+                "product name": "Burger",
+                "product price": 5.00,
+                "number of ordered product": 2,
+                "total price per product": 10.00,
+                "overall total": 10.00
+            },
+            {
+                "order id": 1,
+                "product name": "Fries",
+                "product price": 2.50,
+                "number of ordered product": 1,
+                "total price per product": 2.50,
+                "overall total": 10.00
+            }
+        ]
+
+        */
+        // Arrays to hold individual values
+        const orderId = data[0]['order id']; // Assuming all products belong to the same order ID
+        const grandTotal = data[0]['overall total']; // Same for grand total
+        const productIds = [];
+        const quantities = [];
+        const totals = [];
+        const names = [];
+        const prices = [];
+
+        // Loop through the response data and extract the required values
+        data.forEach(item => {
+            // Add product-specific information to arrays
+            productIds.push(item['order id']); // If you want to store 'order id' for each product
+            quantities.push(item['number of ordered product']);
+            totals.push(item['total price per product']);
+            names.push(item['product name']);
+            prices.push(item['product price']);
+        });
+
         console.log("Order cancelled successfully:", data);
     })
     .catch(error => {

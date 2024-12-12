@@ -152,9 +152,12 @@ const buyProduct = async (request, response) => {
       `,
       [orderId]
     );
-      response.json({
-        message: "Product purchased successfully",
-      });
+
+    const [breakdown]= await db.query(
+      "SELECT o.OrderID AS 'order id', x.name AS 'product name', x.Price AS 'product price', p.Quantity AS 'number of ordered product', p.Total AS 'total price per product', o.Price AS 'overall total' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` x ON p.ProductID = x.ProductID JOIN `booth` b ON b.BoothID = x.BoothID WHERE o.OrderID = ?",
+      [orderId]
+    );
+      response.json(breakdown);
     } else {
       response.json({
         message: "Product purchased unsuccessfully",
