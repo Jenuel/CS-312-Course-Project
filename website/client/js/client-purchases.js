@@ -1,3 +1,5 @@
+import { getProducts } from "../../../backend/nodejs/controllers/productControllers";
+
 // Retrieve the parameters from the URL
 const urlParams = new URLSearchParams(window.location.search);
 const cartJSON = decodeURIComponent(urlParams.get('cart'));
@@ -9,37 +11,78 @@ const cart = JSON.parse(cartJSON);
 
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
-function displayBooths(data) {
+function displayCart(cartItems) {
+    const cartList = document.getElementById('purchase-list');
 
-    const id = localStorage.getItem('id');
-    console.log("id on cart", id);
-    const purchaseList = document.getElementById('purchase-list');
-
-    if (!purchaseList) {
-        console.error("Purchase list container not found.");
+    if (!cartList) {
+        console.error("Cart list container not found.");
         return;
     }
 
-    purchaseList.innerHTML = ""; // Clear existing rows
+    // Clear existing rows
+    cartList.innerHTML = "";
 
-    data.forEach((item, index) => {
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+        // Show a placeholder row if the cart is empty
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `
+            <td colspan="7" class="text-center">Your cart is empty.</td>
+        `;
+        cartList.appendChild(emptyRow);
+        return;
+    }
+
+    cartItems.forEach((item, index) => {
         const row = document.createElement('tr');
 
+        // Add content dynamically based on item properties
         row.innerHTML = `
             <th scope="row">${index + 1}</th>
-            <td><img src="${item.image || 'https://via.placeholder.com/50'}" alt="${item.productName || 'Product Image'}" class="img-fluid"></td>
+            <td>
+                <img 
+                    src="${item.image || 'https://via.placeholder.com/50'}" 
+                    alt="${item.productName || 'Product Image'}" 
+                    class="img-fluid" 
+                    style="max-height: 50px; max-width: 50px;">
+            </td>
             <td>${item.productName || 'Unknown Product'}</td>
-            <td>${item.status || 'Unknown Status'}</td>
-            <td>${item.date || 'Unknown Date'}</td>
+            <td>
+                <input 
+                    type="number" 
+                    class="form-control form-control-sm" 
+                    value="${item.quantity || 1}" 
+                    min="1" 
+                    onchange="updateCartItem(${item.id}, this.value)">
+            </td>
+            <td>${item.price ? `₱${parseFloat(item.price).toFixed(2)}` : '₱0.00'}</td>
             <td>${item.total ? `₱${parseFloat(item.total).toFixed(2)}` : '₱0.00'}</td>
             <td>
-                <button class="btn btn-danger btn-sm" onclick="cancelOrder(${item.id})">Cancel</button>
+                <button class="btn btn-danger btn-sm" onclick="removeCartItem(${item.id})">Remove</button>
             </td>
         `;
 
-        purchaseList.appendChild(row);
+        cartList.appendChild(row);
     });
+
+    // Update the cart total after rendering
+    updateCartTotal(cartItems);
 }
+
+// Function to update the total amount dynamically
+function updateCartTotal(cartItems) {
+    const cartTotalElement = document.getElementById('cart-total');
+    if (!cartTotalElement) {
+        console.error("Cart total element not found.");
+        return;
+    }
+
+    const totalAmount = cartItems.reduce((total, item) => {
+        return total + (item.price * item.quantity || 0);
+    }, 0);
+
+    cartTotalElement.textContent = totalAmount.toFixed(2);
+}
+
 
 
 /* ----------------------------------------------------------------------------------------------------- */
@@ -160,3 +203,25 @@ function createOrder(boothID, data, totalPrice) {
         })
         .catch(error => console.error("Error creating order:", error));
 }
+
+
+function fetchCartData() {
+    fetch("http://localhost:3000/cart")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(cartData => {
+        console.log("Fetched cart data:", cartData);
+
+        // Pass the cart data to displayCart function to render the updated cart
+        displayCart(cartData);
+    })
+    .catch(error => {
+        console.error("Error fetching cart data:", error);
+    });
+}
+
+fetchCartData();
