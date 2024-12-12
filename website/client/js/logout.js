@@ -1,7 +1,7 @@
 
 
 function logout() {
-    fetch('http://localhost/CS-312-Course-Project/backend/php/auth/logout.php/' + new URLSearchParams({
+    fetch('http://localhost:8080/php/auth/logout.php' + new URLSearchParams({
         logout: 'true',
     }).toString(), {
         method: 'POST',
@@ -15,7 +15,8 @@ function logout() {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         } else {
-            window.location.href = 'http://localhost/CS-312-Course-Project/website/auth/html/login.html';
+            
+        window.location.href = 'http://localhost:8080/CS-312-Course-Project/website/auth/html/index.html';
         } 
 
         responseClone = response.clone()
