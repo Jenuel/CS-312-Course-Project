@@ -88,12 +88,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
             if ($vendorResult->num_rows > 0) {
                 $vendor = $vendorResult->fetch_assoc();
-                $_SESSION['user']['role'] = 'vendor';
-                $_SESSION['user']['VendorID'] = $vendor['VendorID'];
-                $_SESSION['user']['OrgID'] = $vendor['OrgID'];
-                echo json_encode(["success" => true, "role" => "vendor", "message" => "User login successfully"]); //Redirection will happen in frontend
+            
+                // Validate that the required keys exist
+                if (isset($vendor['VendorID']) && isset($vendor['OrgID'])) {
+                    $_SESSION['user']['role'] = 'vendor';
+                    $_SESSION['user']['VendorID'] = $vendor['VendorID'];
+                    $_SESSION['user']['OrgID'] = $vendor['OrgID'];
+            
+                    echo json_encode([
+                        "success" => true,
+                        "role" => "vendor",
+                        "message" => "User login successfully",
+                        "UserID" => $vendor['VendorID']
+                    ]); // Redirection will happen in frontend
+                } else {
+                    echo json_encode([
+                        "success" => false,
+                        "message" => "Vendor details are incomplete."
+                    ]);
+                }
+            
                 exit;
             }
+            
 
             // Check if the user is a customer
             $customerQuery = "SELECT CustomerID FROM customer WHERE UserID = ?";
@@ -104,13 +121,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
             if ($customerResult->num_rows > 0) {
                 $customer = $customerResult->fetch_assoc();
-                $_SESSION['user']['role'] = 'customer';
-                $_SESSION['user']['CustomerID'] = $customer['CustomerID'];
-                
-                $transport = array("success" => true, "role" => "customer", "message" => "User login successfully");
-                echo json_encode($transport); //Redirection will happen in frontend
+            
+                // Validate that the required key exists
+                if (isset($customer['CustomerID'])) {
+                    $_SESSION['user']['role'] = 'customer';
+                    $_SESSION['user']['CustomerID'] = $customer['CustomerID'];
+            
+                    // Prepare response
+                    $transport = [
+                        "success" => true,
+                        "role" => "customer",
+                        "message" => "User login successfully",
+                        "UserID" => $customer['CustomerID']
+                    ];
+                    echo json_encode($transport); // Redirection will happen in frontend
+                } else {
+                    // Handle case where CustomerID is missing
+                    echo json_encode([
+                        "success" => false,
+                        "message" => "Customer details are incomplete."
+                    ]);
+                }
+            
                 exit;
             }
+            
 
         } else {
             echo json_encode(["error" => "Incorrect email or password"]);

@@ -3,40 +3,41 @@ const urlParams = new URLSearchParams(window.location.search);
 const cartJSON = decodeURIComponent(urlParams.get('cart'));
 const grandTotal = parseFloat(decodeURIComponent(urlParams.get('total')));
 
+
 // Parse the cart JSON string back into an array of objects
 const cart = JSON.parse(cartJSON);
 
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
-function displayBooths(){
-    box.innerHTML = "";
-        let valueDiv = document.createElement('div'); 
-        valueDiv.classList.add('item');
-        // creating the information of the product
-        valueDiv.innerHTML = `
-        <div class="box">
-            <div class="image">
-                               
-            </div>
-            <div class="product">
-                <p id="status-title">STATUS</p>
-                <p id="status">: insert status here</p>
-            </div>
-            <div class="product">
-                <p id="date-title">DATE</p>
-                <p id="date">: insert date here</p>
-            </div>
-                <div class="product">
-                <p id="productid-title">PRODUCT ID</p>
-                <p id="productid">: insert product id here</p>
-            </div>
-                <div class="product">
-                <p id="total-title">TOTAL</p>
-                <p id="total">: insert total here</p>
-            </div>         
-        </div>`;
-        box.appendChild(valueDiv); // appending the child to "box"
+function displayBooths(data) {
+    const purchaseList = document.getElementById('purchase-list');
+
+    if (!purchaseList) {
+        console.error("Purchase list container not found.");
+        return;
+    }
+
+    purchaseList.innerHTML = ""; // Clear existing rows
+
+    data.forEach((item, index) => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <th scope="row">${index + 1}</th>
+            <td><img src="${item.image || 'https://via.placeholder.com/50'}" alt="${item.productName || 'Product Image'}" class="img-fluid"></td>
+            <td>${item.productName || 'Unknown Product'}</td>
+            <td>${item.status || 'Unknown Status'}</td>
+            <td>${item.date || 'Unknown Date'}</td>
+            <td>${item.total ? `₱${parseFloat(item.total).toFixed(2)}` : '₱0.00'}</td>
+            <td>
+                <button class="btn btn-danger btn-sm" onclick="cancelOrder(${item.id})">Cancel</button>
+            </td>
+        `;
+
+        purchaseList.appendChild(row);
+    });
 }
+
 
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER

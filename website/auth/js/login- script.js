@@ -32,9 +32,17 @@ function handleLogin(event) {
         if (data.success) {
             console.log("Login successful"); 
             if(data.role == "vendor"){ //checks the role of the newly authenticated user
+                const id = data.UserID;
+                document.cookie = "UserID=" + id + "SameSite=None; Secure";
+                console.log("ID : ", id);
                 window.location.href = 'http://localhost:8080/vendor/html/vendor-home.html';//redirect to vendor side
+              
             } else {
+                const id = data.UserID;
+                document.cookie = "UserID=" + id + "SameSite=None; Secure";
+                console.log("ID : ", id);
                 window.location.href = 'http://localhost:8080/client/html/client-home.html'; //redirect to customer side
+                
             }                
         } else {
             console.error(data.message);

@@ -78,12 +78,14 @@ function checkout() {
     window.location.href = `client-purchases.html?cart=${encodeURIComponent(cartJSON)}&total=${encodeURIComponent(grandTotal.toFixed(2))}`;
 }
 
+/*
 if (sessionStorage.getItem("OrderID")) {
     const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
     addToOrder(orderId, cart);
 } else {
     createOrder(boothId, cart, grandTotal);
 }
+    */
 
 /* Fetch Functions */
 
