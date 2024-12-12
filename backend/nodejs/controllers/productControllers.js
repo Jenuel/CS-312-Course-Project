@@ -23,6 +23,14 @@ const getProducts = async (request, response) => {
       params.push(filter);
     }
 
+    // Apply filter for status (active or inactive)
+    if (filter === "active") {
+      query += ` AND p.status = 'active'`;
+    } else if (filter === "inactive") {
+      query += ` AND p.status = 'inactive'`;
+    }
+
+    // Apply sorting logic
     if (sort) {
       const allowedSortFields = ["name", "price"];
       const [field, order] = sort.split(":");
@@ -35,17 +43,18 @@ const getProducts = async (request, response) => {
       } else {
         return response.status(400).json({ error: "Invalid sort parameter" });
       }
-    } else {
-      query += " ORDER BY p.name ASC"; // Default sorting
     }
 
     const [rows] = await db.query(query, params);
-    response.json(rows);
+
+    response.json(rows); // Convert response to JSON
+
   } catch (error) {
     console.error("Error fetching products:", error);
     response.status(500).send("Failed to fetch products");
   }
 };
+
 
 
 /*
