@@ -197,6 +197,8 @@ function addToOrder(orderID, data,) {
 
     const payload = {
         products: formattedProducts,
+        quantity: parseInt(quantity, 10),
+        totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
         productID: id,
     };
 
