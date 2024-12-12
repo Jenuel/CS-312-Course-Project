@@ -260,14 +260,14 @@ function getCart(customerId) {
                 productName: product['Product Name'] || 'Unknown Product',
                 image: product['Product Image'], // If image is base64 or URL
                 quantity: product['Quantity'],
-                price: parseFloat(product['Unit Price']),
+                price: parseFloat(product['Product price']),
                 total: parseFloat(product['Total price per product']),
             }));
 
             // Update the cart display
             displayCart(cartItems);
 
-            updateCartTotal(data.)
+            updateCartTotal(data.grandTotal);
             
         })
         .catch(error => {
