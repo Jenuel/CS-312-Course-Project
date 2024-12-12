@@ -16,11 +16,7 @@ function closeCreateBooth() {
   create.classList.remove("open-createBooth");
 }
 
-
-
-
 function createBoothFinished() {
-
   const form = document.getElementById("booth-form");
 
   if (!form.checkValidity()) {
@@ -33,15 +29,12 @@ function createBoothFinished() {
   document.body.classList.remove("modal-open");
 }
 
-
 function showProducts(boothId) {
   sessionStorage.setItem("currentBoothId", boothId);
   window.location.href = "vendor-product.html";
 }
 
 //for creating and appending values of a booth
-
-
 
 let formData = {
   filter: document.getElementById("filter")?.value || "",
@@ -53,17 +46,13 @@ function getData() {
   const searchTerm = searchInput?.value || "";
   const sortOption = sortSelect?.value || "A-Z";
 
-
-  fetch(
-    "http://localhost:8080/php/boothOps/boothRoutes.php",
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("sessionID"),
-      },
-    }
-  )
+  fetch("http://localhost:8080/php/boothOps/boothRoutes.php", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + sessionStorage.getItem("sessionID"),
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -77,17 +66,14 @@ function getData() {
         if (data.error) {
           console.error("Error:", data.error);
         } else {
-
           let filteredData = data;
-        
 
           if (searchTerm) {
-            filteredData = data.filter(booth => 
+            filteredData = data.filter((booth) =>
               booth.Title.toLowerCase().includes(searchTerm.toLowerCase())
             );
           }
-          
-  
+
           filteredData.sort((a, b) => {
             if (sortOption === "Z-A") {
               return b.Title.localeCompare(a.Title);
@@ -136,7 +122,7 @@ async function displayBooths(data) {
       ? `data:image/png;base64,${value.BoothIcon}`
       : "../res/1564534_customer_man_user_account_profile_icon.png";
 
-    valueDiv.innerHTML =`
+    valueDiv.innerHTML = `
      <div class="card booth-card">
         <!-- Booth Image -->
         <div class="text-center">
@@ -184,7 +170,7 @@ async function displayBooths(data) {
             </button>
           </div>
         </div>
-      </div>`;;
+      </div>`;
     box.appendChild(valueDiv);
   });
 }
@@ -237,49 +223,45 @@ function getBase64(file) {
 // Edit Section
 
 function editBooth(boothId) {
-  console.log(boothId)
+  console.log(boothId);
   modal.classList.add("show");
   edit.classList.add("open-editBooth");
   create.classList.remove("open-createBooth");
   document.body.classList.add("modal-open");
 
-  fetch(
-    `http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + sessionStorage.getItem("sessionID"),
-      },
-    }
-  ).then(response => response.json()).then(booths => {
+  fetch(`http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + sessionStorage.getItem("sessionID"),
+    },
+  })
+    .then((response) => response.json())
+    .then((booths) => {
+      const booth = booths.find((b) => b.BoothID === boothId);
 
-    const booth = booths.find(b => b.BoothID === boothId);
-    
+      console.log(booth);
+      if (booth) {
+        document.getElementById("edit-name").value = booth.Title;
+        console.log(booth.Title.value);
+        document.getElementById("edit-description").value = booth.Description;
+        document.getElementById("edit-schedule").value = booth.Schedules;
+        document.getElementById("edit-location").value = booth.Location;
 
+        // Store the booth ID for the update operation
+        document.getElementById("edit-booth-form").dataset.boothId = boothId;
 
-  
-    console.log(booth)
-    if(booth){
-      document.getElementById('edit-name').value = booth.Title;
-      console.log(booth.Title.value)
-      document.getElementById('edit-description').value = booth.Description;
-      document.getElementById('edit-schedule').value = booth.Schedules;
-      document.getElementById('edit-location').value = booth.Location;
-      
-      // Store the booth ID for the update operation
-      document.getElementById('edit-booth-form').dataset.boothId = boothId;
-      
-      if (booth.BoothIcon) {
-        document.getElementById('edit-image').src = `data:image/png;base64,${booth.BoothIcon}`;
+        if (booth.BoothIcon) {
+          document.getElementById(
+            "edit-image"
+          ).src = `data:image/png;base64,${booth.BoothIcon}`;
+        }
       }
-    }
-
-  })
-  .catch(error => {
-    console.error('Error fetching booth:', error);
-    alert('Error loading booth data');
-  })
+    })
+    .catch((error) => {
+      console.error("Error fetching booth:", error);
+      alert("Error loading booth data");
+    });
 }
 
 function editBoothFinished() {
@@ -289,22 +271,21 @@ function editBoothFinished() {
   document.body.classList.remove("modal-open");
 }
 /* ----------------------------------------------------------------------------------------------------- */
-//THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER 
+//THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
 
 /**
  * Fetch for updating booth (POST)
  */
 async function updateBoothFunction() {
   // console.log(dataset)
-  const boothId = document.getElementById('edit-booth-form').dataset.boothId;
-  console.log(boothId)
+  const boothId = document.getElementById("edit-booth-form").dataset.boothId;
+  console.log(boothId);
   let imageData = null;
   const imageFile = document.getElementById("edit-input-file");
 
-
-  if (imageFile && imageFile.files.length > 0 ) {
+  if (imageFile && imageFile.files.length > 0) {
     try {
-      console.log("True Image exist")
+      console.log("True Image exist");
       const base64Data = await getBase64(imageFile.files[0]);
       imageData = base64Data.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
     } catch (error) {
@@ -318,19 +299,16 @@ async function updateBoothFunction() {
     schedules: document.getElementById("edit-schedule").value,
     location: document.getElementById("edit-location").value,
     boothIcon: imageData,
-    action: "update"
+    action: "update",
   };
 
-  fetch(
-    "http://localhost:8080/php/boothOps/boothRoutes.php",
-    {
-      method: "POST",
-      body: JSON.stringify(formData),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
+  fetch("http://localhost:8080/php/boothOps/boothRoutes.php", {
+    method: "POST",
+    body: JSON.stringify(formData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -376,47 +354,47 @@ async function updateBoothFunction() {
 
 /**
  * Fetch for removing a booth  (DELETE)
- * @param {Integer} boothId 
- * @returns 
+ * @param {Integer} boothId
+ * @returns
  */
 function deleteBooth(boothId) {
-  if (!confirm('Are you sure you want to delete this booth?')) {
-      return;
+  if (!confirm("Are you sure you want to delete this booth?")) {
+    return;
   }
 
   fetch(`http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`, {
-      method: "DELETE",
-      headers: {
-          "Content-Type": "application/json",
-      },
-      credentials: 'include'
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
   })
-  .then(async response => {
+    .then(async (response) => {
       const text = await response.text();
       let data;
       try {
-          data = JSON.parse(text);
+        data = JSON.parse(text);
       } catch (e) {
-          console.error('Server response:', text);
-          throw new Error('Invalid server response');
+        console.error("Server response:", text);
+        throw new Error("Invalid server response");
       }
 
       if (!response.ok) {
-          throw new Error(data.error || 'Failed to delete booth');
+        throw new Error(data.error || "Failed to delete booth");
       }
 
       return data;
-  })
-  .then(data => {
+    })
+    .then((data) => {
       if (data.success) {
-          alert(data.message || "Booth deleted successfully");
-          getData(); // Refresh the booth list
+        alert(data.message || "Booth deleted successfully");
+        getData(); // Refresh the booth list
       }
-  })
-  .catch(error => {
+    })
+    .catch((error) => {
       console.error("Delete error:", error);
       alert(error.message || "Failed to delete booth. Please try again.");
-  });
+    });
 }
 /**
  * fetch for creating booth (POST)
@@ -441,16 +419,13 @@ async function createBoothFunction() {
     boothIcon: imageData,
   };
 
-  fetch(
-    "http://localhost:8080/php/boothOps/boothRoutes.php",
-    {
-      method: "POST",
-      body: JSON.stringify(formData),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
+  fetch("http://localhost:8080/php/boothOps/boothRoutes.php", {
+    method: "POST",
+    body: JSON.stringify(formData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -494,6 +469,33 @@ async function createBoothFunction() {
     });
 }
 
+function logout() {
+  fetch("/php/auth/logout.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: "logout=true",
+    credentials: "include",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.success) {
+        window.location.href = "/auth/html/index.html";
+      } else {
+        throw new Error(data.message || "Logout failed");
+      }
+    })
+    .catch((error) => {
+      console.error("Logout failed:", error);
+      alert("Logout failed. Please try again.");
+    });
+}
 // END FOR FETCH FUNCTIONS
 /* ----------------------------------------------------------------------------------------------------- */
 
@@ -508,7 +510,7 @@ function loadPage(page) {
       pageFrame.style.display = "none";
       getData(); // Refresh
       break;
-      
+
     case "orders":
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";
@@ -517,12 +519,12 @@ function loadPage(page) {
 
     case "sales":
       boothContent.classList.remove("active");
-            pageFrame.style.display = "block";
-            pageFrame.style.height = "100%";
-            pageFrame.style.width = "100%";
-            pageFrame.style.minHeight = "calc(100vh - 56px)"; // Account for navbar
-            pageFrame.style.border = "none"; 
-            pageFrame.src = "../html/vendor-sales.html";
+      pageFrame.style.display = "block";
+      pageFrame.style.height = "100%";
+      pageFrame.style.width = "100%";
+      pageFrame.style.minHeight = "calc(100vh - 56px)"; // Account for navbar
+      pageFrame.style.border = "none";
+      pageFrame.src = "../html/vendor-sales.html";
       break;
   }
 }
@@ -533,6 +535,14 @@ document.addEventListener("DOMContentLoaded", () => {
   edit = document.getElementById("edit");
   boothImage = document.getElementById("image");
   inputFile = document.getElementById("input-file");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      logout();
+    });
+  }
 
   modal.addEventListener("click", function (event) {
     if (event.target === modal) {
@@ -549,7 +559,6 @@ document.addEventListener("DOMContentLoaded", () => {
   searchInput = document.querySelector(".searchbox");
   sortSelect = document.getElementById("sortDropdown");
 
-  
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       getData();
@@ -558,12 +567,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Update your dropdown click handlers
   const sortLinks = document.querySelectorAll(".dropdown-item");
-  sortLinks.forEach(link => {
+  sortLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
-      const sortValue = e.target.textContent;  // This will be "A-Z" or "Z-A"
-      sortSelect.textContent = `Sort By: ${sortValue}`; 
-      sortSelect.value = sortValue;  // Store the sort value
+      const sortValue = e.target.textContent; // This will be "A-Z" or "Z-A"
+      sortSelect.textContent = `Sort By: ${sortValue}`;
+      sortSelect.value = sortValue; // Store the sort value
       getData();
     });
   });

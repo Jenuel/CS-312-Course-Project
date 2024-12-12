@@ -15,11 +15,10 @@
     <link rel="stylesheet" type="text/css" href="../css/vendor-home.css" />
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  
+
     <script src="..\js\vendor-home.js"></script>
   </head>
   <body>
-    
     <!-- <nav>
       <button type="button" data-page="home" onclick="loadPage('home')">
         HOME
@@ -37,97 +36,124 @@
       <button type="button" onclick="logout()">LOGOUT</button>
     </nav> -->
 
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand mx-5" href="#">Blietzkrieg</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
       </button>
-  
+
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-              <a class="nav-link" href="#" data-page="home" onclick="loadPage('home')">Home</a>
+            <a
+              class="nav-link"
+              href="#"
+              data-page="home"
+              onclick="loadPage('home')"
+              >Home</a
+            >
           </li>
           <li class="nav-item active">
-              <a class="nav-link" href="#" data-page="sales" onclick="loadPage('sales')">Sales</a>
+            <a
+              class="nav-link"
+              href="#"
+              data-page="sales"
+              onclick="loadPage('sales')"
+              >Sales</a
+            >
           </li>
-      </ul>
-      <!-- Logout Button -->
-      <a class="btn btn-outline-primary ms-auto mx-3" href="#">Logout</a>
-  </div>
-  </nav>
-  
+        </ul>
+        <!-- Logout Button -->
+        <a class="btn btn-outline-primary ms-auto mx-3" href="#" id="logout-btn"
+          >Logout</a
+        >
+      </div>
+    </nav>
+
     <!-- <header><h1>YOUR BOOTHS</h1></header> -->
 
     <div class="content-wrapper">
       <div id="booth-content" class="page-content active">
         <section class="booth-container">
           <div class="filters-container">
-
             <div class="first-container">
               <div class>
-                <button type="button" class="btn d-flex align-items-center gap-2 btn-dark" onclick="createBooth()">
-                    <i class='bx bx-plus-circle'></i>
-                    <p class="mb-0">Create New Booth</p>
+                <button
+                  type="button"
+                  class="btn d-flex align-items-center gap-2 btn-dark"
+                  onclick="createBooth()"
+                >
+                  <i class="bx bx-plus-circle"></i>
+                  <p class="mb-0">Create New Booth</p>
                 </button>
-            </div>
-                
-    
-                <div class>
-                  <div class="dropdown">
-                    <button
-                      class="btn btn-outline-secondary dropdown-toggle"
-                      type="button"
-                      id="sortDropdown"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
+              </div>
+
+              <div class>
+                <div class="dropdown">
+                  <button
+                    class="btn btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    id="sortDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    Sort By
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="sortDropdown">
+                    <h6 class="dropdown-header">Sorting</h6>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      onclick="sortBooths('random')"
+                      >Random</a
                     >
-                      Sort By
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="sortDropdown">
-                      <h6 class="dropdown-header">Sorting</h6>
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        onclick="sortBooths('random')"
-                        >Random</a
-                      >
-                      <a class="dropdown-item" href="#" onclick="sortBooths('name')"
-                        >A-Z</a
-                      >
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        onclick="sortBooths('schedule')"
-                        >Z-A</a
-                      >
-                    </div>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      onclick="sortBooths('name')"
+                      >A-Z</a
+                    >
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      onclick="sortBooths('schedule')"
+                      >Z-A</a
+                    >
                   </div>
                 </div>
+              </div>
             </div>
- 
 
-            <div class="search  mw-100">
-              <div class="searchbox-wrap input-group mw-100"><input type="text" placeholder="Search For a Booth" class="searchbox form-control"/>
+            <div class="search mw-100">
+              <div class="searchbox-wrap input-group mw-100">
+                <input
+                  type="text"
+                  placeholder="Search For a Booth"
+                  class="searchbox form-control"
+                />
                 <button class="searchBtn btn btn-primary px-4">
                   <i class="bx bx-search-alt"></i>
-                </button></div>
+                </button>
+              </div>
             </div>
           </div>
           <div class="box"></div>
-          </section>
+        </section>
       </div>
 
-      <div class="product-view" style="display: none;">
-        
-      </div>
+      <div class="product-view" style="display: none"></div>
 
       <iframe id="page-frame" frameborder="0" style="display: none"></iframe>
     </div>
 
-
- 
     <section>
       <div class="create-booth container py-5" id="create">
         <div class="position-relative">
@@ -166,7 +192,9 @@
           <div class="flex-grow-1 mb-4">
             <form id="booth-form" class="row g-3">
               <div class="mb-1 row align-items-center">
-                <label for="name" class="col-sm-3 col-form-label text-start">Booth Name</label>
+                <label for="name" class="col-sm-3 col-form-label text-start"
+                  >Booth Name</label
+                >
                 <div class="col-sm-9">
                   <input
                     type="text"
@@ -179,7 +207,9 @@
                 </div>
               </div>
               <div class="mb-2 row align-items-center">
-                <label for="schedule" class="col-sm-3 col-form-label text-start">Operating Days</label>
+                <label for="schedule" class="col-sm-3 col-form-label text-start"
+                  >Operating Days</label
+                >
                 <div class="col-sm-9">
                   <input
                     type="text"
@@ -192,7 +222,9 @@
                 </div>
               </div>
               <div class="mb-2 row align-items-center">
-                <label for="location" class="col-sm-3 col-form-label text-start">Location</label>
+                <label for="location" class="col-sm-3 col-form-label text-start"
+                  >Location</label
+                >
                 <div class="col-sm-9">
                   <input
                     type="text"
@@ -205,7 +237,11 @@
                 </div>
               </div>
               <div class="mb-2 row align-items-center">
-                <label for="description" class="col-sm-3 col-form-label text-start">Description</label>
+                <label
+                  for="description"
+                  class="col-sm-3 col-form-label text-start"
+                  >Description</label
+                >
                 <div class="col-sm-9">
                   <textarea
                     class="form-control"
@@ -238,12 +274,10 @@
 
     <!--POPUP EDITING BOOTH-->
     <section>
-      
       <div class="edit-booth container py-5" id="edit">
         <h2 class="mb-4">EDIT YOUR BOOTH</h2>
 
         <div class="d-flex align-items-start">
-
           <div class="me-4 flex-shrink-0" style="width: 150px; height: 150px">
             <div class="mb-3 text-center">
               <img
@@ -270,7 +304,9 @@
           <div class="flex-grow-1 mb-4">
             <form id="edit-booth-form" class="row g-3">
               <div class="mb-1 row align-items-center">
-                <label for="name" class="col-sm-3 col-form-label text-start">Booth Name</label>
+                <label for="name" class="col-sm-3 col-form-label text-start"
+                  >Booth Name</label
+                >
                 <div class="col-sm-9">
                   <input
                     type="text"
@@ -283,7 +319,9 @@
                 </div>
               </div>
               <div class="mb-2 row align-items-center">
-                <label for="schedule" class="col-sm-3 col-form-label text-start">Operating Days</label>
+                <label for="schedule" class="col-sm-3 col-form-label text-start"
+                  >Operating Days</label
+                >
                 <div class="col-sm-9">
                   <input
                     type="text"
@@ -296,7 +334,9 @@
                 </div>
               </div>
               <div class="mb-2 row align-items-center">
-                <label for="location" class="col-sm-3 col-form-label text-start">Location</label>
+                <label for="location" class="col-sm-3 col-form-label text-start"
+                  >Location</label
+                >
                 <div class="col-sm-9">
                   <input
                     type="text"
@@ -309,7 +349,11 @@
                 </div>
               </div>
               <div class="mb-2 row align-items-center">
-                <label for="description" class="col-sm-3 col-form-label text-start">Description</label>
+                <label
+                  for="description"
+                  class="col-sm-3 col-form-label text-start"
+                  >Description</label
+                >
                 <div class="col-sm-9">
                   <textarea
                     class="form-control"
@@ -324,7 +368,7 @@
             </form>
           </div>
         </div>
-    
+
         <div class="text-center mt-4">
           <button
             type="button"
@@ -338,7 +382,7 @@
       </div>
     </section>
 
-    <div class="modal-backdrop fade "></div>
-    <script src="..\js\logout.js"></script>
+    <div class="modal-backdrop fade"></div>
+    <script src="/website/auth/js/logout.js"></script>
   </body>
 </html>
