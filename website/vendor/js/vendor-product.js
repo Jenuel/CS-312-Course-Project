@@ -483,11 +483,12 @@ function showAddProductFormData(existingData, productContainer) {
 
 //  showProductDetail
 function showProductDetail(product) {
+
   const productDetailContainer = document.createElement("div");
   productDetailContainer.className = "product-detail-container mb-4";
   productDetailContainer.id = `product-${product.ProductID}`;
 
-  console.log(product.ProductStatus)
+  console.log(product)
   const badgeClass =
     product.ProductStatus === "Live"
       ? "bg-success"
@@ -523,7 +524,7 @@ function showProductDetail(product) {
   setupProductEvents(productDetailContainer, product);
   return productDetailContainer;
 }
-
+// thumbnail
 function setupProductEvents(productContainer, product) {
   const thumbnail = productContainer.querySelector(".product-thumbnail");
   if (thumbnail) {
@@ -561,28 +562,11 @@ function setupEventListeners() {
 
   const searchBox = document.querySelector(".searchbox");
   if (searchBox && !eventListeners.search) {
-    const newSearchBox = searchBox.cloneNode(true);
-    searchBox.parentNode.replaceChild(newSearchBox, searchBox);
-    newSearchBox.addEventListener("input", (e) => {
+    searchBox.addEventListener("input", (e) => {
       searchProducts(e.target.value);
     });
     eventListeners.search = true;
   }
-
-  // const navLinks = document.querySelectorAll(".nav-links .nav-link");
-  // if (navLinks && !eventListeners.navLinks) {
-  //   navLinks.forEach((link) => {
-  //     const newLink = link.cloneNode(true);
-  //     link.parentNode.replaceChild(newLink, link);
-  //     newLink.addEventListener("click", (e) => {
-  //       e.preventDefault();
-  //       navLinks.forEach((l) => l.classList.remove("active"));
-  //       newLink.classList.add("active");
-  //       filterProducts(newLink.textContent);
-  //     });
-  //   });
-  //   eventListeners.navLinks = true;
-  // }
 
   const navLinks = document.querySelectorAll(".nav-links .nav-link");
   if (navLinks) {
@@ -592,7 +576,6 @@ function setupEventListeners() {
         navLinks.forEach((l) => l.classList.remove("active"));
         link.classList.add("active");
         const filterType = link.dataset.filter || link.textContent;
-        console.log("Filter333"+filterType)
         filterProducts(filterType);
       });
     });
@@ -705,6 +688,8 @@ function filterProducts(filterType) {
 
 // Add search functionality
 function searchProducts(searchTerm) {
+
+  console.log("Searh term: " + searchTerm)
   const currentFilter = getCurrentFilter();
   tableBody.innerHTML = "";
 
@@ -715,14 +700,16 @@ function searchProducts(searchTerm) {
 
     const matchesFilter =
       currentFilter === "all" ? true : currentFilter === product.ProductStatus;
-
     return matchesSearch && matchesFilter;
   });
 
-  searchResults.forEach((product) => {
-    showProductDetail(product);
-  });
+  tableBody.innerHTML = "";
 
+  searchResults.forEach((product) => {
+    const productElement = showProductDetail(product);
+    tableBody.appendChild(productElement);
+  });
+  
   updateProductTotal(searchResults.length);
 }
 
