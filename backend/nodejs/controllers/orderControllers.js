@@ -14,25 +14,9 @@ const getReservedOrders = async (request, response) => {
             return response.status(400).json({ error: 'Invalid booth ID' });
         }
         
-        const [rows] = await db.query(`
-            SELECT 
-                o.OrderID AS "OrderId", 
-                o.Price AS "TotalPrice", 
-                o.Status AS "Status", 
-                p.Quantity AS "Quantity", 
-                c.Name AS "ProductName" 
-            FROM 
-                \`order\` o 
-            JOIN 
-                \`order_products\` p ON o.OrderID = p.OrderID 
-            JOIN 
-                \`product\` c ON p.ProductID = c.ProductID 
-            WHERE 
-                o.Status = "Reserved" 
-                AND o.BoothID = ? 
-            ORDER BY 
-                o.OrderID ASC
-        `, [boothId]);
+        const [rows] = await db.query(
+            "SELECT o.OrderID AS 'OrderId', o.Price AS 'TotalPrice', o.Status AS 'Status', p.Quantity AS 'Quantity', c.Name AS 'ProductName', CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID JOIN `customer` x ON o.customerID = x.CustomerID JOIN `users` u ON x.UserID = u.UserID WHERE o.Status = 'Reserved' AND o.BoothID = ? ORDER BY o.OrderID ASC", 
+            [boothId]);
 
         response.json(rows);
     } catch (error) {
@@ -51,25 +35,9 @@ const getCompletedOrders = async (request, response) => {
     const { boothId } = request.params;
 
     try {
-        const [rows] = await db.query(`
-            SELECT 
-                o.OrderID AS "OrderId", 
-                o.Price AS "TotalPrice", 
-                o.Status AS "Status", 
-                p.Quantity AS "Quantity", 
-                c.Name AS "ProductName" 
-            FROM 
-                \`order\` o 
-            JOIN 
-                \`order_products\` p ON o.OrderID = p.OrderID 
-            JOIN 
-                \`product\` c ON p.ProductID = c.ProductID 
-            WHERE 
-                o.Status = "Complete" 
-                AND o.BoothID = ? 
-            ORDER BY 
-                o.OrderID ASC
-        `, [boothId]);
+        const [rows] = await db.query(
+            "SELECT o.OrderID AS 'OrderId', o.Price AS 'TotalPrice', o.Status AS 'Status', p.Quantity AS 'Quantity', c.Name AS 'ProductName', CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID JOIN `customer` x ON o.customerID = x.CustomerID JOIN `users` u ON x.UserID = u.UserID WHERE o.Status = 'Complete' AND o.BoothID = ? ORDER BY o.OrderID ASC", 
+            [boothId]);
 
         response.json(rows);
     } catch (error) {
