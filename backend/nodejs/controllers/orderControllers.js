@@ -125,12 +125,9 @@ const createOrder = async (request, response) => {
         console.log("Received date:", date);
 
         // Insert order into the database
-        const [orderQuery] = await db.query(`
-            INSERT INTO \`order\` 
-            (\`OrderID\`, \`BoothID\`, \`Status\`, \`DateOrdered\`, \`DatePaid\`, \`Price\`, \`customerID\`) 
-            VALUES (NULL, ?, "Pending", ?, NULL, ?, ?)`,
-            [boothID, date, totalPrice, parseInt(customerId)]
-        );
+        const { orderQuery } = await db.query(
+            "INSERT INTO order (OrderID, BoothID, Status, DateOrdered, DatePaid, Price, customerID) VALUES (NULL, ?, 'Pending',?, NULL, ?, ?)",
+            [boothId, date, totalPrice,customerId]);
 
         const latestOrderID = orderQuery.insertId;
 
@@ -149,8 +146,7 @@ const createOrder = async (request, response) => {
             }
 
             await db.query(
-                `INSERT INTO \`order_products\` (\`ProductID\`, \`OrderID\`, \`Quantity\`, \`Total\`) 
-                VALUES (?, ?, ?, ?)`,
+                'INSERT INTO order_products (ProductID,`OrderID`, Quantity, Total) VALUES (?, ?, ?, ?)',
                 [productID, latestOrderID, quantity, totalPricePerProduct]
             );
 
@@ -293,5 +289,27 @@ const approveOrder = async (request, response) => {
     }
 };
 
+const checkPendingOrder =async (request, response) => {
+    const db = request.db;
+    const { customerId } = request.params;
 
-export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder};
+    try {
+        // First check if order exists and is not already completed
+        const [orderCheck] = await db.query(
+            "SELECT o.OrderID as 'Order ID',o.Price as 'Grand total', p.ProductID as 'Product ID', p.Quantity as 'Quantity',p.Total as 'Total price per product'FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID WHERE o.customerID = ? AND o.Status = 'Pending'",
+            [customerId]
+        );
+
+        if (!orderCheck.length) {
+            return response.status(404).json({ error: 'Order not found' });
+        }
+
+        response.json(orderCheck);
+    } catch (error) {
+        console.error('Error approving order:', error);
+        response.status(500).send('Failed to approve order');
+    }
+};
+
+
+export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder};

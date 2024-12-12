@@ -53,7 +53,7 @@ function displayProducts(products) {
       container.appendChild(productDiv); // Append each product card to the container
     });
   }
-  
+
   function cancelOrders(){
     cancelOrder(orderID);
   }
@@ -133,6 +133,49 @@ function cancelOrder(orderId) {
       console.error("Error cancelling order:", error);
   });
 }
+
+function getCart(customerId){
+  fetch(`http://localhost:3000/orders/checkPendingOrder/${customerId}`, { // URL for Cancel order
+    method: 'PATCH', 
+    headers: {
+        'Content-Type': 'application/json', 
+    },
+    body: JSON.stringify({ status: 'cancelled' }), 
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      // add handling of data 
+      if (data.error) {
+        // Handle the error message if the response contains an error
+        console.error("Error:", data.error);
+    } else {
+           // Arrays to hold product IDs, quantities, and totals
+           const orderId = data[0]['Order ID'];
+           const grandTotal = data[0]['Grand total'];
+           const productIds = [];
+           const quantities = [];
+           const totals = [];
+ 
+           // Loop through the response data and extract the required values
+           data.forEach(product => {
+               productIds.push(product['Product ID']);
+               quantities.push(product['Quantity']);
+               totals.push(product['Total price per product']);
+           });
+ 
+    }
+  })
+  .catch(error => {
+      console.error("Error cancelling order:", error);
+  });
+}
+
+
 
 //END FOR FETCH FUNCTIONS
 /* ----------------------------------------------------------------------------------------------------- */
