@@ -1,6 +1,11 @@
 const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('id'); 
 
+function myPurchases() {
+  alert("Checking out products");
+  window.location.href = `client-purchases.html?orderID=${orderID}`;// NEED TO FIND LIKE A SET OF VALUE GANUN
+}
+
 
     // Function to dynamically set the "My Purchases" URL
     document.addEventListener('DOMContentLoaded', () => {
