@@ -1,4 +1,4 @@
-let modal, create, edit, boothImage, inputFile;
+let modal, create, edit, boothImage, inputFile, searchInput, sortSelect;
 
 let boothContainer = document.querySelector(".booth-container");
 let productContainer = document.querySelector(".main-container");
@@ -50,6 +50,10 @@ let formData = {
 
 // fetches the data and calls the displaying function
 function getData() {
+  const searchTerm = searchInput?.value || "";
+  const sortOption = sortSelect?.value || "A-Z";
+
+
   fetch(
     "http://localhost:8080/php/boothOps/boothRoutes.php",
     {
@@ -73,8 +77,26 @@ function getData() {
         if (data.error) {
           console.error("Error:", data.error);
         } else {
+
+          let filteredData = data;
+        
+
+          if (searchTerm) {
+            filteredData = data.filter(booth => 
+              booth.Title.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+          }
+          
+  
+          filteredData.sort((a, b) => {
+            if (sortOption === "Z-A") {
+              return b.Title.localeCompare(a.Title);
+            }
+            return a.Title.localeCompare(b.Title);
+          });
+
           console.log("Booths data:", data);
-          displayBooths(data);
+          displayBooths(filteredData);
         }
       },
 
@@ -523,6 +545,28 @@ document.addEventListener("DOMContentLoaded", () => {
   inputFile.onchange = function () {
     boothImage.src = URL.createObjectURL(inputFile.files[0]);
   };
+
+  searchInput = document.querySelector(".searchbox");
+  sortSelect = document.getElementById("sortDropdown");
+
+  
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      getData();
+    });
+  }
+
+  // Update your dropdown click handlers
+  const sortLinks = document.querySelectorAll(".dropdown-item");
+  sortLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const sortValue = e.target.textContent;  // This will be "A-Z" or "Z-A"
+      sortSelect.textContent = `Sort By: ${sortValue}`; 
+      sortSelect.value = sortValue;  // Store the sort value
+      getData();
+    });
+  });
 
   loadPage("home");
   getData();
