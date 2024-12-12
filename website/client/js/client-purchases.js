@@ -78,6 +78,10 @@ function updateCartTotal(cartItems) {
     cartTotalElement.textContent = totalAmount.toFixed(2);
 }
 
+function cancelOrders(){
+    cancelOrder(orderID); 
+}
+
 
 
 /* ----------------------------------------------------------------------------------------------------- */
@@ -111,7 +115,7 @@ function cancelOrder(orderId) {
     });
 }
 
-function removeProductFromDB(orderID){
+function checkoutProducts(orderID){
     etch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
         method: 'PATCH', 
         headers: {
