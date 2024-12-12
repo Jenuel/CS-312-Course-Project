@@ -509,13 +509,7 @@ function loadPage(page) {
       pageFrame.style.display = "none";
       getData(); // Refresh
       break;
-
-    case "orders":
-      boothContent.classList.remove("active");
-      pageFrame.style.display = "block";
-      pageFrame.src = "../html/vendor-orders.html"; // wala pa
-      break;
-
+      
     case "sales":
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";

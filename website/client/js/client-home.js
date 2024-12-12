@@ -3,11 +3,16 @@ let box = document.querySelector(".booth-container"); // where the child will be
 // Get filter and order values
 let formData = {
     filter: document.getElementById("filter").value,
-    order: document.getElementById("order").value
+    order: document.getElementById("sortDropdown").value
 };
+
+// Variables for search and sort input
+let searchInput = document.querySelector(".searchbox");
+let sortSelect = document.getElementById("sortDropdown");
 
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
+
 
 /**
  * Fetch for retrieving booths (GET)
@@ -40,11 +45,27 @@ function getData() {
             if (data.error) {
                 console.error('Error:', data.error);
             } else {
-                console.log('Booths data:', data);
-                displayBooths(data);
+              let filteredData = data;
+
+                if (searchInput) {
+                    filteredData = data.filter((booth) =>
+                        booth.Title.toLowerCase().includes(searchInput.value.toLowerCase())
+                    );
+                }
+
+                console.log(sortSelect.value)
+                // Sort the filtered data based on the selected option
+                filteredData.sort((a, b) => {
+
+                    if (sortSelect.value === "desc") {
+                        return b.Title.localeCompare(a.Title);
+                    }
+                    return a.Title.localeCompare(b.Title);
+                });
+
+                console.log("Booths data:", filteredData);
+                displayBooths(filteredData);
             }
-        } else {
-            console.warn('Empty response from server');
         }
     })
     .catch(error => {
@@ -133,5 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         logout(); 
     });}
+
+    searchInput.addEventListener("input", getData); 
+    sortSelect.addEventListener("change", getData); 
         getData();
 });
