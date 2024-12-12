@@ -2,20 +2,19 @@ import { Session } from "inspector/promises";
 
 let cart = [];
 let grandTotal;
-if(sessionStorage.getItem("Grandtotal")) {
+if(!(sessionStorage.getItem("Grandtotal"))) {
     grandTotal= parseFloat(sessionStorage.getItem("Grandtotal"));
 }
 
 
 const urlParams = new URLSearchParams(window.location.search);
-const productId = urlParams.get('productID');
 const boothId = urlParams.get('boothID'); 
 
 
 
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
+    const productId = urlParams.get('productID');
     if (productId) {
         getSpecificProduct(productId);
     } else {
@@ -82,7 +81,7 @@ function addToCart(quantity,ProductID,Price ){
     const totalPricePerProduct = totalPrice.toString;
 
     cart.push("",productID,",",qty,",",totalPricePerProduct);
-    
+
     grandTotal += totalPrice;
     sessionStorage.setItem("Grandtotal", grandTotal)
 
