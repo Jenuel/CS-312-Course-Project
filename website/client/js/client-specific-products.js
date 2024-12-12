@@ -1,5 +1,16 @@
-let cart = []; 
-let grandTotal= 0.0;
+import { Session } from "inspector/promises";
+
+let cart = [];
+let grandTotal;
+if(sessionStorage.getItem("Grandtotal")) {
+    grandTotal= parseFloat(sessionStorage.getItem("Grandtotal"));
+}
+
+
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get('productID');
+const boothId = urlParams.get('boothID'); 
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -64,28 +75,25 @@ function displaySpecficProduct(product) {
 
 
 
-function addToCart(quantity, ProductID, Price) {
-    quantity = parseInt(quantity, 10);
-    if (isNaN(quantity) || quantity <= 0) {
-        alert("Invalid quantity. Please enter a positive number.");
-        return;
-    }
+function addToCart(quantity,ProductID,Price ){
+    let totalPrice = quantity * Price;
+    const qty = quantity.toString;
+    const productID = ProductID.toString;
+    const totalPricePerProduct = totalPrice.toString;
 
-    // Ensure Price is numeric
-    const numericPrice = parseFloat(Price) || 0.0;
-
-    let totalPrice = quantity * numericPrice;
-    cart.push({
-        ProductID: ProductID,
-        quantity: quantity,
-        price: numericPrice,
-        total: totalPrice
-    });
-
+    cart.push("",productID,",",qty,",",totalPricePerProduct);
+    
     grandTotal += totalPrice;
+    sessionStorage.setItem("Grandtotal", grandTotal)
 
     console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
 }
+ 
+// function checkout() { 
+//     alert("checking out products");
+//     const cartJSON = JSON.stringify(cart);
+//     window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
+// }
 
 function checkout() { 
     alert("checking out products");
@@ -93,6 +101,12 @@ function checkout() {
     window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
 }
 
+if(sessionStorage.getItem("OrderID")){// true if orderID has value
+    const orderId = parseInt(sessionStorage.getItem("OrderID"));
+    addToOrder(orderId, cart);
+}else{// false no order id
+    createOrder(boothId, cart, grandTotal); 
+}
 
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
@@ -113,6 +127,21 @@ function getSpecificProduct(productId) {
         return response.json();
     })
     .then(data => {
+        /*SAMPLE data  OUTPUT
+        
+        {
+            "Name": "Handmade Bracelet",
+            "Stocks": 50,
+            "Price": 29.99,
+            "Status": "active",
+            "Image": "base64",
+            "ProductID":"id"
+        }
+
+        */
+       console.log("Products fetched successfully:", data);
+
+        displaySpecficProduct(data);
         console.log("Fetched product data:", data);
 
         // Safely access and log specific fields
@@ -133,6 +162,162 @@ function getSpecificProduct(productId) {
         console.error("Error fetching product:", error);
     });
 }
+
+/**
+ * Fetch for creating an irder (POST)
+ * @param {Integer} boothID 
+ * @param {Array} Data 
+ * @param {Integer} totalPriceInput 
+ */
+
+function createOrder(boothID, Data, totalPriceInput) {
+    /*
+     format of line in data[] :
+     const Data = [
+         "<productID> , <quantity> , <totalPricePerProduct>",
+         "<productID> , <quantity> , <totalPricePerProduct>"
+     ];
+     refer the format of date input to the db
+     */ 
+     const products = Data.map(entry => {
+         const [productID, quantity, totalPricePerProduct] = entry.split(',');
+         return {
+             productID: parseInt(productID.trim(), 10), // Ensure integer for productID
+             quantity: parseInt(quantity.trim(), 10),  // Ensure integer for quantity
+             totalPricePerProduct: parseFloat(totalPricePerProduct.trim()).toFixed(2), // Ensure decimal(10,2)
+         };
+     });
+     
+     const data = {
+         products,
+         totalPrice: parseFloat(totalPriceInput).toFixed(2), // Ensure decimal(10,2) for totalPrice
+         date:  getCurrentDateWithMicroseconds(), // Date must be in the correct format: YYYY-MM-DD HH:MM:SS
+     };
+ 
+     // POST request to create an order
+     fetch(`http://localhost:3000/orders/create/${boothID}`, {// URL for creating order
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(data),
+     })
+         .then(response => {
+             if (!response.ok) {
+                 throw new Error(`HTTP error! status: ${response.status}`);
+             }
+             return response.json();
+
+
+         })
+         .then(orderData => {
+             console.log("Order created successfully:", orderData);
+             sessionStorage.setItem("OrderID", orderData);// set order id to session
+ 
+             // For each product, send a PATCH request to update stock
+             products.forEach(product => {
+                 const productData = {
+                     numberOfProductsSold: product.quantity, // Pass the integer value for quantity
+                 };
+ 
+                 fetch(`http://localhost:3000/products/buy/${product.productID}`, {// URL for buying product
+                     method: 'PATCH',
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(productData),
+                 })
+                     .then(response => {
+                         if (!response.ok) {
+                             throw new Error(`HTTP error! status: ${response.status}`);
+                         }
+                         return response.json();
+                     })
+                     .then(productData => {
+                         console.log(`Product ${product.productID} updated successfully:`, productData);
+                     })
+                     .catch(error => {
+                         console.error(`Error updating product ${product.productID}:`, error);
+                     });
+             });
+         })
+         .catch(error => {
+             console.error("Error creating order:", error);
+         });
+ }
+
+ function addToOrder(orderID, Data){
+      /*
+     format of line in data[] :
+     const Data = [
+         "<productID> , <quantity> , <totalPricePerProduct>",
+         "<productID> , <quantity> , <totalPricePerProduct>"
+     ];
+     refer the format of date input to the db
+     */ 
+     const products = Data.map(entry => {
+        const [productID, quantity, totalPricePerProduct] = entry.split(',');
+        return {
+            productID: parseInt(productID.trim(), 10), // Ensure integer for productID
+            quantity: parseInt(quantity.trim(), 10),  // Ensure integer for quantity
+            totalPricePerProduct: parseFloat(totalPricePerProduct.trim()).toFixed(2), // Ensure decimal(10,2)
+        };
+    });
+    
+    const data = {
+        products,
+    };
+
+    // POST request to create an order
+    fetch(`http://localhost:3000/orders/addToOrder/${orderID}`, {// URL for creating order
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(orderData => {
+            console.log("Order created successfully:", orderData);
+
+            // For each product, send a PATCH request to update stock
+            products.forEach(product => {
+                const productData = {
+                    numberOfProductsSold: product.quantity, // Pass the integer value for quantity
+                };
+
+                fetch(`http://localhost:3000/products/buy/${product.productID}`, {// URL for buying product
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(productData => {
+                        console.log(`Product ${product.productID} updated successfully:`, productData);
+                    })
+                    .catch(error => {
+                        console.error(`Error updating product ${product.productID}:`, error);
+                    });
+            });
+        })
+        .catch(error => {
+            console.error("Error creating order:", error);
+        });
+
+ }
+
 
 //END OF FETCH FUNCTIONS
 /* ----------------------------------------------------------------------------------------------------- */

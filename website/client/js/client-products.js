@@ -1,6 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('id'); 
 
+
 let box = document.querySelector(".product-list"); 
 
 function displayProducts(products) {
@@ -30,7 +31,7 @@ function displayProducts(products) {
           <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
             <div class="text-center">
               ${product.Stocks > 0 ? `
-                <a class="btn btn-outline-primary mt-auto" href="client-specific-product.html?id=${product.ProductID}">See more</a>
+                <a class="btn btn-outline-primary mt-auto" href="client-specific-product.html?productID=${product.ProductID}&boothID=${boothId}">See more</a>
               ` : `
                 <button class="btn btn-outline-primary mt-auto" disabled>Out of Stock</button>
               `}
