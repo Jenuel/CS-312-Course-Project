@@ -90,3 +90,12 @@ function handleRegistration(password) {
         alert('An error occurred. Please try again.');
     });
 }
+
+document.getElementById('userType').addEventListener('change', function() {
+    const label = document.getElementById('userTypeLabel');
+    if (this.checked) {
+        label.textContent = 'Vendor'; 
+    } else {
+        label.textContent = 'Customer';
+    }
+});
