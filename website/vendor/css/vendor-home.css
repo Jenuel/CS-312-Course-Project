@@ -74,21 +74,13 @@ body {
 .first-container {
     background-color: transparent;
     display: flex;
-    align-items: center;
-    /* justify-items: center; */
-    justify-content: flex-start;
-    gap: 2rem;
-    flex-wrap: wrap;
-    flex: 0.3;
+    align-items: center; 
+    justify-content: center; 
+    gap: 2rem; 
+    flex-wrap: nowrap; 
+    
 }
 
-/* .searchbox-wrap {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    width: 100%;
-    gap: 0.5rem; 
-  } */
   
   .search {
     flex: 2;
