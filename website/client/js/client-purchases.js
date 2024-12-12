@@ -137,14 +137,15 @@ function cancelOrder(orderId) {
 }
 
 function checkoutProducts(){
-
+    const date = getCurrentDateWithMicroseconds();
+ 
     let orderID = localStorage.getItem('orderId');
     fetch(`http://localhost:3000/products/buy/${orderID}`, { // URL for updaeting product in db
         method: 'PATCH', 
         headers: {
             'Content-Type': 'application/json', 
         },
-        body: JSON.stringify({ status: 'cancelled' }), 
+        body: JSON.stringify({datePaid:date}), 
     })
     .then(response => {
         if (!response.ok) {
