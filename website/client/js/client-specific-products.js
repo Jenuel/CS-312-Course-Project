@@ -10,8 +10,7 @@ if(sessionStorage.getItem("Grandtotal")) {
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('productID');
 const boothId = urlParams.get('boothID'); 
-let cart = []; 
-let grandTotal= 0.0;
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -83,24 +82,7 @@ function addToCart(quantity,ProductID,Price ){
     const totalPricePerProduct = totalPrice.toString;
 
     cart.push("",productID,",",qty,",",totalPricePerProduct);
-function addToCart(quantity, ProductID, Price) {
-    quantity = parseInt(quantity, 10);
-    if (isNaN(quantity) || quantity <= 0) {
-        alert("Invalid quantity. Please enter a positive number.");
-        return;
-    }
-
-    // Ensure Price is numeric
-    const numericPrice = parseFloat(Price) || 0.0;
-
-    let totalPrice = quantity * numericPrice;
-    cart.push({
-        ProductID: ProductID,
-        quantity: quantity,
-        price: numericPrice,
-        total: totalPrice
-    });
-
+    
     grandTotal += totalPrice;
     sessionStorage.setItem("Grandtotal", grandTotal)
 
