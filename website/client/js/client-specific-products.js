@@ -7,6 +7,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const boothId = urlParams.get('boothID');
 
 document.addEventListener("DOMContentLoaded", () => {
+    const backToProductsButton = document.getElementById('backToProducts');
+    backToProductsButton.addEventListener('click', (event) => {
+    event.preventDefault(); 
+    window.location.href = `client-products.html?id=${boothId}`; // Redirect 
+}); 
     const productId = urlParams.get('productID');
     if (productId) {
         getSpecificProduct(productId);
