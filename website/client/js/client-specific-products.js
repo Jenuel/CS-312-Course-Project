@@ -69,14 +69,6 @@ function addToCart(quantity, ProductID, Price) {
     grandTotal += totalPrice;
     sessionStorage.setItem("Grandtotal", grandTotal.toFixed(2));
 
-    if (sessionStorage.getItem("OrderID")) {
-        const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
-        addToOrder(orderId, cart);
-    } else {
-        createOrder(boothId, cart, grandTotal);
-    }
-    console.log(`Added ${quantity} of Product ID ${ProductID} to the cart. Grand Total: ₱${grandTotal.toFixed(2)}`);
-
     if (sessionStorage.getItem("OrderID")) { // there is an existing order
         const orderId = parseInt(sessionStorage.getItem("OrderID"), 10);
         addToOrder(orderId, cart);
@@ -127,15 +119,18 @@ function createOrder(boothID, data, totalPrice,customerID) {
     console.log("id: " ,customerID);
     
     // Ensure the total price is a float (not a string)
+    // Ensure the total price is a float (not a string)
     const formattedTotalPrice = parseFloat(totalPrice); 
+    const id = parseInt(customerID, 10);
 
     const payload = {
         products: formattedProducts,
         totalPrice: formattedTotalPrice, // Send as a number, not a string
         date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        customerId:parseInt(customerID, 10),
+        customerId:id,
     };
 
+    console.log("payload: ", payload);
     fetch(`http://localhost:3000/orders/create/${boothID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
