@@ -14,25 +14,9 @@ const getReservedOrders = async (request, response) => {
             return response.status(400).json({ error: 'Invalid booth ID' });
         }
         
-        const [rows] = await db.query(`
-            SELECT 
-                o.OrderID AS "OrderId", 
-                o.Price AS "TotalPrice", 
-                o.Status AS "Status", 
-                p.Quantity AS "Quantity", 
-                c.Name AS "ProductName" 
-            FROM 
-                \`order\` o 
-            JOIN 
-                \`order_products\` p ON o.OrderID = p.OrderID 
-            JOIN 
-                \`product\` c ON p.ProductID = c.ProductID 
-            WHERE 
-                o.Status = "Reserved" 
-                AND o.BoothID = ? 
-            ORDER BY 
-                o.OrderID ASC
-        `, [boothId]);
+        const [rows] = await db.query(
+            "SELECT o.OrderID AS 'OrderId', o.Price AS 'TotalPrice', o.Status AS 'Status', p.Quantity AS 'Quantity', c.Name AS 'ProductName', CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID JOIN `customer` x ON o.customerID = x.CustomerID JOIN `users` u ON x.UserID = u.UserID WHERE o.Status = 'Reserved' AND o.BoothID = ? ORDER BY o.OrderID ASC", 
+            [boothId]);
 
         response.json(rows);
     } catch (error) {
@@ -51,25 +35,9 @@ const getCompletedOrders = async (request, response) => {
     const { boothId } = request.params;
 
     try {
-        const [rows] = await db.query(`
-            SELECT 
-                o.OrderID AS "OrderId", 
-                o.Price AS "TotalPrice", 
-                o.Status AS "Status", 
-                p.Quantity AS "Quantity", 
-                c.Name AS "ProductName" 
-            FROM 
-                \`order\` o 
-            JOIN 
-                \`order_products\` p ON o.OrderID = p.OrderID 
-            JOIN 
-                \`product\` c ON p.ProductID = c.ProductID 
-            WHERE 
-                o.Status = "Complete" 
-                AND o.BoothID = ? 
-            ORDER BY 
-                o.OrderID ASC
-        `, [boothId]);
+        const [rows] = await db.query(
+            "SELECT o.OrderID AS 'OrderId', o.Price AS 'TotalPrice', o.Status AS 'Status', p.Quantity AS 'Quantity', c.Name AS 'ProductName', CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID JOIN `customer` x ON o.customerID = x.CustomerID JOIN `users` u ON x.UserID = u.UserID WHERE o.Status = 'Complete' AND o.BoothID = ? ORDER BY o.OrderID ASC", 
+            [boothId]);
 
         response.json(rows);
     } catch (error) {
@@ -296,7 +264,7 @@ const checkPendingOrder =async (request, response) => {
     try {
         // First check if order exists and is not already completed
         const [orderCheck] = await db.query(
-          "SELECT b.BoothID as 'Booth ID',o.OrderID as 'orderId',o.Price as 'grandTotal', p.ProductID as 'Product ID', p.Quantity as 'Quantity',p.Total as 'Total price per product', x.name as 'Product Name', TO_BASE64(x.Image) as 'Product Image', x.Price as 'Product price'FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` x ON p.ProductID = x.ProductID JOIN `booth` b ON b.BoothID = x.BoothID WHERE o.customerID = 1 AND o.Status = 'Pending'",
+          "SELECT b.BoothID as 'Booth ID',o.Order ID as 'Order ID',o.Price as 'grandTotal', p.ProductID as 'Product ID', p.Quantity as 'Quantity',p.Total as 'Total price per product', x.name as 'Product Name', TO_BASE64(x.Image) as 'Product Image', x.Price as 'Product price'FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` x ON p.ProductID = x.ProductID JOIN `booth` b ON b.BoothID = x.BoothID WHERE o.customerID = 1 AND o.Status = 'Pending'",
            [customerId]
         );
 
