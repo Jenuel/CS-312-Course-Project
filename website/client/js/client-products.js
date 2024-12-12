@@ -155,24 +155,29 @@ function getCart(customerId){
         console.error("Error:", data.error);
     } else {
       /*
-      [
-    {
-        "Booth ID": 1,
-        "Order ID": 123,
-        "Grand total": 150.00,
-        "Product ID": 101,
-        "Quantity": 2,
-        "Total price per product": 30.00
-    },
-    {
-        "Booth ID": 1,
-        "Order ID": 123,
-        "Grand total": 150.00,
-        "Product ID": 102,
-        "Quantity": 3,
-        "Total price per product": 60.00
-    }
-]
+     [
+        {
+            "Booth ID": 1,
+            "Order ID": 123,
+            "Grand total": 150.00,
+            "Product ID": 101,
+            "Quantity": 2,
+            "Total price per product": 30.00,
+            "Product Name": "Product A",
+            "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)"
+        },
+        {
+            "Booth ID": 2,
+            "Order ID": 123,
+            "Grand total": 150.00,
+            "Product ID": 102,
+            "Quantity": 3,
+            "Total price per product": 60.00,
+            "Product Name": "Product B",
+            "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)"
+        }
+      ]
+
       */
            // Arrays to hold product IDs, quantities, and totals
            const orderId = data[0]['Order ID'];
@@ -181,12 +186,16 @@ function getCart(customerId){
            const productIds = [];
            const quantities = [];
            const totals = [];
+           const name = [];
+           const image = [];
  
            // Loop through the response data and extract the required values
            data.forEach(product => {
                productIds.push(product['Product ID']);
                quantities.push(product['Quantity']);
                totals.push(product['Total price per product']);
+               name.push(product['Product Name']);
+               image.push(product['Product Image']);
            });
  
     }
