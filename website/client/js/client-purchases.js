@@ -129,3 +129,34 @@ function checkout() {
     const cartJSON = JSON.stringify(cart);
     window.location.href = "client-purchases.html?cart=" + encodeURIComponent(cartJSON) + "&total=" + encodeURIComponent(grandTotal);
 }
+
+
+function createOrder(boothID, data, totalPrice) {
+    const formattedProducts = data.map(entry => {
+        const [productID, quantity, totalPricePerProduct] = entry.split(',');
+        return {
+            productID: parseInt(productID, 10),
+            quantity: parseInt(quantity, 10),
+            totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
+        };
+    });
+
+    const payload = {
+        products: formattedProducts,
+        totalPrice: parseFloat(totalPrice).toFixed(2),
+        date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    };
+
+    fetch(`http://localhost:3000/orders/create/${boothID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+        .then(response => response.ok ? response.json() : Promise.reject(response))
+        .then(orderData => {
+            console.log("Order created successfully:", orderData);
+            sessionStorage.setItem("OrderID", orderData.id);
+            // Update stocks for each product
+        })
+        .catch(error => console.error("Error creating order:", error));
+}
