@@ -6,13 +6,11 @@ const boothId = urlParams.get('id');
     document.addEventListener('DOMContentLoaded', () => {
       const myPurchasesLink = document.getElementById('my-purchases');
 
-      if (customerID) {
+
         // Append the customerID as a query parameter to the URL
-        myPurchasesLink.href = `/client-purchases.html?id=${boothId}`;
-      } else {
-        console.warn('booth id not found!');
-      }
-    });
+        myPurchasesLink.href = `client-purchases.html?id=${boothId}`;
+      } 
+    );
 
 let box = document.querySelector(".product-list"); 
 
@@ -55,7 +53,7 @@ function displayProducts(products) {
       container.appendChild(productDiv); // Append each product card to the container
     });
   }
-  
+
   function cancelOrders(){
     cancelOrder(orderID);
   }
@@ -135,6 +133,70 @@ function cancelOrder(orderId) {
       console.error("Error cancelling order:", error);
   });
 }
+
+function getCart(customerId){
+  fetch(`http://localhost:3000/orders/checkPendingOrder/${customerId}`, { // URL for Cancel order
+    method: 'PATCH', 
+    headers: {
+        'Content-Type': 'application/json', 
+    },
+    body: JSON.stringify({ status: 'cancelled' }), 
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      // add handling of data 
+      if (data.error) {
+        // Handle the error message if the response contains an error
+        console.error("Error:", data.error);
+    } else {
+      /*
+      [
+    {
+        "Booth ID": 1,
+        "Order ID": 123,
+        "Grand total": 150.00,
+        "Product ID": 101,
+        "Quantity": 2,
+        "Total price per product": 30.00
+    },
+    {
+        "Booth ID": 1,
+        "Order ID": 123,
+        "Grand total": 150.00,
+        "Product ID": 102,
+        "Quantity": 3,
+        "Total price per product": 60.00
+    }
+]
+      */
+           // Arrays to hold product IDs, quantities, and totals
+           const orderId = data[0]['Order ID'];
+           const grandTotal = data[0]['Grand total'];
+           const boothId = data[0]['Booth ID'];
+           const productIds = [];
+           const quantities = [];
+           const totals = [];
+ 
+           // Loop through the response data and extract the required values
+           data.forEach(product => {
+               productIds.push(product['Product ID']);
+               quantities.push(product['Quantity']);
+               totals.push(product['Total price per product']);
+           });
+ 
+    }
+  })
+  .catch(error => {
+      console.error("Error cancelling order:", error);
+  });
+}
+
+
 
 //END FOR FETCH FUNCTIONS
 /* ----------------------------------------------------------------------------------------------------- */
