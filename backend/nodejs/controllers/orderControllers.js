@@ -404,5 +404,41 @@ const getCustomerID =async (request, response) => {
     }
 };
 
+const completeOrder = async (request, response) => {
+    const db = request.db;
+    const { orderId } = request.params;
+    const { datePaid } = request.body;
 
-export { getCompletedOrders, getReservedOrders, removeCompletedOrder, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID};
+    try {
+        // Check if order exists and is pending
+        const [orderCheck] = await db.query(
+            'SELECT Status FROM `order` WHERE OrderID = ?',
+            [orderId]
+        );
+
+        if (!orderCheck.length) {
+            return response.status(404).json({ error: 'Order not found' });
+        }
+
+        if (orderCheck[0].Status === 'Complete') {
+            return response.status(400).json({ error: 'Order is already completed' });
+        }
+
+        // Update order status
+        const [updateResult] = await db.query(
+            'UPDATE `order` SET Status = "Complete", DatePaid = ? WHERE OrderID = ?',
+            [datePaid, orderId]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            throw new Error('Failed to update order status');
+        }
+
+        response.json({ message: 'Order completed successfully' });
+    } catch (error) {
+        console.error('Error completing order:', error);
+        response.status(500).json({ error: 'Failed to complete order' });
+    }
+};
+
+export { getCompletedOrders, getReservedOrders, removeCompletedOrder, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID, completeOrder};
