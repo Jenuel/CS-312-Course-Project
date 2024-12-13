@@ -9,7 +9,7 @@ if((urlParams.get('id'))==="none"){
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
     }else{
-      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+      window.location.href = 'http://192.168.27.140:8080/client/html/client-home.html';
     }
   
   }else{
@@ -104,7 +104,7 @@ function fetchProducts(boothId, search = '', filter = 'all', order = 'asc') {
     queryParams.append('filter', 'active');
 }
 
-  fetch(`http://localhost:3000/products/booth/${boothId}?${queryParams.toString()}`, {
+  fetch(`http://192.168.27.140:3000/products/booth/${boothId}?${queryParams.toString()}`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ function fetchProducts(boothId, search = '', filter = 'all', order = 'asc') {
 
 
 function cancelOrder(orderId) {
-  fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+  fetch(`http://192.168.27.140:3000/orders/cancel/${orderId}`, { // URL for Cancel order
       method: 'PATCH', 
       headers: {
           'Content-Type': 'application/json', 
@@ -201,7 +201,7 @@ function cancelOrder(orderId) {
 
 function getCart(customerId){
   let cid = parseInt(customerId);
-  fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
+  fetch(`http://192.168.27.140:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
     method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 

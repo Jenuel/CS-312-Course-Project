@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000/products";
+const API_BASE_URL = "http://192.168.27.140:3000/products";
 let eventSetup = false;
 const boothId = sessionStorage.getItem("currentBoothId");
 const productTotal = document.getElementById("product-total");
@@ -762,7 +762,7 @@ async function initializePage() {
   // Check session
   const sessionId = getSessionId();
   if (!sessionId) {
-    window.location.href = "localhost:8080/auth/html/index.html";
+    window.location.href = "192.168.27.140:8080/auth/html/index.html";
     return;
   }
 
@@ -805,7 +805,7 @@ function getBoothIdFromSession() {
 
 // Populate Pending Orders
 function populatePendingOrders(boothId) {
-  fetch(`http://localhost:3000/orders/reserved/${boothId}`, {
+  fetch(`http://192.168.27.140:3000/orders/reserved/${boothId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
   })
@@ -838,7 +838,7 @@ function populatePendingOrders(boothId) {
 
 // Populate Completed Orders
 function populateCompletedOrders(boothId) {
-  fetch(`http://localhost:3000/orders/complete/${boothId}`, {
+  fetch(`http://192.168.27.140:3000/orders/complete/${boothId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
   })
@@ -873,7 +873,7 @@ function populateCompletedOrders(boothId) {
 function markAsCompleted(orderId) {
     if (!confirm("Mark this order as completed?")) return;
 
-    fetch(`http://localhost:3000/orders/approve/${orderId}`, {
+    fetch(`http://192.168.27.140:3000/orders/approve/${orderId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -896,7 +896,7 @@ function removeCompletedOrder(orderId) {
   if (!confirm("Are you sure you want to remove this order?")) return;
 
   // Send request to remove the order from the backend
-  fetch(`http://localhost:3000/orders/removeCompleted/${orderId}`, {
+  fetch(`http://192.168.27.140:3000/orders/removeCompleted/${orderId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" }
   })

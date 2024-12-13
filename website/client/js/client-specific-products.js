@@ -14,7 +14,7 @@ if((urlParams.get('boothId'))==="none"){
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
     }else{
-      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+      window.location.href = 'http://192.168.27.140:8080/client/html/client-home.html';
     }
   
   }else{
@@ -136,7 +136,7 @@ function checkout() {
 /* Fetch Functions */
 
 function getSpecificProduct(productId) {
-    fetch(`http://localhost:3000/products/details/${productId}`, {
+    fetch(`http://192.168.27.140:3000/products/details/${productId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     })
@@ -181,7 +181,7 @@ function createOrder(boothID, data, totalPrice,customerID) {
     };
 
     console.log("payload: ", payload);
-    fetch(`http://localhost:3000/orders/create/${boothID}`, {
+    fetch(`http://192.168.27.140:3000/orders/create/${boothID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -232,7 +232,7 @@ function addToOrder(orderID, data,) {
 
     console.log(payload);
 
-    fetch(`http://localhost:3000/orders/addToOrder/${orderID}`, {
+    fetch(`http://192.168.27.140:3000/orders/addToOrder/${orderID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -247,7 +247,7 @@ function addToOrder(orderID, data,) {
 }
 
 function getCustomerID(id){
-    fetch(`http://localhost:3000/orders/getCustomerID/${id}`, { // URL for Cancel order
+    fetch(`http://192.168.27.140:3000/orders/getCustomerID/${id}`, { // URL for Cancel order
       method: 'GET', 
       headers: {
           'Content-Type': 'application/json', 
@@ -295,7 +295,7 @@ function getCustomerID(id){
   
   function getCart(customerId){
     let cid = parseInt(customerId);
-    fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
+    fetch(`http://192.168.27.140:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
       method: 'GET', 
       headers: {
           'Content-Type': 'application/json', 

@@ -10,7 +10,7 @@ if((urlParams.get('boothId'))==="none"){
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
     }else{
-      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+      window.location.href = 'http://192.168.27.140:8080/client/html/client-home.html';
     }
   
   }else{
@@ -98,7 +98,7 @@ function updateCartItem(productId, newQuantity) {
         return;
     }
 
-    fetch(`http://localhost:3000/orders/updateQuantity/${orderId}/${productId}`, {
+    fetch(`http://192.168.27.140:3000/orders/updateQuantity/${orderId}/${productId}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ function removeCartItem(productId) {
         return;
     }
 
-    fetch(`http://localhost:3000/orders/removeItem/${orderId}/${productId}`, {
+    fetch(`http://192.168.27.140:3000/orders/removeItem/${orderId}/${productId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -197,7 +197,7 @@ function cancelOrders(){
  * @param {Integer} orderId 
  */
 function cancelOrder(orderId) {
-    fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+    fetch(`http://192.168.27.140:3000/orders/cancel/${orderId}`, { // URL for Cancel order
         method: 'PATCH', 
         headers: {
             'Content-Type': 'application/json', 
@@ -230,7 +230,7 @@ function checkoutProducts() {
     }
 
     // Change the endpoint to use the products/buy endpoint instead of orders/complete
-    fetch(`http://localhost:3000/products/buy/${orderID}`, {
+    fetch(`http://192.168.27.140:3000/products/buy/${orderID}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -334,7 +334,7 @@ function createOrder(boothID, data, totalPrice, customerId) {
         status: 'Pending' // Explicitly set status as Pending
     };
 
-    fetch(`http://localhost:3000/orders/create/${boothID}`, {
+    fetch(`http://192.168.27.140:3000/orders/create/${boothID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -367,7 +367,7 @@ function getCart(customerId) {
         return;
     }
 
-    fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, {
+    fetch(`http://192.168.27.140:3000/orders/checkPendingOrder/${cid}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     })

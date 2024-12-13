@@ -21,7 +21,7 @@ function getBoothIdFromSession() {
 
 // Populate Pending Orders
 function populateReservedOrders(boothID) {
-    fetch(`http://localhost:3000/orders/reserved/${boothID}`, {
+    fetch(`http://192.168.27.140:3000/orders/reserved/${boothID}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })
@@ -76,7 +76,7 @@ function populateCompletedOrders() {
 function markAsCompleted(orderId) {
     if (!confirm("Mark this order as completed?")) return;
 
-    fetch(`http://localhost:3000/orders/update/${orderId}`, {
+    fetch(`http://192.168.27.140:3000/orders/update/${orderId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

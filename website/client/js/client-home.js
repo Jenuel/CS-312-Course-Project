@@ -19,7 +19,7 @@ let sortSelect = document.getElementById("sortDropdown");
  */
 function getData() {
     // Use the formData object for filter and order params
-    fetch('http://localhost:8080/php/boothOps/boothRoutes.php', {
+    fetch('http://192.168.27.140:8080/php/boothOps/boothRoutes.php', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

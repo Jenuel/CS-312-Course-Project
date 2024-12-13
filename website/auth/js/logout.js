@@ -1,5 +1,5 @@
 function logout() {
-  fetch("http://localhost:8080/php/auth/logout.php", {
+  fetch("http://192.168.27.140:8080/php/auth/logout.php", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -16,7 +16,7 @@ function logout() {
     .then((data) => {
       if (data.success) {
         window.location.href =
-          "http://localhost:8080/CS-312-Course-Project/website/auth/html/index.html";
+          "http://192.168.27.140:8080/CS-312-Course-Project/website/auth/html/index.html";
       } else {
         throw new Error(data.message || "Logout failed");
       }

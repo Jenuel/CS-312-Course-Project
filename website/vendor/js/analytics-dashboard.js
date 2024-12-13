@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/analytics';
+const API_BASE_URL = 'http://192.168.27.140:3000/analytics';
 let currentBoothId = sessionStorage.getItem("currentBoothId"); 
 
 console.log(currentBoothId)

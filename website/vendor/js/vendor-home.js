@@ -46,7 +46,7 @@ function getData() {
   const searchTerm = searchInput?.value || "";
   const sortOption = sortSelect?.value || "A-Z";
 
-  fetch("http://localhost:8080/php/boothOps/boothRoutes.php", {
+  fetch("http://192.168.27.140:8080/php/boothOps/boothRoutes.php", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -228,7 +228,7 @@ function editBooth(boothId) {
   create.classList.remove("open-createBooth");
   document.body.classList.add("modal-open");
 
-  fetch(`http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`, {
+  fetch(`http://192.168.27.140:8080/php/boothOps/boothRoutes.php/${boothId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -301,7 +301,7 @@ async function updateBoothFunction() {
     action: "update",
   };
 
-  fetch("http://localhost:8080/php/boothOps/boothRoutes.php", {
+  fetch("http://192.168.27.140:8080/php/boothOps/boothRoutes.php", {
     method: "POST",
     body: JSON.stringify(formData),
     headers: {
@@ -361,7 +361,7 @@ function deleteBooth(boothId) {
     return;
   }
 
-  fetch(`http://localhost:8080/php/boothOps/boothRoutes.php/${boothId}`, {
+  fetch(`http://192.168.27.140:8080/php/boothOps/boothRoutes.php/${boothId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -418,7 +418,7 @@ async function createBoothFunction() {
     boothIcon: imageData,
   };
 
-  fetch("http://localhost:8080/php/boothOps/boothRoutes.php", {
+  fetch("http://192.168.27.140:8080/php/boothOps/boothRoutes.php", {
     method: "POST",
     body: JSON.stringify(formData),
     headers: {

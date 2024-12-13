@@ -10,7 +10,7 @@ function handleLogin(event) {
 
     var responseClone; // 1
    
-    fetch('http://localhost:8080/php/auth/authRoutes.php', {
+    fetch('http://192.168.27.140:8080/php/auth/authRoutes.php', {
         method: 'POST',
         // mode: 'no-cors',
         headers: {
@@ -36,22 +36,22 @@ function handleLogin(event) {
                 // set your values in the first page
                 localStorage.setItem('id', id.toString);
                 console.log("ID : ", localStorage.getItem('id'));
-                window.location.href = 'http://localhost:8080/vendor/html/vendor-home.html';//redirect to vendor side
+                window.location.href = 'http://192.168.27.140:8080/vendor/html/vendor-home.html';//redirect to vendor side
               
             } else {
                 const id = data.UserID;
                 localStorage.setItem('id', id);
                 alert("from auth ID customer : "+ localStorage.getItem('id'));
                 if(localStorage.getItem("Status") === "client-purchases.html"){
-                    window.location.href = 'http://localhost:8080/client/html/client-purchases.html?orderID=none';
+                    window.location.href = 'http://192.168.27.140:8080/client/html/client-purchases.html?orderID=none';
                 }
                 if(localStorage.getItem("Status") === "client-specific-products.html"){
-                    window.location.href = 'http://localhost:8080/client/html/client-specific-product.html?productID=none&boothID=none';
+                    window.location.href = 'http://192.168.27.140:8080/client/html/client-specific-product.html?productID=none&boothID=none';
                 }
                 if(localStorage.getItem("Status") === "client-product.html"){
-                    window.location.href = 'http://localhost:8080/client/html/client-products.html?id=none';
+                    window.location.href = 'http://192.168.27.140:8080/client/html/client-products.html?id=none';
                 }else{
-                    window.location.href = 'http://localhost:8080/client/html/client-home.html'; //redirect to customer side
+                    window.location.href = 'http://192.168.27.140:8080/client/html/client-home.html'; //redirect to customer side
                 }
                 
                 
