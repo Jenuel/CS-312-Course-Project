@@ -19,7 +19,7 @@ router.patch("/cancel/:orderId", cancelOrder); // customer *
 router.patch("/approve/:orderId", approveOrder); // vendor *
 router.post("/addToOrder/:orderId", addToOrder); // customer *
 router.get("/checkPendingOrder/:customerId", checkPendingOrder)// customer 
-router.get("/getCustomerID/:userId", getCustomerID)// customer
+router.get("/getCustomerID/:userId", checkPendingOrder)// customer
 
 router.delete("/removeCompleted/:orderId", removeCompletedOrder); // vendor *
 

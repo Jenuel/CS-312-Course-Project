@@ -13,9 +13,9 @@ const getReservedOrders = async (request, response) => {
         const [rows] = await db.query(
             `SELECT 
                 o.OrderID AS 'OrderId', 
-                GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName',  -- Concatenate product names
-                GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', -- Concatenate quantities
-                SUM(p.Total) AS 'TotalPrice', 
+                GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName', 
+                GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', 
+                SUM(p.Total * p.Quantity) AS 'TotalPrice', 
                 o.Status AS 'Status', 
                 CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName'
             FROM \`order\` o
@@ -38,6 +38,7 @@ const getReservedOrders = async (request, response) => {
 
 
 
+
 /*
 VENDOR CONTROLLER
 
@@ -51,9 +52,9 @@ const getCompletedOrders = async (request, response) => {
         const [rows] = await db.query(
             `SELECT 
                 o.OrderID AS 'OrderId', 
-                GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName',  -- Concatenate product names
-                GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', -- Concatenate quantities
-                SUM(p.Total) AS 'TotalPrice', 
+                GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName', 
+                GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', 
+                SUM(p.Total * p.Quantity) AS 'TotalPrice', 
                 o.Status AS 'Status', 
                 CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName'
             FROM \`order\` o
@@ -73,6 +74,7 @@ const getCompletedOrders = async (request, response) => {
         response.status(500).send('Failed to fetch completed orders');
     }
 };
+
 
 /*
 VENDOR CONTROLLER
