@@ -23,7 +23,7 @@ const getReservedOrders = async (request, response) => {
             JOIN \`product\` c ON p.ProductID = c.ProductID
             JOIN \`customer\` x ON o.customerID = x.CustomerID
             JOIN \`users\` u ON x.UserID = u.UserID
-            WHERE o.Status = 'Reserved' AND o.BoothID = ?
+            WHERE o.Status = 'Pending' AND o.BoothID = ?
             GROUP BY o.OrderID, u.FirstName, u.LastName
             ORDER BY o.OrderID ASC`, 
             [boothId]
@@ -352,26 +352,52 @@ const approveOrder = async (request, response) => {
 
     try {
         // First check if order exists and is not already completed
+        // Validate inputs
+        if (!orderId) {
+            return response.status(400).json({ error: 'Order ID is required' });
+        }
+
+        const dateRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}$/;
+        if (!dateRegex.test(datePaid)) {
+            return response.status(400).json({ 
+                error: 'Invalid date format',
+                expectedFormat: 'YYYY-MM-DD HH:MM:SS.MICROSECONDS'
+            });
+        }
+
+        // Check order exists
         const [orderCheck] = await db.query(
             'SELECT Status FROM `order` WHERE OrderID = ?',
             [orderId]
         );
 
-        if (!orderCheck.length) {
-            return response.status(404).json({ error: 'Order not found' });
-        }
-
         if (orderCheck[0].Status === 'Complete') {
             return response.status(400).json({ error: 'Order is already completed' });
         }
 
+         const [rows] = await db.query(
+            'UPDATE `order` SET `Status` = "Complete", `DatePaid` = ? WHERE `order`.`OrderID` = ?',
+            [datePaid, orderId]
+        );
 
-        const [rows] = await db.query('UPDATE `order` SET `Status` = "Complete", `DatePaid` = ? WHERE `order`.`OrderID` = ?',
-            [datePaid, orderId]);
-        res.json(rows);
+        console.log('Update Query Result:', rows);
+
+        // Check if update was successful
+        if (rows.affectedRows === 0) {
+            console.error('Failed to update order status');
+            throw new Error('Failed to update order status');
+        }
+
+        response.json({
+            message: 'Order completed successfully',
+            updatedOrder: rows
+        });
     } catch (error) {
-        console.error('Error approving order:', error);
-        response.status(500).send('Failed to approve order');
+        console.error('Error Name:', error.name);
+        console.error('Error Message:', error.message);
+        console.error('Error Stack:', error.stack);
+
+
     }
 };
 
