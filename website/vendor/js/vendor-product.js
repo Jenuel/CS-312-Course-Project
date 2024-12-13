@@ -870,32 +870,43 @@ function populateCompletedOrders(boothId) {
 }
 
 // Mark an Order as Completed
-async function markAsCompleted(orderId) {
+function markAsCompleted(orderId) {
   if (!confirm("Mark this order as completed?")) return;
 
+  const datePaid = getCurrentDateWithMicroseconds();
+  console.log('Marking Order Completed:');
+  console.log('Order ID:', orderId);
+  console.log('Date Paid:', datePaid);
 
-  console.log(`Attempting to mark order ${orderId} as completed`);
   fetch(`http://localhost:3000/orders/approve/${orderId}`, {
       method: "PATCH",
       headers: { 
           "Content-Type": "application/json" 
       },
-      body: JSON.stringify({
-          datePaid: getCurrentDateWithMicroseconds()
-      }),
+      body: JSON.stringify({ datePaid }),
   })
   .then((response) => {
+    console.log('Response Status:', response.status);
+    // Always proceed to update tables, even if the response is not OK
+    updateTables();
+
     if (!response.ok) {
-        console.error(`HTTP error! Status: ${response.status}`);
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.text().then(errorText => {
+            console.error('Error Response Text:', errorText);
+            // Optionally, you can still throw the error for logging
+            throw new Error(`HTTP error! Status: ${response.status}, Text: ${errorText}`);
+        });
     }
     return response.json();
-})
-.then((data) => {
+  })
+  .then((data) => {
     console.log(`Order ${orderId} completed successfully`, data);
-    updateTables();
-})
-  .catch((error) => console.error("Error marking order as completed:", error));
+  })
+  .catch((error) => {
+    console.error("Comprehensive Error:", error);
+    console.error("Error Name:", error.name);
+    console.error("Error Message:", error.message);
+  });
 }
 // Remove a Completed Order
 function removeCompletedOrder(orderId) {
