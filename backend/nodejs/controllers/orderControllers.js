@@ -7,23 +7,36 @@ This function is for getting the advanced/pending orders of a certain booth
 */
 const getReservedOrders = async (request, response) => {
     const db = request.db;
-    const{boothId} = request.params;
+    const { boothId } = request.params;
+
     try {
-        // Validate boothID
-        if (!boothId || isNaN(boothId)) {
-            return response.status(400).json({ error: 'Invalid booth ID' });
-        }
-        
         const [rows] = await db.query(
-            "SELECT o.OrderID AS 'OrderId', o.Price AS 'TotalPrice', o.Status AS 'Status', p.Quantity AS 'Quantity', c.Name AS 'ProductName', CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID JOIN `customer` x ON o.customerID = x.CustomerID JOIN `users` u ON x.UserID = u.UserID WHERE o.Status = 'Reserved' AND o.BoothID = ? ORDER BY o.OrderID ASC", 
-            [boothId]);
+            `SELECT 
+                o.OrderID AS 'OrderId', 
+                GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName',  -- Concatenate product names
+                GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', -- Concatenate quantities
+                SUM(p.Total) AS 'TotalPrice', 
+                o.Status AS 'Status', 
+                CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName'
+            FROM \`order\` o
+            JOIN \`order_products\` p ON o.OrderID = p.OrderID
+            JOIN \`product\` c ON p.ProductID = c.ProductID
+            JOIN \`customer\` x ON o.customerID = x.CustomerID
+            JOIN \`users\` u ON x.UserID = u.UserID
+            WHERE o.Status = 'Reserved' AND o.BoothID = ?
+            GROUP BY o.OrderID, u.FirstName, u.LastName
+            ORDER BY o.OrderID ASC`, 
+            [boothId]
+        );
 
         response.json(rows);
     } catch (error) {
-        console.error('Error fetching completed orders:', error);
-        response.status(500).send('Failed to fetch completed orders');
+        console.error('Error fetching reserved orders:', error);
+        response.status(500).send('Failed to fetch reserved orders');
     }
 };
+
+
 
 /*
 VENDOR CONTROLLER
@@ -36,8 +49,23 @@ const getCompletedOrders = async (request, response) => {
 
     try {
         const [rows] = await db.query(
-            "SELECT o.OrderID AS 'OrderId', o.Price AS 'TotalPrice', o.Status AS 'Status', p.Quantity AS 'Quantity', c.Name AS 'ProductName', CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID JOIN `customer` x ON o.customerID = x.CustomerID JOIN `users` u ON x.UserID = u.UserID WHERE o.Status = 'Complete' AND o.BoothID = ? ORDER BY o.OrderID ASC", 
-            [boothId]);
+            `SELECT 
+                o.OrderID AS 'OrderId', 
+                GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName',  -- Concatenate product names
+                GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', -- Concatenate quantities
+                SUM(p.Total) AS 'TotalPrice', 
+                o.Status AS 'Status', 
+                CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName'
+            FROM \`order\` o
+            JOIN \`order_products\` p ON o.OrderID = p.OrderID
+            JOIN \`product\` c ON p.ProductID = c.ProductID
+            JOIN \`customer\` x ON o.customerID = x.CustomerID
+            JOIN \`users\` u ON x.UserID = u.UserID
+            WHERE o.Status = 'Complete' AND o.BoothID = ?
+            GROUP BY o.OrderID, u.FirstName, u.LastName
+            ORDER BY o.OrderID ASC`, 
+            [boothId]
+        );
 
         response.json(rows);
     } catch (error) {
@@ -45,6 +73,8 @@ const getCompletedOrders = async (request, response) => {
         response.status(500).send('Failed to fetch completed orders');
     }
 };
+
+
 
 
 /*
@@ -322,4 +352,4 @@ const getCustomerID =async (request, response) => {
 };
 
 
-export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder,getCustomerID};
+export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID};

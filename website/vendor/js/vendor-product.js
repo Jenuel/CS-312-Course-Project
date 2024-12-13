@@ -805,34 +805,34 @@ function getBoothIdFromSession() {
 
 // Populate Pending Orders
 function populatePendingOrders(boothId) {
-    fetch(`http://localhost:3000/orders/reserved/${boothId}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-    })
-        .then((response) => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then((orders) => {
-            pendingOrdersTable.innerHTML = ""; // Clear existing rows
-            if (orders.length === 0) {
-                pendingOrdersTable.innerHTML = "<tr><td colspan='6'>No pending orders found.</td></tr>";
-                return;
-            }
-            orders.forEach((order) => {
-                const row = `
-                    <tr>
-                        <td>${order.OrderId}</td>
-                        <td>${order.CustomerName}</td>
-                        <td>${order.ProductName}</td>
-                        <td>${order.Quantity}</td>
-                        <td>₱${order.TotalPrice}</td>
-                        <td><button class="btn btn-sm btn-success" onclick="markAsCompleted('${order.OrderId}')">Complete</button></td>
-                    </tr>`;
-                pendingOrdersTable.insertAdjacentHTML("beforeend", row);
-            });
-        })
-        .catch((error) => console.error("Error fetching pending orders:", error));
+  fetch(`http://localhost:3000/orders/reserved/${boothId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+  })
+  .then((response) => {
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return response.json();
+  })
+  .then((orders) => {
+      pendingOrdersTable.innerHTML = ""; // Clear existing rows
+      if (orders.length === 0) {
+          pendingOrdersTable.innerHTML = "<tr><td colspan='6'>No pending orders found.</td></tr>";
+          return;
+      }
+      orders.forEach((order) => {
+          const row = `
+              <tr>
+                  <td>${order.OrderId}</td>
+                  <td>${order.CustomerName}</td>
+                  <td>${order.ProductName}</td> <!-- Display concatenated product names -->
+                  <td>${order.Quantity}</td> <!-- Display concatenated quantities -->
+                  <td>₱${order.TotalPrice}</td>
+                  <td><button class="btn btn-sm btn-success" onclick="markAsCompleted('${order.OrderId}')">Complete</button></td>
+              </tr>`;
+          pendingOrdersTable.insertAdjacentHTML("beforeend", row);
+      });
+  })
+  .catch((error) => console.error("Error fetching pending orders:", error));
 }
 
 
@@ -858,8 +858,8 @@ function populateCompletedOrders(boothId) {
               <tr id="order-${order.OrderId}">
                   <td>${order.OrderId}</td>
                   <td>${order.CustomerName}</td>
-                  <td>${order.ProductName}</td>
-                  <td>${order.Quantity}</td>
+                  <td>${order.ProductName}</td> <!-- Display concatenated product names -->
+                  <td>${order.Quantity}</td> <!-- Display concatenated quantities -->
                   <td>₱${order.TotalPrice}</td>
                   <td><button class="btn btn-sm btn-danger" onclick="removeCompletedOrder('${order.OrderId}')">Remove</button></td>
               </tr>`;
