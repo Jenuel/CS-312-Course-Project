@@ -71,20 +71,41 @@ function displaySpecificProduct(product) {
                     <span id="product-price">₱${parseFloat(productPrice).toFixed(2)}</span>
                 </div>
                 <p id="product-description" class="lead">Product Description</p>
-                <div class="d-flex align-items-center">
-                    <label for="quantityInput" class="me-2">Quantity:</label>
-                    <input type="number" id="quantityInput" min="1" value="1" class="form-control" style="width: 5rem;">
-                    <button class="btn btn-primary ms-3" type="button" 
-                        onclick="addToCart(
-                            this.parentElement.querySelector('#quantityInput').value,
-                            ${ProductID},
-                            ${parseFloat(productPrice)}
-                        )">
-                        Add to Cart
-                    </button>
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <label for="quantityInput" class="me-2">Quantity:</label>
+                        <input type="number" 
+                               id="quantityInput" 
+                               min="1" 
+                               value="1" 
+                               class="form-control" 
+                               style="width: 5rem;">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fs-5">Total: ₱<span id="cart-total">${parseFloat(productPrice).toFixed(2)}</span></span>
+                        <button class="btn btn-primary" 
+                                type="button" 
+                                onclick="addToCart(
+                                    this.parentElement.parentElement.querySelector('#quantityInput').value,
+                                    ${ProductID},
+                                    ${parseFloat(productPrice)}
+                                )">
+                            Add to Cart
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>`;
+
+    // Add event listener for quantity changes
+    const quantityInput = container.querySelector('#quantityInput');
+    quantityInput.addEventListener('input', (e) => {
+        const quantity = parseInt(e.target.value) || 1;
+        updateTotal(quantity, productPrice);
+    });
+
+    // Set initial total
+    updateTotal(1, productPrice);
 }
 
 function addToCart(quantity, ProductID, Price) {
@@ -357,7 +378,17 @@ function getCustomerID(id){
     });
   }
   
-
+  function updateTotal(quantity, price) {
+    const totalElement = document.getElementById('cart-total');
+    if (!totalElement) {
+        console.error("Cart total element not found");
+        return;
+    }
+    
+    const total = quantity * price;
+    totalElement.textContent = total.toFixed(2);
+    return total;
+}
 
 
 
