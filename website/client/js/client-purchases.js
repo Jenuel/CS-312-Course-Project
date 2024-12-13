@@ -90,7 +90,7 @@ function displayCart(cartItems) {
 
     updateCartTotal(runningTotal);
 }
-
+//gg
 function removeCartItem(productId) {
     const orderId = getOrderId();
     
