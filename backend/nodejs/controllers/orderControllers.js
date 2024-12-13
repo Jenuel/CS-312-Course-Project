@@ -74,6 +74,59 @@ const getCompletedOrders = async (request, response) => {
     }
 };
 
+/*
+VENDOR CONTROLLER
+
+This function is for removing completed orders from the booth.
+*/
+const removeCompletedOrder = async (request, response) => {
+    const db = request.db;
+    const { orderId } = request.params;
+
+    try {
+        // First, check if the order exists and is completed
+        const [orderCheck] = await db.query(
+            'SELECT Status FROM `order` WHERE OrderID = ?',
+            [orderId]
+        );
+
+        if (!orderCheck.length) {
+            return response.status(404).json({ error: 'Order not found' });
+        }
+
+        if (orderCheck[0].Status !== 'Complete') {
+            return response.status(400).json({ error: 'Order is not completed yet' });
+        }
+
+        // Delete the order from order_products table
+        const [rmOrderPrd] = await db.query(
+            'DELETE FROM order_products WHERE OrderID = ?',
+            [orderId]
+        );
+
+        // Now delete the order from the `order` table
+        const [rmOrder] = await db.query(
+            'DELETE FROM `order` WHERE OrderID = ?',
+            [orderId]
+        );
+
+        // Check if the order was successfully removed
+        if (rmOrder.affectedRows === 0) {
+            return response.status(400).json({ error: 'Failed to delete the order' });
+        }
+
+        // Return success response with the number of deleted rows
+        response.json({
+            message: `Completed order with ID ${orderId} successfully removed.`,
+            removedOrder: rmOrder.affectedRows, // Number of rows removed from `order`
+            removedOrderProducts: rmOrderPrd.affectedRows // Number of rows removed from `order_products`
+        });
+    } catch (error) {
+        console.error('Error removing completed order:', error);
+        response.status(500).send('Failed to remove completed order');
+    }
+};
+
 
 
 
@@ -352,4 +405,4 @@ const getCustomerID =async (request, response) => {
 };
 
 
-export { getCompletedOrders, getReservedOrders, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID};
+export { getCompletedOrders, getReservedOrders, removeCompletedOrder, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID};

@@ -896,7 +896,7 @@ function removeCompletedOrder(orderId) {
   if (!confirm("Are you sure you want to remove this order?")) return;
 
   // Send request to remove the order from the backend
-  fetch(`http://localhost:3000/orders/${orderId}`, {
+  fetch(`http://localhost:3000/orders/removeCompleted/${orderId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" }
   })
