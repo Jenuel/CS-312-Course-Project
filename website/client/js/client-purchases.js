@@ -36,15 +36,8 @@ function getOrderId() {
 
 function displayCart(cartItems) {
     const cartList = document.getElementById('purchase-list');
-    const cartTotalElement = document.getElementById('cart-total');
-    
-
     if (!cartList) {
         console.error("Cart list container (purchase-list) not found in DOM");
-        return;
-    }
-    if (!cartTotalElement) {
-        console.error("Cart total element (cart-total) not found in DOM");
         return;
     }
 
@@ -54,10 +47,10 @@ function displayCart(cartItems) {
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
         const emptyRow = document.createElement('tr');
         emptyRow.innerHTML = `
-            <td colspan="7" class="text-center">Your cart is empty.</td>
+            <td colspan="7" class="text-center">Your cart is empty</td>
         `;
         cartList.appendChild(emptyRow);
-        cartTotalElement.textContent = "0.00";
+        updateCartTotal(0);
         return;
     }
 
@@ -69,35 +62,29 @@ function displayCart(cartItems) {
         row.innerHTML = `
             <th scope="row">${index + 1}</th>
             <td>
-                <img 
-                    src="${item.image ? `data:image/png;base64,${item.image}` : 'https://via.placeholder.com/50'}" 
-                    alt="${item.productName || 'Product Image'}" 
-                    class="img-fluid" 
-                    style="max-height: 50px; max-width: 50px;">
+                <img src="${item.image ? `data:image/png;base64,${item.image}` : 'https://via.placeholder.com/50'}" 
+                     alt="${item.productName || 'Product Image'}" 
+                     class="img-fluid" 
+                     style="max-height: 50px; max-width: 50px;">
             </td>
             <td>${item.productName || 'Unknown Product'}</td>
             <td>
-                <input 
-                    type="number" 
-                    class="form-control form-control-sm quantity-input" 
-                    value="${item.quantity || 1}" 
-                    min="1" 
-                    onchange="updateCartItem(${item.productID}, this.value)"
-                    data-product-id="${item.productID}">
+                <input type="number" 
+                       class="form-control form-control-sm quantity-input" 
+                       value="${item.quantity || 1}" 
+                       min="1" 
+                       onchange="updateCartItem(${item.productID}, this.value)"
+                       data-product-id="${item.productID}">
             </td>
-            <td>₱${parseFloat(item.price).toFixed(2)}</td>
-            <td>₱${itemTotal.toFixed(2)}</td>
+            <td class="text-end">₱${parseFloat(item.price).toFixed(2)}</td>
+            <td class="text-end">₱${itemTotal.toFixed(2)}</td>
             <td>
-                <button 
-                    class="btn btn-danger btn-sm" 
-                    onclick="removeCartItem(${item.productID})"
-                    data-order-id="${localStorage.getItem('OrderId')}"
-                >
+                <button class="btn btn-danger btn-sm w-100" 
+                        onclick="removeCartItem(${item.productID})">
                     Remove
                 </button>
             </td>
         `;
-
         cartList.appendChild(row);
     });
 
@@ -409,7 +396,6 @@ function getCart(customerId) {
             cartList: !!cartList,
             cartTotal: !!cartTotal
         });
-        return;
     }
     const cid = parseInt(customerId);
     if (isNaN(cid)) {
@@ -449,11 +435,14 @@ function getCart(customerId) {
         }));
 
         // Store data with consistent key names
-        localStorage.setItem('OrderId', data[0].orderID);
-        localStorage.setItem('BoothId', data[0].boothID);
-        
+        if (data[0]) {
+            localStorage.setItem('OrderId', data[0].orderID);
+            localStorage.setItem('BoothId', data[0].boothID);
+        }
         displayCart(cartItems);
-        updateCartTotal(data[0].grandTotal);
+        if (cartTotal && data[0]) {
+            updateCartTotal(data[0].grandTotal);
+        }
     })
     .catch(error => {
         console.error("Error fetching cart items:", error);
