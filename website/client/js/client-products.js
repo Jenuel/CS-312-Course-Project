@@ -21,24 +21,31 @@ if((urlParams.get('id'))==="none"){
   }
 
   
-
-
-    // Function to dynamically set the "My Purchases" URL
-    document.addEventListener('DOMContentLoaded', () => {
-      const myPurchasesLink = document.getElementById('my-purchases');
-
-
-        // Append the customerID as a query parameter to the URL
-        myPurchasesLink.href = `client-purchases.html?id=${boothId}`;
-      } 
-    );
-
 let box = document.querySelector(".product-list"); 
+
+function getData() {
+  const searchInput = document.querySelector('input[type="search"]').value.trim();
+  const filterSelect = document.getElementById('filter').value;
+  const orderSelect = document.getElementById('order').value;
+  fetchProducts(boothId, searchInput, filterSelect, orderSelect);
+}
 
 function displayProducts(products) {
     const container = document.querySelector(".row.gx-4.gx-lg-5.row-cols-2.row-cols-md-3.row-cols-xl-4.justify-content-center");
     container.innerHTML = ""; // Clear any previous product cards
   
+
+    if (products.length === 0) {
+      // Show no results message
+      container.innerHTML = `
+          <div class="col-12 text-center">
+              <p class="text-muted my-5">No products found matching your criteria.</p>
+          </div>
+      `;
+      return;
+  }
+
+
     products.forEach((product) => {
       const productDiv = document.createElement("div");
       productDiv.classList.add("col", "mb-5");
@@ -89,46 +96,83 @@ function displayProducts(products) {
  * @param {String} type  choices: name || price 
  * @param {String} order  choices: ASC || DESC
  */
-function fetchProducts(boothId,type, order ) {
+function fetchProducts(boothId, search = '', filter = 'all', order = 'asc') {
+  let queryParams = new URLSearchParams();
+  queryParams.append('sort', `name:${order}`);
 
-    type = 'name';
-    order = 'asc';
+  if (filter !== 'all') {
+    queryParams.append('filter', 'active');
+}
 
-    fetch(`http://localhost:3000/products/booth/${boothId}?filter=active&sort=${type}:${order}`, { 
-        method: 'GET',
-        headers: {
-            "Content-type": 'application/json',
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+  fetch(`http://localhost:3000/products/booth/${boothId}?${queryParams.toString()}`, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      let filteredProducts = data;
+
+      if (search) {
+        const searchLower = search.toLowerCase();
+        filteredProducts = filteredProducts.filter(product => 
+            product.Name.toLowerCase().includes(searchLower)
+        );
+    }
+
+    // Apply stock filter
+    if (filter === 'in-stock') {
+        filteredProducts = filteredProducts.filter(product => product.Stocks > 0);
+    } else if (filter === 'out-of-stock') {
+        filteredProducts = filteredProducts.filter(product => product.Stocks === 0);
+    }
+
+    // Sort products
+    filteredProducts.sort((a, b) => {
+        const nameA = a.Name.toLowerCase();
+        const nameB = b.Name.toLowerCase();
+        if (order === 'asc') {
+            return nameA.localeCompare(nameB);
+        } else {
+            return nameB.localeCompare(nameA);
         }
-        return response.json();
-    })
-    .then(data => {
-        /*
-        sample data output
-        [
-            {
-                "Name": "Handmade Bracelet",
-                "Status": "active",
-                "Image": "base64"
-            },
-            {
-                "Name": "Handmade Bracelet",
-                "Status": "active",
-                "Image": "base64"
-            }
-        ]
-        */
-        console.log("Products fetched successfully:", data);
+    });if (search) {
+      const searchLower = search.toLowerCase();
+      filteredProducts = filteredProducts.filter(product => 
+          product.Name.toLowerCase().includes(searchLower)
+      );
+  }
 
-        displayProducts(data);
-    })
-    .catch(error => {
-        console.error("Error purchasing product:", error);
-    });
+  // Apply stock filter
+  if (filter === 'in-stock') {
+      filteredProducts = filteredProducts.filter(product => product.Stocks > 0);
+  } else if (filter === 'out-of-stock') {
+      filteredProducts = filteredProducts.filter(product => product.Stocks === 0);
+  }
+
+  // Sort products
+  filteredProducts.sort((a, b) => {
+      const nameA = a.Name.toLowerCase();
+      const nameB = b.Name.toLowerCase();
+      if (order === 'asc') {
+          return nameA.localeCompare(nameB);
+      } else {
+          return nameB.localeCompare(nameA);
+      }
+  });
+
+      displayProducts(filteredProducts);
+  })
+  .catch(error => {
+      console.error("Error fetching products:", error);
+      alert("Failed to load products. Please try again.");
+  });
 }
 
 
@@ -162,7 +206,6 @@ function getCart(customerId){
     headers: {
         'Content-Type': 'application/json', 
     },
-    body: JSON.stringify({ status: 'cancelled' }), 
   })
   .then(response => {
       if (!response.ok) {
@@ -293,13 +336,38 @@ function logout() {
     localStorage.setItem("Status", "client-product.html");  // adding status
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
+  // Set up My Purchases link (just once)
+  const myPurchasesLink = document.getElementById('my-purchases');
+  if (myPurchasesLink) {
+      myPurchasesLink.href = `client-purchases.html?id=${boothId}`;
+  }
+
+  // Set up search and filter handlers
+  const searchForm = document.querySelector('form[role="search"]');
+  const searchInput = document.querySelector('input[type="search"]');
+  const filterSelect = document.getElementById('filter');
+  const orderSelect = document.getElementById('order');
   const logoutBtn = document.getElementById("logout-btn");
 
-  if (logoutBtn) {
-      logoutBtn.addEventListener("click", function (e) {
+  //\
+  searchForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      logout(); 
-  });}
       getData();
+  });
+
+  // Handle filter and sort changes
+  filterSelect.addEventListener('change', getData);
+  orderSelect.addEventListener('change', getData);
+
+  // Handle logout
+  if (logoutBtn) {
+      logoutBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          logout();
+      });
+  }
+
+  // Initial load of products (just once)
+  getData();
 });
