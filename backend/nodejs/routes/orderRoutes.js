@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getCompletedOrders,
+  getAllOrdersByBooth,
   createOrder,
   cancelOrder,
   approveOrder,
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.get("/reserved/:boothId", getReservedOrders); // vendor *
 router.get("/complete/:boothId", getCompletedOrders); // vendor *
+router.get("/all/:boothId", getAllOrdersByBooth); //vendor *
 router.post("/create/:boothID", createOrder); // customer *
 router.patch("/cancel/:orderId", cancelOrder); // customer *
 router.patch("/approve/:orderId", approveOrder); // vendor *

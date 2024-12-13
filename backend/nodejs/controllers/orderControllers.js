@@ -128,7 +128,37 @@ const removeCompletedOrder = async (request, response) => {
 };
 
 
-
+const getAllOrdersByBooth = async (request, response) => {
+    const db = request.db; 
+    const { boothID } = request.params; 
+    const customerID = request.cookies.customerID; 
+    if (!customerID) {
+        return response.status(400).send('Customer ID is required');
+    }
+    try {
+        const [rows] = await db.query(
+            `
+            SELECT 
+                c1.cartID AS "cartID", 
+                c1.productID AS "productID", 
+                c1.quantity AS "quantity" 
+            FROM 
+                cart_products c1 
+            JOIN 
+                cart c2 
+                ON c1.cartID = c2.cartID 
+            WHERE 
+                c2.customerID = ? 
+                AND c2.boothID = ?;
+            `,
+            [customerID, boothID] 
+        );
+        response.json(rows); 
+    } catch (error) {
+        console.error('Error fetching orders by booth:', error);
+        response.status(500).send('Failed to fetch orders');
+    }
+};
 
 /*
 CLIENT CONTROLLER
@@ -441,4 +471,4 @@ const completeOrder = async (request, response) => {
     }
 };
 
-export { getCompletedOrders, getReservedOrders, removeCompletedOrder, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID, completeOrder};
+export { getCompletedOrders, getReservedOrders, removeCompletedOrder, getAllOrdersByBooth, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID, completeOrder};
