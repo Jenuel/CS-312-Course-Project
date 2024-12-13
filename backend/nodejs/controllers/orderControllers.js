@@ -23,7 +23,7 @@ const getReservedOrders = async (request, response) => {
             JOIN \`product\` c ON p.ProductID = c.ProductID
             JOIN \`customer\` x ON o.customerID = x.CustomerID
             JOIN \`users\` u ON x.UserID = u.UserID
-            WHERE o.Status = 'Reserved' AND o.BoothID = ?
+            WHERE o.Status = 'Pending' AND o.BoothID = ?
             GROUP BY o.OrderID, u.FirstName, u.LastName
             ORDER BY o.OrderID ASC`, 
             [boothId]
@@ -336,9 +336,20 @@ const approveOrder = async (request, response) => {
         }
 
 
-        const [rows] = await db.query('UPDATE `order` SET `Status` = "Complete", `DatePaid` = ? WHERE `order`.`OrderID` = ?',
-            [datePaid, orderId]);
-        res.json(rows);
+         const [rows] = await db.query(
+            'UPDATE `order` SET `Status` = "Complete", `DatePaid` = ? WHERE `order`.`OrderID` = ?',
+            [datePaid, orderId]
+        );
+
+        // Check if update was successful
+        if (rows.affectedRows === 0) {
+            throw new Error('Failed to update order status');
+        }
+
+        response.json({
+            message: 'Order completed successfully',
+            updatedOrder: rows
+        });
     } catch (error) {
         console.error('Error approving order:', error);
         response.status(500).send('Failed to approve order');

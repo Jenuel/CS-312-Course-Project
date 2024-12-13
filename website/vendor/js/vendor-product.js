@@ -870,27 +870,33 @@ function populateCompletedOrders(boothId) {
 }
 
 // Mark an Order as Completed
-function markAsCompleted(orderId) {
-    if (!confirm("Mark this order as completed?")) return;
+async function markAsCompleted(orderId) {
+  if (!confirm("Mark this order as completed?")) return;
 
-    fetch(`http://localhost:3000/orders/approve/${orderId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            status: "completed",
-            dateCompleted: getCurrentDateWithMicroseconds(),
-        }),
-    })
-        .then((response) => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(() => {
-            updateTables();
-        })
-        .catch((error) => console.error("Error marking order as completed:", error));
+
+  console.log(`Attempting to mark order ${orderId} as completed`);
+  fetch(`http://localhost:3000/orders/approve/${orderId}`, {
+      method: "PATCH",
+      headers: { 
+          "Content-Type": "application/json" 
+      },
+      body: JSON.stringify({
+          datePaid: getCurrentDateWithMicroseconds()
+      }),
+  })
+  .then((response) => {
+    if (!response.ok) {
+        console.error(`HTTP error! Status: ${response.status}`);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json();
+})
+.then((data) => {
+    console.log(`Order ${orderId} completed successfully`, data);
+    updateTables();
+})
+  .catch((error) => console.error("Error marking order as completed:", error));
 }
-
 // Remove a Completed Order
 function removeCompletedOrder(orderId) {
   if (!confirm("Are you sure you want to remove this order?")) return;
@@ -901,12 +907,12 @@ function removeCompletedOrder(orderId) {
       headers: { "Content-Type": "application/json" }
   })
   .then((response) => {
-      if (!response.ok) throw new Error(`Error removing order: ${response.status}`);
-      console.log(`Order ${orderId} removed successfully`);
-
-      // After removal, update the table
-      updateTables();
-  })
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    console.log(`Order ${orderId} completed successfully`);
+    
+    // Update tables immediately after successful response
+    updateTables();
+})
   .catch((error) => console.error("Error removing completed order:", error));
 }
 
