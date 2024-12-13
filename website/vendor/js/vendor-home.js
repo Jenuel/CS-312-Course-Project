@@ -222,7 +222,7 @@ function getBase64(file) {
 
 // Edit Section
 function editBooth(boothId) {
-  console.log(boothId);
+  console.log("Editing Booth: " + boothId);
   modal.classList.add("show");
   edit.classList.add("open-editBooth");
   create.classList.remove("open-createBooth");
@@ -241,8 +241,8 @@ function editBooth(boothId) {
 
       console.log(booth);
       if (booth) {
+        console.log(booth.Title);
         document.getElementById("edit-name").value = booth.Title;
-        console.log(booth.Title.value);
         document.getElementById("edit-description").value = booth.Description;
         document.getElementById("edit-schedule").value = booth.Schedules;
         document.getElementById("edit-location").value = booth.Location;
@@ -251,15 +251,15 @@ function editBooth(boothId) {
         document.getElementById("edit-booth-form").dataset.boothId = boothId;
 
         if (booth.BoothIcon) {
-          document.getElementById(
-            "edit-image"
-          ).src = `data:image/png;base64,${booth.BoothIcon}`;
+          document.getElementById("edit-image").src = `data:image/png;base64,${booth.BoothIcon}`;
+        } else {
+          document.getElementById("edit-image").src = "../res/1564534_customer_man_user_account_profile_icon.png";
         }
       }
     })
     .catch((error) => {
       console.error("Error fetching booth:", error);
-      alert("Error loading booth data");
+      // alert("Error loading booth data");
     });
 }
 
@@ -509,7 +509,7 @@ function loadPage(page) {
       pageFrame.style.display = "none";
       getData(); // Refresh
       break;
-      
+
     case "sales":
       boothContent.classList.remove("active");
       pageFrame.style.display = "block";
@@ -528,6 +528,9 @@ document.addEventListener("DOMContentLoaded", () => {
   edit = document.getElementById("edit");
   boothImage = document.getElementById("image");
   inputFile = document.getElementById("input-file");
+  const editInputFile = document.getElementById("edit-input-file");
+  const editImage = document.getElementById("edit-image");
+
   const logoutBtn = document.getElementById("logout-btn");
 
   if (logoutBtn) {
@@ -547,6 +550,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   inputFile.onchange = function () {
     boothImage.src = URL.createObjectURL(inputFile.files[0]);
+  };
+
+  editInputFile.onchange = function () {
+    editImage.src = URL.createObjectURL(editInputFile.files[0]);
   };
 
   searchInput = document.querySelector(".searchbox");

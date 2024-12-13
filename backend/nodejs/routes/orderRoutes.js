@@ -9,7 +9,8 @@ import {
   checkPendingOrder,
   getCustomerID,
   completeOrder,
-  removeCompletedOrder
+  removeCompletedOrder,
+  removeItemFromOrder
 } from "../controllers/orderControllers.js";
 const router = express.Router();
 
@@ -25,5 +26,6 @@ router.get("/getCustomerID/:userId", checkPendingOrder)// customer
 router.delete("/removeCompleted/:orderId", removeCompletedOrder); // vendor *
 router.patch("/products/buy/:orderId", completeOrder);
 router.patch("/complete/:orderId", completeOrder);
+router.delete("/removeItem/:orderId", removeItemFromOrder); // client
 
 export default router;

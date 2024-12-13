@@ -26,14 +26,30 @@ if((urlParams.get('boothId'))==="none"){
 
 let box = document.querySelector(".purchase-list"); // where the child will be appended
 
+function getOrderId() {
+    const orderId = localStorage.getItem('OrderId') || 
+                   localStorage.getItem('orderId') ||
+                   localStorage.getItem('OrderID');
+    console.log('Current Order ID:', orderId);
+    return orderId;
+}
+
 function displayCart(cartItems) {
     const cartList = document.getElementById('purchase-list');
+    const cartTotalElement = document.getElementById('cart-total');
+    
+
     if (!cartList) {
-        console.error("Cart list container not found.");
+        console.error("Cart list container (purchase-list) not found in DOM");
+        return;
+    }
+    if (!cartTotalElement) {
+        console.error("Cart total element (cart-total) not found in DOM");
         return;
     }
 
     cartList.innerHTML = "";
+    let runningTotal = 0;
 
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
         const emptyRow = document.createElement('tr');
@@ -41,11 +57,9 @@ function displayCart(cartItems) {
             <td colspan="7" class="text-center">Your cart is empty.</td>
         `;
         cartList.appendChild(emptyRow);
-        updateCartTotal(0);
+        cartTotalElement.textContent = "0.00";
         return;
     }
-
-    let runningTotal = 0;
 
     cartItems.forEach((item, index) => {
         const itemTotal = item.quantity * item.price;
@@ -74,15 +88,71 @@ function displayCart(cartItems) {
             <td>₱${parseFloat(item.price).toFixed(2)}</td>
             <td>₱${itemTotal.toFixed(2)}</td>
             <td>
-                <button class="btn btn-danger btn-sm" onclick="removeCartItem(${item.productID})">Remove</button>
+                <button 
+                    class="btn btn-danger btn-sm" 
+                    onclick="removeCartItem(${item.productID})"
+                    data-order-id="${localStorage.getItem('OrderId')}"
+                >
+                    Remove
+                </button>
             </td>
         `;
 
         cartList.appendChild(row);
     });
 
-    // Update the total display
     updateCartTotal(runningTotal);
+}
+
+function removeCartItem(productId) {
+    const orderId = getOrderId();
+    
+    if (!orderId) {
+        console.error("No order ID found in localStorage:", localStorage);
+        alert("Could not find your order. Please refresh the page and try again.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to remove this item from your cart?")) {
+        return;
+    }
+
+    console.log(`Removing product ${productId} from order ${orderId}`);
+
+    fetch(`http://localhost:3000/orders/removeItem/${orderId}/${productId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Remove item response:', data);
+        
+        if (data.isEmpty) {
+            // Clear all order-related storage
+            localStorage.removeItem('OrderId');
+            localStorage.removeItem('orderId');
+            localStorage.removeItem('OrderID');
+            localStorage.removeItem('BoothId');
+            
+            window.location.href = 'client-home.html';
+        } else {
+            const localStorageId = localStorage.getItem('id');
+            if (localStorageId) {
+                getCart(localStorageId);
+            }
+        }
+    })
+    .catch(error => {
+        console.error("Error removing item:", error);
+        alert("Failed to remove item from cart. Please try again.");
+    });
 }
 
 function updateCartItem(productId, newQuantity) {
@@ -124,37 +194,7 @@ function updateCartItem(productId, newQuantity) {
     });
 }
 
-function removeCartItem(productId) {
-    const orderId = localStorage.getItem('orderId');
-    if (!orderId) {
-        console.error("No order ID found");
-        return;
-    }
 
-    fetch(`http://localhost:3000/orders/removeItem/${orderId}/${productId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Refresh the cart display
-        const localStorageId = localStorage.getItem('id');
-        if (localStorageId) {
-            getCart(localStorageId);
-        }
-    })
-    .catch(error => {
-        console.error("Error removing item from cart:", error);
-        alert("Failed to remove item from cart. Please try again.");
-    });
-}
 
 function updateCartTotal(input) {
     const cartTotalElement = document.getElementById('cart-total');
@@ -361,7 +401,17 @@ function createOrder(boothID, data, totalPrice, customerId) {
   
 
 function getCart(customerId) {
-    let cid = parseInt(customerId);
+    const cartList = document.getElementById('purchase-list');
+    const cartTotal = document.getElementById('cart-total');
+    
+    if (!cartList || !cartTotal) {
+        console.error("Required DOM elements not found:", {
+            cartList: !!cartList,
+            cartTotal: !!cartTotal
+        });
+        return;
+    }
+    const cid = parseInt(customerId);
     if (isNaN(cid)) {
         console.error("Invalid customer ID");
         return;

@@ -466,5 +466,95 @@ const completeOrder = async (request, response) => {
         response.status(500).json({ error: 'Failed to complete order' });
     }
 };
+const removeItemFromOrder = async (request, response) => {
+    const db = request.db;
+    const { orderId, productId } = request.params;
 
-export { getCompletedOrders, getReservedOrders, removeCompletedOrder, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID, completeOrder};
+    try {
+        // First check if the order exists and is pending
+        const [orderCheck] = await db.query(
+            'SELECT Status FROM `order` WHERE OrderID = ?',
+            [orderId]
+        );
+
+        if (!orderCheck.length) {
+            return response.status(404).json({ error: 'Order not found' });
+        }
+
+        if (orderCheck[0].Status !== 'Pending') {
+            return response.status(400).json({ error: 'Can only remove items from pending orders' });
+        }
+
+        // Get the product's total price before removing
+        const [productInfo] = await db.query(
+            'SELECT Total, Quantity FROM order_products WHERE OrderID = ? AND ProductID = ?',
+            [orderId, productId]
+        );
+
+        if (!productInfo.length) {
+            return response.status(404).json({ error: 'Product not found in order' });
+        }
+
+        const productTotal = productInfo[0].Total;
+
+        // Begin transaction
+        await db.beginTransaction();
+
+        try {
+ 
+            const [removeResult] = await db.query(
+                'DELETE FROM order_products WHERE OrderID = ? AND ProductID = ?',
+                [orderId, productId]
+            );
+
+            if (removeResult.affectedRows === 0) {
+                throw new Error('Failed to remove product from order');
+            }
+
+   
+            const [updateOrder] = await db.query(
+                'UPDATE `order` SET Price = Price - ? WHERE OrderID = ?',
+                [productTotal, orderId]
+            );
+
+            const [remainingItems] = await db.query(
+                'SELECT COUNT(*) as count FROM order_products WHERE OrderID = ?',
+                [orderId]
+            );
+
+            let isEmpty = false;
+            if (remainingItems[0].count === 0) {
+                // If no items left, delete the order
+                const [deleteOrder] = await db.query(
+                    'DELETE FROM `order` WHERE OrderID = ?',
+                    [orderId]
+                );
+                isEmpty = true;
+            }
+
+            await db.commit();
+
+            response.json({ 
+                message: 'Product removed from order successfully',
+                isEmpty: isEmpty,
+                removedProduct: {
+                    productId,
+                    quantity: productInfo[0].Quantity,
+                    total: productTotal
+                }
+            });
+
+        } catch (error) {
+            await db.rollback();
+            throw error;
+        }
+
+    } catch (error) {
+        console.error('Error removing product from order:', error);
+        response.status(500).json({ 
+            error: 'Failed to remove product from order',
+            details: error.message 
+        });
+    }
+};
+export { getCompletedOrders, getReservedOrders, removeCompletedOrder, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID, completeOrder, removeItemFromOrder};

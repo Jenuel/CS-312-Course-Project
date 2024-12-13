@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } else {
         echo json_encode(["error" => "Error updating booth: " . $conn->error]);
     }
-} 
+}  
 // If no boothId, it's a create operation
 else {
         $orgID = $_SESSION['user']['OrgID'];
@@ -126,17 +126,16 @@ else {
         $location = $input['location'];
         $boothIcon = null;
         $status = 'open';
-        $boothIcon = isset($input['boothIcon']) && !empty($input['boothIcon']) ? $input['boothIcon'] : file_get_contents("./vendor/res/booth.png");
-        
+    
         if ($input['boothIcon']) {
             $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $input['boothIcon']));
             $boothIcon = $imageData;
         }
 
 
-        $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID,BoothIcon ) VALUES (?, ?, ?, ?, ?,?,?,?)";
+        $insertQuery = "INSERT INTO booth (Title, Description, Schedules, Location, BoothIcon, Status, orgID ) VALUES (?, ?, ?, ?, ?,?,?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssssssib", $title, $description, $schedules, $location, $boothIcon, $status, $orgID,$boothIcon);
+        $insertStmt->bind_param("ssssssi", $title, $description, $schedules, $location, $boothIcon, $status, $orgID);
         if ($insertStmt->execute()) {
             http_response_code(201); 
             echo json_encode(["success" => true]); 
