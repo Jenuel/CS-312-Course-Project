@@ -3,7 +3,7 @@
 /*
 VENDOR CONTROLLER
 
-This function is for getting the advanced/pending orders of a certain booth 
+This function is for getting the advanced/pending orders of a certain booth
 */
 const getReservedOrders = async (request, response) => {
     const db = request.db;
@@ -15,7 +15,7 @@ const getReservedOrders = async (request, response) => {
                 o.OrderID AS 'OrderId', 
                 GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName', 
                 GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', 
-                SUM(p.Total * p.Quantity) AS 'TotalPrice', 
+                o.Price AS 'TotalPrice',  -- Using Price from order table
                 o.Status AS 'Status', 
                 CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName'
             FROM \`order\` o
@@ -36,13 +36,10 @@ const getReservedOrders = async (request, response) => {
     }
 };
 
-
-
-
 /*
 VENDOR CONTROLLER
 
-This function is for getting the completed orders of a certain booth 
+This function is for getting the completed orders of a certain booth
 */
 const getCompletedOrders = async (request, response) => {
     const db = request.db;
@@ -54,7 +51,7 @@ const getCompletedOrders = async (request, response) => {
                 o.OrderID AS 'OrderId', 
                 GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName', 
                 GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', 
-                SUM(p.Total * p.Quantity) AS 'TotalPrice', 
+                o.Price AS 'TotalPrice',  -- Using Price from order table
                 o.Status AS 'Status', 
                 CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName'
             FROM \`order\` o
@@ -74,6 +71,7 @@ const getCompletedOrders = async (request, response) => {
         response.status(500).send('Failed to fetch completed orders');
     }
 };
+
 
 
 /*
