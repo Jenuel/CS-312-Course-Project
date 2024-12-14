@@ -842,32 +842,39 @@ function populateCompletedOrders(boothId) {
       method: "GET",
       headers: { "Content-Type": "application/json" },
   })
-  .then((response) => {
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      return response.json();
-  })
-  .then((orders) => {
-      completedOrdersTable.innerHTML = ""; // Clear existing rows
-      if (orders.length === 0) {
-          completedOrdersTable.innerHTML = "<tr><td colspan='6'>No completed orders yet.</td></tr>";
-          return;
-      }
+      .then((response) => {
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          return response.json();
+      })
+      .then((orders) => {
+          completedOrdersTable.innerHTML = ""; // Clear existing rows
 
-      orders.forEach((order) => {
-          const row = `
-              <tr id="order-${order.OrderId}">
-                  <td>${order.OrderId}</td>
-                  <td>${order.CustomerName}</td>
-                  <td>${order.ProductName}</td> <!-- Display concatenated product names -->
-                  <td>${order.Quantity}</td> <!-- Display concatenated quantities -->
-                  <td>₱${order.TotalPrice}</td>
-                  <td><button class="btn btn-sm btn-danger" onclick="removeCompletedOrder('${order.OrderId}')">Remove</button></td>
-              </tr>`;
-          completedOrdersTable.insertAdjacentHTML("beforeend", row);
-      });
-  })
-  .catch((error) => console.error("Error fetching completed orders:", error));
+          // Check if no completed orders exist
+          if (orders.length === 0) {
+              completedOrdersTable.innerHTML =
+                  "<tr><td colspan='6'>No completed orders yet.</td></tr>";
+              return;
+          }
+
+          // Populate the table with completed orders
+          orders.forEach((order) => {
+              const row = `
+                  <tr id="order-${order.OrderId}">
+                      <td>${order.OrderId}</td>
+                      <td>${order.CustomerName}</td>
+                      <td>${order.ProductName}</td> <!-- Display concatenated product names -->
+                      <td>${order.Quantity}</td> <!-- Display concatenated quantities -->
+                      <td>₱${order.TotalPrice}</td>
+                      <td>${new Date(order["date paid"]).toLocaleString()}</td> <!-- Format date -->
+                  </tr>`;
+              completedOrdersTable.insertAdjacentHTML("beforeend", row);
+          });
+      })
+      .catch((error) =>
+          console.error("Error fetching completed orders:", error)
+      );
 }
+
 
 // Mark an Order as Completed
 function markAsCompleted(orderId) {
@@ -908,25 +915,6 @@ function markAsCompleted(orderId) {
     console.error("Error Message:", error.message);
   });
 }
-// Remove a Completed Order
-function removeCompletedOrder(orderId) {
-  if (!confirm("Are you sure you want to remove this order?")) return;
-
-  // Send request to remove the order from the backend
-  fetch(`http://localhost:3000/orders/removeCompleted/${orderId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" }
-  })
-  .then((response) => {
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    console.log(`Order ${orderId} completed successfully`);
-    
-    // Update tables immediately after successful response
-    updateTables();
-})
-  .catch((error) => console.error("Error removing completed order:", error));
-}
-
 
 // Update Tables
 function updateTables() {
