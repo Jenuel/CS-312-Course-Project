@@ -180,8 +180,12 @@ function checkout() {
   )}`; // NEED TO FIND LIKE A SET OF VALUE GANUN
 }
 
-/* Fetch Functions */
+/* -------------------------------------Fetch Functions------------------------------------- */
 
+/*
+function to get the detils of a specific product
+FROM: productController.js
+*/
 function getSpecificProduct(productId) {
   fetch(`http://localhost:3000/products/details/${productId}`, {
     method: "GET",
@@ -202,6 +206,10 @@ function getSpecificProduct(productId) {
     .catch((error) => console.error("Error fetching product:", error));
 }
 
+/*
+funtion for creating new order by a customer
+FROM: orderController.js
+*/
 function createOrder(boothID, data, totalPrice, customerID) {
   console.log(customerID);
   const formattedProducts = data.map((entry) => {
@@ -253,6 +261,10 @@ function createOrder(boothID, data, totalPrice, customerID) {
     });
 }
 
+/*
+function to add a product to an EXISTING order
+FROM: orderController.js
+*/
 function addToOrder(orderID, data) {
   let productID = localStorage.getItem("currentpId");
 
@@ -293,55 +305,13 @@ function addToOrder(orderID, data) {
     })
     .catch((error) => console.error("Error creating order:", error));
 }
-
-function getCustomerID(id) {
-  fetch(`http://localhost:3000/orders/getCustomerID/${id}`, {
-    // URL for Cancel order
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ status: "cancelled" }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      // add handling of data
-      if (data.error) {
-        // Handle the error message if the response contains an error
-        console.error("Error:", data.error);
-        return null;
-      } else {
-        /*
-        date output:
-        [
-          {
-              "Customer ID": 12345
-          }
-        ]
-        */
-        if (data.length > 0) {
-          custID = data[0]["Customer ID"];
-          alert("SUCCESS" + custID);
-          console.log("Customer ID:", custID);
-          return data[0]["Customer ID"];
-        } else {
-          console.log("No customer found.");
-        }
-      }
-    })
-    .catch((error) => {
-      console.error("Error cancelling order:", error);
-    });
-}
-
+/*
+use to get ordered that are in reserves status of a customer
+FROM: orderController.js
+*/
 function getCart(customerId) {
   let cid = parseInt(customerId);
-  fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, {
+  fetch(`http://localhost:3000/orders/checkReservedOrder/${cid}`, {
     // URL for Cancel order
     method: "GET",
     headers: {
@@ -424,6 +394,37 @@ function getCart(customerId) {
       console.error("Error cancelling order:", error);
     });
 }
+
+/**
+ * Fetch for order cancelation (PATCH)
+ * @param {Integer} orderId 
+ */
+function cancelOrder(orderId) {
+  fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+      method: 'PATCH', 
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify({ status: 'cancelled' }), 
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      // data is a json massgae no parsing needed
+      console.log("Order cancelled successfully:", data);
+  })
+  .catch(error => {
+      console.error("Error cancelling order:", error);
+  });
+}
+
+
+/* -------------------------------------End Fetch Functions------------------------------------- */
+
 
 function updateTotal(quantity, price) {
   const totalElement = document.getElementById("cart-total");
