@@ -1,10 +1,13 @@
-const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search); // connecting to url params of html
 let boothId = 0;
+/*
+checking value in url parameter
+*/
 if((urlParams.get('id'))==="none"){
 
-    const localStorageId = localStorage.getItem('id');// get customer id 
+    const customerId = localStorage.getItem('id');// get customer id 
   
-    const hasCart =  getCart(localStorageId); //  result of getCart
+    const hasCart =  getCart(customerId); //  result of getCart
   
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
@@ -12,16 +15,13 @@ if((urlParams.get('id'))==="none"){
       window.location.href = 'http://localhost:8080/client/html/client-home.html';
     }
   
-  }else{
+  }else{ // id has value
     boothId = urlParams.get('id');
-    alert("from products bothid: "+boothId);
+    alert("from products bothid: "+boothId); // REMOVE BEFORE PASSING
     localStorage.setItem('BoothId',boothId);
-    alert("from products bothid storage: "+localStorage.getItem('BoothId'));
+    alert("from products bothid storage: "+localStorage.getItem('BoothId'));// REMOVE BEFORE PASSING
 
-  }
-
-  
-let box = document.querySelector(".product-list"); 
+  } 
 
 function getData() {
   const searchInput = document.querySelector('input[type="search"]').value.trim();

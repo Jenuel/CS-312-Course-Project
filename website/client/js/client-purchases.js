@@ -343,7 +343,7 @@ function closeProfile() {
 
 
 
-function createOrder(boothID, data, totalPrice, customerId) {
+function createOrder(boothID, data, totalPrice, customerId) {// PLEASE EXPLAIN HOW THIS IS USED
     const formattedProducts = data.map(entry => {
         const [productID, quantity, totalPricePerProduct] = entry.split(',');
         return {
@@ -384,9 +384,11 @@ function createOrder(boothID, data, totalPrice, customerId) {
         alert(`Error creating order: ${error.message}`);
     });
 }
-
-  
-
+ 
+/*
+use to get ordered that are in reserves status of a customer
+FROM: orderController.js
+*/
 function getCart(customerId) {
     const cartList = document.getElementById('purchase-list');
     const cartTotal = document.getElementById('cart-total');
@@ -403,7 +405,7 @@ function getCart(customerId) {
         return;
     }
 
-    fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, {
+    fetch(`http://localhost:3000/orders/checkReservedOrder/${cid}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     })
@@ -450,7 +452,7 @@ function getCart(customerId) {
     });
 }
 
-
+/* -------------------------------------End Fetch Functions------------------------------------- */
 
 getCart(localStorage.getItem('id'));
 
