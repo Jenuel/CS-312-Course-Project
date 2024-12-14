@@ -1,11 +1,15 @@
 // Retrieve the parameters from the URL
 const urlParams = new URLSearchParams(window.location.search);
 let boothId = 0;
+
+/*
+checking value in url parameter
+*/
 if((urlParams.get('boothId'))==="none"){
 
-    const localStorageId = localStorage.getItem('id');// get customer id 
+    const customerId = localStorage.getItem('id');// get customer id 
   
-    const hasCart =  getCart(localStorageId); //  result of getCart
+    const hasCart =  getCart(customerId); //  result of getCart
   
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
@@ -17,15 +21,9 @@ if((urlParams.get('boothId'))==="none"){
     // boothId = urlParams.get('boothId');
     boothId = localStorage.getItem('BoothId');
   }
-
-  
-
-
-
-
-
-let box = document.querySelector(".purchase-list"); // where the child will be appended
-
+/*
+helper for remove item function
+*/
 function getOrderId() {
     const orderId = localStorage.getItem('OrderId') || 
                    localStorage.getItem('orderId') ||
@@ -90,98 +88,46 @@ function displayCart(cartItems) {
 
     updateCartTotal(runningTotal);
 }
-//gg
-function removeCartItem(productId) {
-    const orderId = getOrderId();
-    
-    if (!orderId) {
-        console.error("No order ID found in localStorage:", localStorage);
-        alert("Could not find your order. Please refresh the page and try again.");
-        return;
-    }
-
-    if (!confirm("Are you sure you want to remove this item from your cart?")) {
-        return;
-    }
-
-    console.log(`Removing product ${productId} from order ${orderId}`);
-
-    fetch(`http://localhost:3000/orders/removeItem/${orderId}/${productId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => Promise.reject(err));
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Remove item response:', data);
-        
-        if (data.isEmpty) {
-            // Clear all order-related storage
-            localStorage.removeItem('OrderId');
-            localStorage.removeItem('orderId');
-            localStorage.removeItem('OrderID');
-            localStorage.removeItem('BoothId');
-            
-            window.location.href = 'client-home.html';
-        } else {
-            const localStorageId = localStorage.getItem('id');
-            if (localStorageId) {
-                getCart(localStorageId);
-            }
-        }
-    })
-    .catch(error => {
-        console.error("Error removing item:", error);
-        alert("Failed to remove item from cart. Please try again.");
-    });
-}
-
-function updateCartItem(productId, newQuantity) {
-    const orderId = localStorage.getItem('OrderId') || localStorage.getItem('orderId');
-    if (!orderId) {
-        console.error("No order ID found");
-        return;
-    }
-
-    const quantity = parseInt(newQuantity);
-    if (isNaN(quantity) || quantity < 1) {
-        alert("Please enter a valid quantity");
-        return;
-    }
-
-    fetch(`http://localhost:3000/orders/updateQuantity/${orderId}/${productId}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ quantity: quantity })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Refresh the cart to show updated totals
-        const localStorageId = localStorage.getItem('id');
-        if (localStorageId) {
-            getCart(localStorageId);
-        }
-    })
-    .catch(error => {
-        console.error("Error updating cart item:", error);
-        alert("Failed to update item quantity. Please try again.");
-    });
-}
 
 
+// function updateCartItem(productId, newQuantity) {
+//     const orderId = localStorage.getItem('OrderId') || localStorage.getItem('orderId');
+//     if (!orderId) {
+//         console.error("No order ID found");
+//         return;
+//     }
+
+//     const quantity = parseInt(newQuantity);
+//     if (isNaN(quantity) || quantity < 1) {
+//         alert("Please enter a valid quantity");
+//         return;
+//     }
+
+//     fetch(`http://localhost:3000/orders/updateQuantity/${orderId}/${productId}`, {
+//         method: 'PATCH',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ quantity: quantity })
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//         // Refresh the cart to show updated totals
+//         const localStorageId = localStorage.getItem('id');
+//         if (localStorageId) {
+//             getCart(localStorageId);
+//         }
+//     })
+//     .catch(error => {
+//         console.error("Error updating cart item:", error);
+//         alert("Failed to update item quantity. Please try again.");
+//     });
+// }
 
 function updateCartTotal(input) {
     const cartTotalElement = document.getElementById('cart-total');
@@ -205,15 +151,36 @@ function updateCartTotal(input) {
     cartTotalElement.textContent = total.toFixed(2);
 }
 
-
-
-
-
 function cancelOrders(){
     cancelOrder(orderID); 
 }
 
+ /*
+Helper method to retrive date in YYYY-MM-DD HH:MM:SS'
+*/
+const getCurrentDateWithMicroseconds = () => {
+    const date = new Date();
+    
+    // Get the date in the format 'YYYY-MM-DD HH:MM:SS'
+    let formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    
+    // Get microseconds (using a simple approximation as JavaScript doesn't have built-in microsecond precision)
+    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, '0');
+    
+    // Add microseconds to the date
+    return `${formattedDate}.${microseconds}`;
+};
 
+function openProfile() {
+    const profile = document.getElementById("profile");
+    profile.classList.add("open-profile");
+}
+
+// Close profile form popup
+function closeProfile() {
+    const profile = document.getElementById("profile");
+    profile.classList.remove("open-profile");
+}
 
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
@@ -246,6 +213,11 @@ function cancelOrder(orderId) {
     });
 }
 
+/*
+funtion for checking out products
+- product stocks  are now removed in porduct table and updated in inventory table
+FROM: productController.js
+*/
 function checkoutProducts() {
     const date = getCurrentDateWithMicroseconds();
     let orderID = localStorage.getItem('OrderId') || localStorage.getItem('orderId');
@@ -304,45 +276,10 @@ function checkoutProducts() {
     });
 }
 
-
-
-//END FOR FETCH FUNCTIONS
-/* ----------------------------------------------------------------------------------------------------- */
-
-
- /*
-Helper method to retrive date in YYYY-MM-DD HH:MM:SS'
+/*
+funtion for creating new order by a customer
+FROM: orderController.js
 */
-const getCurrentDateWithMicroseconds = () => {
-    const date = new Date();
-    
-    // Get the date in the format 'YYYY-MM-DD HH:MM:SS'
-    let formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
-    
-    // Get microseconds (using a simple approximation as JavaScript doesn't have built-in microsecond precision)
-    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, '0');
-    
-    // Add microseconds to the date
-    return `${formattedDate}.${microseconds}`;
-};
-
-      
-
-
-function openProfile() {
-    const profile = document.getElementById("profile");
-    profile.classList.add("open-profile");
-}
-
-// Close profile form popup
-function closeProfile() {
-    const profile = document.getElementById("profile");
-    profile.classList.remove("open-profile");
-}
-
-
-
-
 function createOrder(boothID, data, totalPrice, customerId) {// PLEASE EXPLAIN HOW THIS IS USED
     const formattedProducts = data.map(entry => {
         const [productID, quantity, totalPricePerProduct] = entry.split(',');
@@ -451,6 +388,67 @@ function getCart(customerId) {
         alert("Failed to load cart items. Please try again.");
     });
 }
+
+/*
+remove's an item in and order witha  status of reserved
+FROM:orderController.js
+*/
+function removeCartItem(productId) {
+    const orderId = getOrderId();
+    
+    if (!orderId) {
+        console.error("No order ID found in localStorage:", localStorage);
+        alert("Could not find your order. Please refresh the page and try again.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to remove this item from your cart?")) {
+        return;
+    }
+
+    console.log(`Removing product ${productId} from order ${orderId}`);
+
+    fetch(`http://localhost:3000/orders/removeItem/${orderId}/${productId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Remove item response:', data);
+        
+        if (data.isEmpty) {
+            // Clear all order-related storage
+            localStorage.removeItem('OrderId');
+            localStorage.removeItem('orderId');
+            localStorage.removeItem('OrderID');
+            localStorage.removeItem('BoothId');
+            
+            window.location.href = 'client-home.html';
+        } else {
+            const localStorageId = localStorage.getItem('id');
+            if (localStorageId) {
+                getCart(localStorageId);
+            }
+        }
+    })
+    .catch(error => {
+        console.error("Error removing item:", error);
+        alert("Failed to remove item from cart. Please try again.");
+    });
+}
+
+/*
+function for updateding quantitity of a product in a cart
+(cart is an order with a reserved status)
+FROM: orderController.js
+*/
 
 /* -------------------------------------End Fetch Functions------------------------------------- */
 

@@ -395,6 +395,33 @@ function getCart(customerId) {
     });
 }
 
+/**
+ * Fetch for order cancelation (PATCH)
+ * @param {Integer} orderId 
+ */
+function cancelOrder(orderId) {
+  fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+      method: 'PATCH', 
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify({ status: 'cancelled' }), 
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => {
+      // data is a json massgae no parsing needed
+      console.log("Order cancelled successfully:", data);
+  })
+  .catch(error => {
+      console.error("Error cancelling order:", error);
+  });
+}
+
 
 /* -------------------------------------End Fetch Functions------------------------------------- */
 
