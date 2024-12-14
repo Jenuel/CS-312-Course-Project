@@ -1,9 +1,9 @@
 /*
- * Gets the product for a certain booth
+ * Gets the product for a certain boo
+- filerts a product i.e active or inactive
+- sorts product ASC or DESC
 
-INPUT:
-HTTP PUT /<productRoutes>/<boothId>
-
+USED BY: vendor & customer
  */
 
 const getProducts = async (request, response) => {
@@ -58,21 +58,9 @@ const getProducts = async (request, response) => {
 
 
 /*
- * Gets the detailed version of the product 
-
-INPUT:
-HTTP PUT /<productRoutes>/<productId>
-
-SAMPLE OUTPUT:
-    
-    {
-        "name": "Handmade Bracelet",
-        "Stocks": 50,
-        "Price": 29.99,
-        "status": "active",
-        "Image": "base64"
-    }
-
+ Gets the detailed version of the product
+ 
+ USED BY: customer
 */
 const getProductDetails = async (request, response) => {
   const db = request.db;
@@ -91,13 +79,15 @@ const getProductDetails = async (request, response) => {
 };
 
 /*
- * Decrements the stock of the product given.
-directlty from the store 
-already paid
+ * Buy product fetch 
+- updated order table
+- remove stocks  from product table
+- insert in inventory table
+- returns a breakdown of the order
 
-INPUT:
-HTTP PUT /<productRoutes>/<orderId>
+used in checking out orders
 
+USED BY: customer
  */
 const buyProduct = async (request, response) => {
   const db = request.db;
@@ -123,7 +113,7 @@ const buyProduct = async (request, response) => {
     if (allPositive.length && allPositive[0].AllPositive) {
 
       await db.query(
-      "UPDATE `order` SET `Status` = 'Complete', `DatePaid` = ? WHERE `order`.`OrderID` = ?",
+      "UPDATE `order` SET `Status` = 'Pending', `DatePaid` = ? WHERE `order`.`OrderID` = ?",
       [datePaid,orderId]
     );// updated status and date of order
 
@@ -157,17 +147,11 @@ const buyProduct = async (request, response) => {
 
 /**
  * Create product
+- add new product in product table
+- updaet new stock in inventory table
 
-INPUT:
-{
-    "boothID": 123,
-    "stocks": 50,
-    "price": 29.99,
-    "name": "Handmade Bracelet",
-    "status": "active",
-    "image": blobvalue
-} 
 
+USED BY: vendor
  */
 const createProduct = async (request, response) => {
   console.log("Create Product I");
@@ -211,25 +195,15 @@ const createProduct = async (request, response) => {
 
 /**
  * edit a product
- * for product details
- 
-INPUT:
- HTTP PUT /<productRoutes>/<productId>
+- edit column/s in product table
 
- sample body:
- {
-  "product": [
-    { "name": "New Product" },
-    { "price": "200" },
-    { "stock": "30" }
-  ]
-} 
+USED BY: vendor 
 */
 const editProduct = async (request, response) => {
 
   const db = request.db;
-  const { productId } = request.params; // productId is now from request.params
-  const { product } = request.body; // fields to be updated are in request.body
+  const { productId } = request.params; 
+  const { product } = request.body; // product is an array of "key:value"
 
   try {
 
@@ -269,60 +243,13 @@ const editProduct = async (request, response) => {
     response.status(500).json({ error: error.message });
   }
 };
-
-
 /*
-helper function to retrive current
+fetch for deleting a product
+- deletes a product in porduct table
+- check if there are pending order 
+
+USED BY: vendor
 */
-const getCurrentDate = () => {
-  const date = new Date();
-
-  // Get the date in the format 'YYYY-MM-DD'
-  const formattedDate = date.toISOString().slice(0, 10); // Extract the 'YYYY-MM-DD' part
-
-  return formattedDate;
-};
-
-/*
-helper function to updateStocks
-*/
-
-const updateStockInInventory = async (value, productId, db) => {
-  try {
-    // Query to get the current and updated stock values
-    const [difference] = await db.query(
-      'SELECT p.StocksRemaining as "current stocks", ' +
-      '(p.StocksRemaining - ? ) as "updated stocks" ' +
-      'FROM product p WHERE p.ProductID = ?',
-      [value, productId]
-    );
-
-    const { 'current stocks': currentStocks, 'updated stocks': updatedStocks } = difference[0];
-
-    if (currentStocks > updatedStocks) { // stocks decreased
-      const stocks = (updatedStocks * -1);
-      await db.query(
-        'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) ' + 
-        'VALUES (NULL, ?, ?, "out", ?)',
-        [productId, getCurrentDate(), stocks]
-      ); // query to add stocks to inventory when stocks decrease
-
-    } else { // stocks increased
-      const stocks = updatedStocks - currentStocks;
-      await db.query(
-        'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) ' + 
-        'VALUES (NULL, ?, ?, "in", ?)',
-        [productId, getCurrentDate(), stocks]
-      ); // query to add stocks to inventory when stocks increase
-
-    }
-
-  } catch (error) {
-    console.error("Error updating stock information:", error);
-    throw new Error("Error updating stock information.");
-  }
-};
-
 const deleteProduct = async (request, response) => {
   const db = request.db;
   const { productId } = request.params;
@@ -342,7 +269,7 @@ const deleteProduct = async (request, response) => {
 
     // Check if product has any orders
     const [orders] = await db.query(
-      "SELECT COUNT(*) as orderCount FROM order_products WHERE ProductID = ?",
+      "SELECT o.Status FROM order_products p JOIN `order` o ON p.OrderID = o.OrderID WHERE p.ProductID = ? AND o.Status = 'Pending'",
       [productId]
     );
 
@@ -390,86 +317,69 @@ const deleteProduct = async (request, response) => {
   }
 };
 
+/*
+helper function to updateStocks
 
+USED BY: customer
+*/
 
-export {
-  getProducts,
-  getProductDetails,
-  buyProduct,
-  createProduct,
-  editProduct,
-  deleteProduct
+const updateStockInInventory = async (value, productId, db) => {
+  try {
+    // Query to get the current and updated stock values
+    const [difference] = await db.query(
+      'SELECT p.StocksRemaining as "current stocks", ' +
+      '(p.StocksRemaining - ? ) as "updated stocks" ' +
+      'FROM product p WHERE p.ProductID = ?',
+      [value, productId]
+    );
+
+    const { 'current stocks': currentStocks, 'updated stocks': updatedStocks } = difference[0];
+
+    if (updatedStocks > 0) { // stocks decreased
+      await db.query(
+        'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) ' + 
+        'VALUES (NULL, ?, ?, "out", ?)',
+        [productId, getCurrentDate(), updatedStocks]
+      ); // query to add stocks to inventory when stocks decrease
+
+    } else { // stocks increased
+      const stocks = (updatedStocks * -1);
+      await db.query(
+        'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) ' + 
+        'VALUES (NULL, ?, ?, "in", ?)',
+        [productId, getCurrentDate(), stocks]
+      ); // query to add stocks to inventory when stocks increase
+
+    }
+
+  } catch (error) {
+    console.error("Error updating stock information:", error);
+    throw new Error("Error updating stock information.");
+  }
 };
 
-/* ------------------------------------------------------------------------------------- */
+/*
+helper function to retrive current
 
-//THE CODE BELOW ARE NOT BEING USE REMOVE BEFORE SUBMITTING 
+USED BY: customer
+*/
+const getCurrentDate = () => {
+  const date = new Date();
 
-/**
- * edit a product status
- * for market publish
+  // Get the date in the format 'YYYY-MM-DD'
+  const formattedDate = date.toISOString().slice(0, 10); // Extract the 'YYYY-MM-DD' part
 
-INPUT:
-HTTP PUT /<productRoutes>/<productId>
-{
-"status": value
-}
- */
-// const changeStatusProduct = async (request, response) => {
-  
-//   const db = request.db;
-//   const { productId } = request.params;
-//   const { status } = request.body; // please check if this is right
-
-//   try {
-//     // Update the stock in the database
-//     const [updateResult] = await db.query(
-//       "UPDATE `product` SET `status` = ? WHERE `ProductID` = ?",
-//       [status, productId]
-//     );
-
-//     response.json({
-//       message: "Product purchased successfully",
-//       updatedRows: updateResult.affectedRows,
-//     });
-//   } catch (error) {
-//     console.error("Error updating product status:", error);
-//     response.status(500).send("Failed to update product status");
-//   }
-// };
+  return formattedDate;
+};
 
 /*
-adding stcok of a product
-INPUT:
-HTTP PUT /<productRoutes>/<productId>
-{
-"qty": intvalue
-"date":2024-11-04
-}
- */
-
-// const AddStocks = async (request, response) => {
-//   const db = request.db;
-//   const { productID } = request.params;
-//   const { qty, date } = request.body;
-
-//   try {
-//       await db.query(
-//           `UPDATE product SET StocksRemaining = (StocksRemaining + ?) WHERE product.ProductID = ?`,
-//           [qty,productID]
-//       ); // query to add stocks to product
-
-//       await db.query(
-//         'INSERT INTO `inventory` (`InventoryID`, `ProductID`, `Date`, `Type`, `Quantity`) '+ 
-//         'VALUES (NULL, ? , ?, "in", ?)',
-//         [productID,date,qty]
-//       ); // query to add stocks to inventory 
-
-//     response.json({
-//       message: `Successfully added ${qty} stocks to product with ID ${productID}.`,
-//     });
-//   } catch (error) {
-//     console.error('Error adding stocks:', error);
-//     response.status(500).send('Failed to add stocks');
-//   }
-// };
+export statement
+*/
+export {
+      getProducts,
+      getProductDetails,
+      buyProduct,
+      createProduct,
+      editProduct,
+      deleteProduct
+    };

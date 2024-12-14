@@ -1,67 +1,39 @@
-// Implementation of the logic
-
 /*
-VENDOR CONTROLLER
+function to get pending order of a booth
+- selects order detail from order and order_products table
 
-This function is for getting the advanced/pending orders of a certain booth
+USED BY: vendor
 */
-const getReservedOrders = async (request, response) => {
+const getPendingOrders = async (request, response) => {
     const db = request.db;
     const { boothId } = request.params;
 
     try {
         const [rows] = await db.query(
-            `SELECT 
-                o.OrderID AS 'OrderId', 
-                GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName', 
-                GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', 
-                o.Price AS 'TotalPrice',  -- Using Price from order table
-                o.Status AS 'Status', 
-                CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName'
-            FROM \`order\` o
-            JOIN \`order_products\` p ON o.OrderID = p.OrderID
-            JOIN \`product\` c ON p.ProductID = c.ProductID
-            JOIN \`customer\` x ON o.customerID = x.CustomerID
-            JOIN \`users\` u ON x.UserID = u.UserID
-            WHERE o.Status = 'Pending' AND o.BoothID = ?
-            GROUP BY o.OrderID, u.FirstName, u.LastName
-            ORDER BY o.OrderID ASC`, 
+            "SELECT o.OrderID AS 'OrderId', GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName', GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', o.Price AS 'TotalPrice', o.Status AS 'Status', CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID JOIN `customer` x ON o.customerID = x.CustomerID JOIN `users` u ON x.UserID = u.UserID WHERE o.Status = 'Pending' AND o.BoothID = ? GROUP BY o.OrderID, u.FirstName, u.LastName ORDER BY o.OrderID ASC", 
             [boothId]
         );
 
         response.json(rows);
     } catch (error) {
-        console.error('Error fetching reserved orders:', error);
-        response.status(500).send('Failed to fetch reserved orders');
+        console.error('Error fetching pending orders:', error);
+        response.status(500).send('Failed to fetch pending orders');
     }
 };
 
 /*
-VENDOR CONTROLLER
+function to get pending order of a booth
+- selects order detail from order and order_products table
 
-This function is for getting the completed orders of a certain booth
-*/
+USED BY: vendor
+*/  
 const getCompletedOrders = async (request, response) => {
     const db = request.db;
     const { boothId } = request.params;
 
     try {
         const [rows] = await db.query(
-            `SELECT 
-                o.OrderID AS 'OrderId', 
-                GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName', 
-                GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', 
-                o.Price AS 'TotalPrice',  -- Using Price from order table
-                o.Status AS 'Status', 
-                CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName'
-            FROM \`order\` o
-            JOIN \`order_products\` p ON o.OrderID = p.OrderID
-            JOIN \`product\` c ON p.ProductID = c.ProductID
-            JOIN \`customer\` x ON o.customerID = x.CustomerID
-            JOIN \`users\` u ON x.UserID = u.UserID
-            WHERE o.Status = 'Complete' AND o.BoothID = ?
-            GROUP BY o.OrderID, u.FirstName, u.LastName
-            ORDER BY o.OrderID ASC`, 
+           "SELECT o.OrderID AS 'OrderId', GROUP_CONCAT(c.Name ORDER BY c.Name) AS 'ProductName', GROUP_CONCAT(p.Quantity ORDER BY c.Name) AS 'Quantity', o.Price AS 'TotalPrice', o.Status AS 'Status', CONCAT(u.FirstName, ' ', u.LastName) AS 'CustomerName',o.DatePaid as 'date paid' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` c ON p.ProductID = c.ProductID JOIN `customer` x ON o.customerID = x.CustomerID JOIN `users` u ON x.UserID = u.UserID WHERE o.Status = 'Complete' AND o.BoothID = ? GROUP BY o.OrderID, u.FirstName, u.LastName ORDER BY o.DatePaid DESC",
             [boothId]
         );
 
@@ -72,89 +44,24 @@ const getCompletedOrders = async (request, response) => {
     }
 };
 
-
-
 /*
-VENDOR CONTROLLER
+creates an order
+- add new order in order table
+- add new line/s in order_products
 
-This function is for removing completed orders from the booth.
-*/
-const removeCompletedOrder = async (request, response) => {
-    const db = request.db;
-    const { orderId } = request.params;
-
-    try {
-        // First, check if the order exists and is completed
-        const [orderCheck] = await db.query(
-            'SELECT Status FROM `order` WHERE OrderID = ?',
-            [orderId]
-        );
-
-        if (!orderCheck.length) {
-            return response.status(404).json({ error: 'Order not found' });
-        }
-
-        if (orderCheck[0].Status !== 'Complete') {
-            return response.status(400).json({ error: 'Order is not completed yet' });
-        }
-
-        // Delete the order from order_products table
-        const [rmOrderPrd] = await db.query(
-            'DELETE FROM order_products WHERE OrderID = ?',
-            [orderId]
-        );
-
-        // Now delete the order from the `order` table
-        const [rmOrder] = await db.query(
-            'DELETE FROM `order` WHERE OrderID = ?',
-            [orderId]
-        );
-
-        // Check if the order was successfully removed
-        if (rmOrder.affectedRows === 0) {
-            return response.status(400).json({ error: 'Failed to delete the order' });
-        }
-
-        // Return success response with the number of deleted rows
-        response.json({
-            message: `Completed order with ID ${orderId} successfully removed.`,
-            removedOrder: rmOrder.affectedRows, // Number of rows removed from `order`
-            removedOrderProducts: rmOrderPrd.affectedRows // Number of rows removed from `order_products`
-        });
-    } catch (error) {
-        console.error('Error removing completed order:', error);
-        response.status(500).send('Failed to remove completed order');
-    }
-};
-
-
-
-
-/*
-CLIENT CONTROLLER
-
-This function is for finalizing an order and sends it to the specific booth
-
-HTTP PUT /<orderRoutes>/<boothId>
-{
-  "products":[
-    ["productID":value, "quantity": value,  "totalPricePerProduct":value ], FOLLOW THE FORMAT HERE SA PAG COMPOSE NG BODY
-    ["productID":100, "quantity": 100,  "totalPricePerProduct":100.00 ] MAKE SURE DECIMAL SIYA
-    ],
-  "totalPrice": 450
-  "date": 2024-11-19 10:31:54
-} 
+USED BY: customer
 */ 
 const createOrder = async (request, response) => {
     const db = request.db;
-    const { boothID } = request.params;
+    const { boothId } = request.params;
     const { products, totalPrice, date, customerId } = request.body;
 
+     //TESTER LOGS
     console.log("Request body:", request.body);
 
     try {
         // Validate inputs
-        if (!boothID || isNaN(boothID)) {
+        if (!boothID || isNaN(boothId)) {
             return response.status(400).send('Invalid boothID');
         }
 
@@ -170,24 +77,27 @@ const createOrder = async (request, response) => {
             return response.status(400).send('Invalid customerId');
         }
 
-        console.log("Received boothID:", boothID);
+        //TESTER LOGS
+        console.log("Received boothID:", boothId);
         console.log("Received products:", products);
         console.log("Received totalPrice:", totalPrice);
         console.log("Received date:", date);
 
         // Insert order into the database
         const [orderQuery] = await db.query(
-            "INSERT INTO `order` (OrderID, BoothID, Status, DateOrdered, DatePaid, Price, customerID) VALUES (NULL, ?, 'Pending', ?, NULL, ?, ?)",
-            [boothID, date, totalPrice, customerId]
+            "INSERT INTO `order` (OrderID, BoothID, Status, DateOrdered, DatePaid, Price, customerID) VALUES (NULL, ?, 'Reserved', ?, NULL, ?, ?)",
+            [boothId, date, totalPrice, customerId]
           );
           
           const latestOrderID = orderQuery.insertId;
           
 
         if (!latestOrderID) {
+            alert("Failed to create order. No insertId returned.");
             throw new Error("Failed to create order. No insertId returned.");
         }
 
+         //TESTER LOGS
         console.log("New Order ID:", latestOrderID);
 
         // Insert each product into `order_products`
@@ -203,9 +113,11 @@ const createOrder = async (request, response) => {
                 [productID, latestOrderID, quantity, totalPricePerProduct]
             );
 
+            //TESTER LOGS
             console.log(`Product inserted: ${JSON.stringify(product)}`);
         }
 
+        //TESTER LOGS
         console.log(`Total price of all products: ${totalPrice}`);
 
         // Return the latest order ID
@@ -218,26 +130,19 @@ const createOrder = async (request, response) => {
 };
 
 /*
-CLIENT CONTROLLER
+add products to order
+- add new line/s in order_products
 
-This function is for adding new products to orders
-
-HTTP PUT /<orderRoutes>/<orderID
-{
-  "products":[
-    ["productID":value, "quantity": value,  "totalPricePerProduct":value ], FOLLOW THE FORMAT HERE SA PAG COMPOSE NG BODY
-    ["productID":100, "quantity": 100,  "totalPricePerProduct":100.00 ] MAKE SURE DECIMAL SIYA
-    ],
-} 
-*/ 
+USED BY: customer
+*/
 
 const addToOrder = async (request, response) => {
     const db = request.db;
     const{orderId} = request.params;
     const { productID, quantity, totalPricePerProduct } = request.body; // Extract updates map and total price
-
-
-    console.log("add to" , productID);
+    
+    //TESTER LOGS
+    console.log("add prd ",productID, " to ord " , orderId);
     
     try {
         // Validate totalPrice if needed
@@ -255,23 +160,21 @@ const addToOrder = async (request, response) => {
     }
 };
 
-
-
 /*
-CLIENT CONTROLLER
+deletes an order
+- delete a line in order table
+- delete line/s in order_products table
 
-This function is for cancelling the order and returning the stocks ADD RETURN STOCKS
-
-HTTP PUT /<orderRoutes>/<orderId>
+USED BY: customer
 */ 
-const cancelOrder = async (request, response) => {// RECENTLY DONE
+const cancelOrder = async (request, response) => {
     const db = request.db;
     const { orderId } = request.params;
 
     try {
-        await returnStocks(orderId, db);
-        const [rmOrder] = await db.query('DELETE FROM `order` o WHERE o.OrderID  ?',[orderId]);
         const [rmOrderPrd] = await db.query('DELETE FROM order_products p  WHERE  p.OrderID = ?',[orderId]);
+        const [rmOrder] = await db.query('DELETE FROM `order` o WHERE o.OrderID  ?',[orderId]);
+        
         response.json({ 
             message: `Order with ID ${orderId} successfully canceled.`,
             removedOrder: rmOrder.affectedRows, // Number of rows removed from `order`
@@ -283,39 +186,13 @@ const cancelOrder = async (request, response) => {// RECENTLY DONE
     }
 };
 
-async function returnStocks (orderId , db){
-    try {
-    const [getProduct] = await db.query(
-        `SELECT o.ProductID as productID , o.Quantity as qty FROM order_products o WHERE o.OrderID = ?`,
-         [orderId]
-        );
-    //extract rows and 
-    for(let products of getProduct){
-        const {productId , qty}= products;
-         await db.query(
-            `UPDATE product SET StocksRemaining = (StocksRemaining + ?) WHERE product.ProductID = ?`,
-            [qty,productId]
-        );
-    }
-    } catch (error) {
-        console.error('Error returning stocks:', error);
-        throw new Error('Failed to return stocks'); 
-    }
-}
-
 /*
-VENDOR CONTROLLER
+completes an order
+- changes status of order to Complete
 
-This function is used to approve pending orders of the booth. It is used by the regulators of the booth
-
-change pending order to complete
-
-HTTP PUT /<orderRoute>/<orderID>
-{
-"datePaid": value
-}
-*/
-const approveOrder = async (request, response) => {
+USED BY: vendor
+*/ 
+const completeOrder  = async (request, response) => {
     const db = request.db;
     const { orderId } = request.params;
     const {datePaid}= request.body;
@@ -370,29 +247,20 @@ const approveOrder = async (request, response) => {
 
     }
 };
+/*
+check reserved order of a cutsomer
+- used for storing cart order for customer
 
-const checkPendingOrder =async (request, response) => {
+USED BY: customer
+*/ 
+const checkReservedOrder =async (request, response) => {
     const db = request.db;
     const {customerId} = request.params;
 
     try {
         // First check if order exists and is not already completed
         const [orderCheck] = await db.query(
-            `SELECT 
-                b.BoothID as 'boothID',
-                o.OrderID as 'orderID',
-                o.Price as 'grandTotal',
-                p.ProductID as 'productID',
-                p.Quantity as 'quantity',
-                p.Total as 'totalPricePerProduct',
-                x.name as 'productName',
-                TO_BASE64(x.Image) as 'productImage',
-                x.Price as 'productPrice'
-             FROM \`order\` o 
-             JOIN \`order_products\` p ON o.OrderID = p.OrderID 
-             JOIN \`product\` x ON p.ProductID = x.ProductID 
-             JOIN \`booth\` b ON b.BoothID = x.BoothID 
-             WHERE o.customerID = ? AND o.Status = 'Pending'`,
+            "SELECT b.BoothID as 'boothID', o.OrderID as 'orderID', o.Price as 'grandTotal', p.ProductID as 'productID', p.Quantity as 'quantity', p.Total as 'totalPricePerProduct', x.name as 'productName', TO_BASE64(x.Image) as 'productImage', x.Price as 'productPrice' FROM `order` o JOIN `order_products` p ON o.OrderID = p.OrderID JOIN `product` x ON p.ProductID = x.ProductID JOIN `booth` b ON b.BoothID = x.BoothID WHERE o.customerID = ? AND o.Status = 'Reserved'",
             [customerId]
         );
         
@@ -408,64 +276,14 @@ const checkPendingOrder =async (request, response) => {
     }
 };
 
-const getCustomerID =async (request, response) => {
-    const db = request.db;
-    const {userId} = request.params;
+/*
+use to remnove a product of ordered items
+- edit in order_products 
+- edit in orders (price or delete)
 
-    try {
+USED BY: customer
+*/ 
 
-        const [orderCheck] = await db.query(
-            `SELECT c.CustomerID as "Customer ID" FROM customer c WHERE c.UserID = ?`,
-            [userId]
-        );
-        
-        if (!orderCheck.length) {
-            return response.status(404).json({ error: 'Order not found' });
-        }
-
-        response.json(orderCheck);
-    } catch (error) {
-        console.error('Error approving order:', error);
-        response.status(500).send('Failed to approve order');
-    }
-};
-
-const completeOrder = async (request, response) => {
-    const db = request.db;
-    const { orderId } = request.params;
-    const { datePaid } = request.body;
-
-    try {
-        // Check if order exists and is pending
-        const [orderCheck] = await db.query(
-            'SELECT Status FROM `order` WHERE OrderID = ?',
-            [orderId]
-        );
-
-        if (!orderCheck.length) {
-            return response.status(404).json({ error: 'Order not found' });
-        }
-
-        if (orderCheck[0].Status === 'Complete') {
-            return response.status(400).json({ error: 'Order is already completed' });
-        }
-
-        // Update order status
-        const [updateResult] = await db.query(
-            'UPDATE `order` SET Status = "Complete", DatePaid = ? WHERE OrderID = ?',
-            [datePaid, orderId]
-        );
-
-        if (updateResult.affectedRows === 0) {
-            throw new Error('Failed to update order status');
-        }
-
-        response.json({ message: 'Order completed successfully' });
-    } catch (error) {
-        console.error('Error completing order:', error);
-        response.status(500).json({ error: 'Failed to complete order' });
-    }
-};
 const removeItemFromOrder = async (request, response) => {
     const db = request.db;
     const { orderId, productId } = request.params;
@@ -481,8 +299,8 @@ const removeItemFromOrder = async (request, response) => {
             return response.status(404).json({ error: 'Order not found' });
         }
 
-        if (orderCheck[0].Status !== 'Pending') {
-            return response.status(400).json({ error: 'Can only remove items from pending orders' });
+        if (orderCheck[0].Status !== 'Reserved') {
+            return response.status(400).json({ error: 'Can only remove items from reserved orders' });
         }
 
         // Get the product's total price before removing
@@ -512,8 +330,8 @@ const removeItemFromOrder = async (request, response) => {
             }
 
    
-            const [updateOrder] = await db.query(
-                'UPDATE `order` SET Price = Price - ? WHERE OrderID = ?',
+            await db.query(
+                'UPDATE `order` SET Price = (Price - ?) WHERE OrderID = ?',
                 [productTotal, orderId]
             );
 
@@ -523,6 +341,7 @@ const removeItemFromOrder = async (request, response) => {
             );
 
             let isEmpty = false;
+
             if (remainingItems[0].count === 0) {
                 // If no items left, delete the order
                 const [deleteOrder] = await db.query(
@@ -557,4 +376,195 @@ const removeItemFromOrder = async (request, response) => {
         });
     }
 };
-export { getCompletedOrders, getReservedOrders, removeCompletedOrder, createOrder, cancelOrder, approveOrder, addToOrder, checkPendingOrder, getCustomerID, completeOrder, removeItemFromOrder};
+
+
+
+/*
+use to alter quantity of ordered products
+- edit in order_products
+
+USED BY: customer
+*/ 
+const alterOrder = async (request, response) => {
+    const db = request.db;
+    const { orderId} = request.params;
+    const {products} = request.body;
+
+    try {
+        // First check if the order exists and is pending
+        const [orderCheck] = await db.query(
+            'SELECT Status FROM `order` WHERE OrderID = ?',
+            [orderId]
+        );
+
+        if (!orderCheck.length) {
+            return response.status(404).json({ error: 'Order not found' });
+        }
+
+        if (orderCheck[0].Status !== 'Reserved') {
+            return response.status(400).json({ error: 'Can only remove items from reserved orders' });
+        }
+
+        for (const field of products) {
+            const {productID , quantity }= field;
+            // where quantity is the new number of products TOBE inputted in  order_products
+
+            const [difference] = await db.query(
+                'SELECT o.Quantity as "Initial Quantitiy", (o.Quantity - ?) as "Updated Quantity" FROM order_products o WHERE o.ProductID = ? AND o.OrderID =?',
+                [quantity,productID,orderId]
+              );
+          
+              const { 'Initial Quantitiy': currentStocks, 'Updated Quantity': updatedStocks } = difference[0];
+          
+              if (updatedStocks === currentStocks) { // new quantity is 0 
+                deleteProduct(db,orderId,productID);
+                orderId= null;
+
+              } else { // updatedStocks either increased or decreased 
+
+                await db.query(
+                  "UPDATE `order_products` SET `Quantity` = ? WHERE `order_products`.`ProductID` = ? AND `order_products`.`OrderID` = ?",
+                  [quantity,productID,orderId]
+                );// changing the quantity of the product order
+
+                await db.query(
+                    "UPDATE order_products o SET o.Total = o.Quantity * (SELECT p.Price FROM product p WHERE p.ProductID = o.ProductID) WHERE o.ProductID = ? AND o.OrderID = ?",
+                    [productID, orderId]
+                );// updating the total price per product in order_product
+              }
+          }// end of loop 
+          
+          if(orderId === null){
+            response.json("order is removed");
+          }else{
+            updatedPrices(db,orderId);
+          }
+
+    } catch (error) {
+        console.error('Error altering product from order', error);
+        response.status(500).json({ 
+            error: 'Failed to alter product from order',
+            details: error.message 
+        });
+    }
+};
+
+/*
+helper function to update Grand total in order
+*/
+async function updatedPrices (db,orderId) {
+    try{
+
+         // After updating the order products, update the total price of the order
+         const [orderTotal] = await db.query(
+            'SELECT SUM(Total) AS `Updated Order Total` FROM order_products WHERE OrderID = ?',
+            [orderId]
+        );
+
+        const updatedOrderTotal = orderTotal[0]['Updated Order Total'];
+
+        await db.query(
+            'UPDATE `order` SET `Price` = ? WHERE `OrderID` = ?',
+            [updatedOrderTotal, orderId]
+        );
+    } catch (error) {
+        console.error('Error altering product from order', error);
+        response.status(500).json({ 
+            error: 'Failed to alter product from order',
+            details: error.message 
+        });
+    }
+    
+}
+
+async function deleteProduct(db, orderId, productId) {
+    try{
+         // Get the product's total price before removing
+         const [productInfo] = await db.query(
+            'SELECT Total, Quantity FROM order_products WHERE OrderID = ? AND ProductID = ?',
+            [orderId, productId]
+        );
+
+        if (!productInfo.length) {
+            return response.status(404).json({ error: 'Product not found in order' });
+        }
+
+        const productTotal = productInfo[0].Total;
+
+        // Begin transaction
+        await db.beginTransaction();
+
+        try {
+ 
+            const [removeResult] = await db.query(
+                'DELETE FROM order_products WHERE OrderID = ? AND ProductID = ?',
+                [orderId, productId]
+            );
+
+            if (removeResult.affectedRows === 0) {
+                throw new Error('Failed to remove product from order');
+            }
+
+   
+            await db.query(
+                'UPDATE `order` SET Price = (Price - ?) WHERE OrderID = ?',
+                [productTotal, orderId]
+            );
+
+            const [remainingItems] = await db.query(
+                'SELECT COUNT(*) as count FROM order_products WHERE OrderID = ?',
+                [orderId]
+            );
+
+            let isEmpty = false;
+
+            if (remainingItems[0].count === 0) {
+                // If no items left, delete the order
+                const [deleteOrder] = await db.query(
+                    'DELETE FROM `order` WHERE OrderID = ?',
+                    [orderId]
+                );
+                isEmpty = true;
+            }
+
+            await db.commit();
+
+            response.json({ 
+                message: 'Product removed from order successfully',
+                isEmpty: isEmpty,
+                removedProduct: {
+                    productId,
+                    quantity: productInfo[0].Quantity,
+                    total: productTotal
+                }
+            });
+
+        } catch (error) {
+            await db.rollback();
+            throw error;
+        }
+
+    } catch (error) {
+        console.error('Error removing product from order:', error);
+        response.status(500).json({ 
+            error: 'Failed to remove product from order',
+            details: error.message 
+        });
+    }
+    
+}
+
+/*
+export statement
+*/
+export { 
+    getPendingOrders,
+    getCompletedOrders,
+    createOrder,
+    addToOrder,
+    cancelOrder,
+    completeOrder, 
+    checkReservedOrder,
+    removeItemFromOrder,
+    alterOrder  
+    };
