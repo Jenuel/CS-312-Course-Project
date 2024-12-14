@@ -908,6 +908,7 @@ function markAsCompleted(orderId) {
     console.error("Error Message:", error.message);
   });
 }
+
 // Remove a Completed Order
 function removeCompletedOrder(orderId) {
   if (!confirm("Are you sure you want to remove this order?")) return;
