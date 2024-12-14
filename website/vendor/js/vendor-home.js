@@ -34,7 +34,7 @@ function showProducts(boothId) {
   window.location.href = "vendor-product.html";
 }
 
-//for creating and appending values of a booth
+// for creating and appending values of a booth
 
 let formData = {
   filter: document.getElementById("filter")?.value || "",
