@@ -51,7 +51,7 @@ const getLiveProducts = async (request, response) => {
 
   try {
     let query =
-      'SELECT p.ProductID AS "ProductID", p.name AS "Name", p.StocksRemaining AS "Stocks", p.Price AS "Price", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p WHERE p.BoothID = ? AND p.status = "Live"';
+      'SELECT p.ProductID AS "ProductID", p.name AS "Name", p.StocksRemaining AS "Stocks", p.Price AS "Price", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p WHERE p.BoothID = ? AND p.status = "active"';
     let params = [boothId];
 
     // Apply sorting logic

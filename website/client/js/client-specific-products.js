@@ -22,31 +22,6 @@ if (urlParams.get("boothId") === "none") {
 }
 alert("from specs boothid" + localStorage.getItem("BoothId"));
 
-document.addEventListener("DOMContentLoaded", () => {
-  const backToProductsButton = document.getElementById("backToProducts");
-  const addToCartBtn = document.getElementById("addToCart");
-
-  addToCartBtn.addEventListener("click", (event) => {
-    event.preventDefault();
-    const boothId = localStorage.getItem("BoothId");
-    window.location.href = `client-products.html?id=${boothId}`;
-  });
-
-  backToProductsButton.addEventListener("click", (event) => {
-    event.preventDefault();
-    const boothId = localStorage.getItem("BoothId");
-    window.location.href = `client-products.html?id=${boothId}`;
-  });
-
-  const productId = urlParams.get("productID");
-  if (productId) {
-    getSpecificProduct(productId);
-    localStorage.setItem("currentpId", productId);
-  } else {
-    console.error("Product ID is missing in the URL parameters.");
-  }
-});
-
 function displaySpecificProduct(product) {
   console.log("Product received in displaySpecificProduct:", product);
 
@@ -470,6 +445,13 @@ function logout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const backToProductsButton = document.getElementById("backToProducts");
+  const addToCartBtn = document.getElementById("addToCart");
+  // productId = document.getElementById('product-name').getAttribute('data-product-id'); // Example: data-product-id="123"
+  const productId = urlParams.get("productID");
+  const boothId = localStorage.getItem("BoothId"); // Example: data-booth-id="456"
+  const quantity = document.getElementById("quantityInput").value;
+
   const logoutBtn = document.getElementById("logout-btn");
 
   if (logoutBtn) {
@@ -478,5 +460,30 @@ document.addEventListener("DOMContentLoaded", () => {
       logout();
     });
   }
+
+  console.log(`Product ID: ${productId}`);
+  console.log(`Booth ID: ${boothId}`);
+  console.log(`Quantity: ${quantity}`);
+  addToCartBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    const boothId = localStorage.getItem("BoothId");
+
+    addToCart(quantity, productId, boothId);
+    window.location.href = `client-products.html?id=${boothId}`;
+  });
+
+  backToProductsButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    const boothId = localStorage.getItem("BoothId");
+    window.location.href = `client-products.html?id=${boothId}`;
+  });
+
+  if (productId) {
+    getSpecificProduct(productId);
+    localStorage.setItem("currentpId", productId);
+  } else {
+    console.error("Product ID is missing in the URL parameters.");
+  }
+
   getData();
 });
