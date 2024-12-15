@@ -1,7 +1,7 @@
 
-
+const API_BASE_URL = 'http://10.241.155.155:8080';
 function logout() {
-    fetch('http://localhost:8080/php/auth/logout.php' + new URLSearchParams({
+    fetch(`${API_BASE_URL}/php/auth/logout.php` + new URLSearchParams({
         logout: 'true',
     }).toString(), {
         method: 'POST',
@@ -16,7 +16,7 @@ function logout() {
             throw new Error('Network response was not ok');
         } else {
             
-        window.location.href = 'http://localhost:8080/CS-312-Course-Project/website/auth/html/index.html';
+        window.location.href = `${API_BASE_URL}/auth/html/index.html`;
         } 
 
         responseClone = response.clone()

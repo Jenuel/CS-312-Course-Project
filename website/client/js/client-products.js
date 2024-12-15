@@ -1,3 +1,5 @@
+const API_BASE_URL = 'http://10.241.155.155:8080';
+const API_BASE_URL_NODE = 'http://10.241.155.155:3000';
 const urlParams = new URLSearchParams(window.location.search); // connecting to url params of html
 let boothId = 0;
 /*
@@ -12,7 +14,7 @@ if((urlParams.get('id'))==="none"){
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
     }else{
-      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+      window.location.href = `${API_BASE_URL}/client/html/client-home.html`;
     }
   
   }else{ // id has value
@@ -104,7 +106,7 @@ function fetchProducts(boothId, search = '', filter = 'all', order = 'asc') {
     queryParams.append('filter', 'active');
 }
 
-  fetch(`http://localhost:3000/products/booth/${boothId}?${queryParams.toString()}`, {
+  fetch(`${API_BASE_URL_NODE}/products/booth/${boothId}?${queryParams.toString()}`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',
@@ -177,7 +179,7 @@ function fetchProducts(boothId, search = '', filter = 'all', order = 'asc') {
 
 
 function cancelOrder(orderId) {
-  fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+  fetch(`${API_BASE_URL_NODE}/orders/cancel/${orderId}`, { // URL for Cancel order
       method: 'PATCH', 
       headers: {
           'Content-Type': 'application/json', 
@@ -201,7 +203,7 @@ function cancelOrder(orderId) {
 
 function getCart(customerId){
   let cid = parseInt(customerId);
-  fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
+  fetch(`${API_BASE_URL_NODE}/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
     method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 

@@ -1,3 +1,4 @@
+const API_BASE_URL = 'http://10.241.155.155';
 // DOM Elements
 const pendingOrdersTable = document.querySelector("#pendingOrders tbody");
 const completedOrdersTable = document.querySelector("#completedOrders tbody");

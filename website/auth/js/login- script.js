@@ -1,3 +1,4 @@
+const API_BASE_URL = 'http://10.241.155.155:8080';
 /**
  * Handles the login process by capturing the form submission event,
  * sending the login data to the server, and redirecting based on the
@@ -21,7 +22,7 @@ function handleLogin(event) {
      * Send the login data to the server via a POST request.
      * The data is sent as JSON, and the server's response is expected to be in JSON format.
      */
-    fetch('http://localhost:8080/php/auth/authRoutes.php', {
+    fetch( `${API_BASE_URL}/php/auth/authRoutes.php`, {
         method: 'POST', // HTTP method to be used
         headers: {
             'Content-Type': 'application/json' // Indicate that the request body is JSON
@@ -56,7 +57,7 @@ function handleLogin(event) {
                 console.log("ID : ", localStorage.getItem('id'));
                 
                 // Redirect to the vendor home page
-                window.location.href = 'http://localhost:8080/vendor/html/vendor-home.html'; 
+                window.location.href = `${API_BASE_URL}/vendor/html/vendor-home.html`; 
             } else {
                 const id = data.UserID;
 
@@ -66,16 +67,16 @@ function handleLogin(event) {
 
                 // Check the stored status and redirect based on that
                 if (localStorage.getItem("Status") === "client-purchases.html") {
-                    window.location.href = 'http://localhost:8080/client/html/client-purchases.html?orderID=none';
+                    window.location.href = `${API_BASE_URL}/client/html/client-purchases.html?orderID=none`;
                 }
                 if (localStorage.getItem("Status") === "client-specific-products.html") {
-                    window.location.href = 'http://localhost:8080/client/html/client-specific-product.html?productID=none&boothID=none';
+                    window.location.href = `${API_BASE_URL}/client/html/client-specific-product.html?productID=none&boothID=none`;
                 }
                 if (localStorage.getItem("Status") === "client-product.html") {
-                    window.location.href = 'http://localhost:8080/client/html/client-products.html?id=none';
+                    window.location.href = `${API_BASE_URL}/client/html/client-products.html?id=none`;
                 } else {
                     // Redirect to the customer home page if no other conditions are met
-                    window.location.href = 'http://localhost:8080/client/html/client-home.html'; 
+                    window.location.href = `${API_BASE_URL}/client/html/client-home.html`; 
                 }
             }
         } else {
