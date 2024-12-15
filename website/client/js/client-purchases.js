@@ -106,6 +106,7 @@ function updateCartItem(productId, newQuantity) {
   const orderId = getOrderId();
 
   console.log("This is the order Id:" + orderId);
+  
   if (!orderId) {
     alert("No active order found. Please refresh the page.");
     return;
@@ -134,6 +135,8 @@ function updateCartItem(productId, newQuantity) {
   };
 
   console.log("Sending update request:", updateData);
+
+  console.log("new quantity purchases", newQuantity);
 
   // Send update request to the server
   fetch(`http://localhost:3000/orders/alterOrder/${orderId}`, {

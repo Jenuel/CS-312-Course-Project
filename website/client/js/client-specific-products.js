@@ -1,6 +1,7 @@
 const API_BASE_URL = "10.241.155.155";
 let cart = [];
 let grandTotal = 0;
+let ord = 0;
 
 const urlParams = new URLSearchParams(window.location.search);
 let boothId = 0;
@@ -132,6 +133,7 @@ function addToCart(quantity, ProductID, Price) {
 
   if (localStorage.getItem("OrderID")) {
     const orderId = parseInt(localStorage.getItem("OrderID"), 10);
+    console.log("within add to cart func", orderId);
     // Save cart state before adding to order
     localStorage.setItem(`cart_${orderId}`, JSON.stringify(cart));
     addToOrder(orderId, cart);
@@ -230,7 +232,10 @@ function createOrder(boothID, data, totalPrice, customerID) {
     })
     .then((orderData) => {
       console.log("Order created successfully:", orderData);
-      localStorage.setItem("OrderID", orderData); // Save OrderID to sessionStorage
+      ord = parseInt(orderData.id);
+      console.log("parsed", ord);
+      localStorage.setItem("OrderID", ord); // Save OrderID to sessionStorage
+      console.log("after success orderid", localStorage.getItem("OrderID"));
       alert(localStorage.getItem("OrderID") + " this is the latest order");
     })
     .catch((error) => {
@@ -267,8 +272,9 @@ function addToOrder(orderID, data) {
   };
 
   console.log("This is payload" + payload);
+  console.log("THIS IS THE ODRID", orderID);
 
-  fetch(`http://${API_BASE_URL}/orders/addToOrder/${orderID}`, {
+  fetch(`http://${API_BASE_URL}:3000/orders/addToOrder/${orderID}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -277,8 +283,8 @@ function addToOrder(orderID, data) {
       response.ok ? response.json() : Promise.reject(response)
     )
     .then((orderData) => {
-      console.log("Order created successfully:", orderData);
-      sessionStorage.setItem("OrderID", orderData.id);
+      console.log("Order created successfully:", orderData, id);
+      localStorage.setItem("OrderID", orderData.id);
       // Update stocks for each product
     })
     .catch((error) => console.error("Error creating order:", error));

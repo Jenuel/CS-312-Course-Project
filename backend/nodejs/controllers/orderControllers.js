@@ -146,13 +146,12 @@ USED BY: customer
 const addToOrder = async (request, response) => {
   const db = request.db;
   const { orderId } = request.params;
-  const { productID, quantity, totalPricePerProduct } = request.body; // Extract updates map and total price
+  const { products } = request.body;
 
-  //TESTER LOGS
-  console.log("add prd ", productID, " to ord ", orderId);
+  // TESTER LOGS
+  console.log("Adding products to order:", orderId);
 
   try {
-    // Validate totalPrice if needed
     for (const product of products) {
       const { productID, quantity, totalPricePerProduct } = product;
 
@@ -167,25 +166,47 @@ const addToOrder = async (request, response) => {
         throw new Error(`Invalid product data: ${JSON.stringify(product)}`);
       }
 
-      await db.query(
-        "INSERT INTO order_products (ProductID,`OrderID`, Quantity, Total) VALUES (?, ?, ?, ?)",
-        [productID, orderId, quantity, totalPricePerProduct]
+      const [rows] = await db.query(
+        `SELECT Quantity, Total FROM order_products WHERE ProductID = ? AND OrderID = ?`,
+        [productID, orderId]
       );
 
-      //TESTER LOGS
-      console.log(`Product inserted: ${JSON.stringify(product)}`);
+      if (rows.length > 0) {
+        const existingProduct = rows[0];
+        let { Quantity, Total } = existingProduct;
+
+        Quantity = Number(Quantity);
+        Total = parseFloat(Total);
+
+        if (isNaN(Quantity) || isNaN(Total)) {
+          throw new Error(
+            `Database returned invalid numbers: Quantity (${Quantity}), Total (${Total})`
+          );
+        }
+
+        const newQuantity = Quantity + quantity;
+        const newTotal = Total + parseFloat(totalPricePerProduct);
+
+        await db.query(
+          `UPDATE order_products SET Quantity = ?, Total = ? WHERE ProductID = ? AND OrderID = ?`,
+          [newQuantity, newTotal, productID, orderId]
+        );
+      } else {
+        await db.query(
+          `INSERT INTO order_products (ProductID, OrderID, Quantity, Total) VALUES (?, ?, ?, ?)`,
+          [productID, orderId, quantity, totalPricePerProduct]
+        );
+      }
     }
 
     response.json({
-      message: "Products added successfully to order: ",
-      orderId,
+      message: `Products added successfully to order: ${orderId}`,
     });
   } catch (error) {
     console.error("Error creating order:", error);
     response.status(500).send("Failed to create order");
   }
 };
-
 /*
 deletes an order
 - delete a line in order table
