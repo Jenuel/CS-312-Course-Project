@@ -117,7 +117,7 @@ function fetchProducts(boothId, search = "", filter = "all", order = "asc") {
   }
 
   fetch(
-    `http://${API_BASE_URL}:3000/products/booth/${boothId}?${queryParams.toString()}`,
+    `http://${API_BASE_URL}:3000/products/booth/live/${boothId}?${queryParams.toString()}`,
     {
       method: "GET",
       headers: {
