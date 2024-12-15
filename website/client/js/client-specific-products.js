@@ -1,4 +1,4 @@
-const API_BASE_URL = "10.241.155.155";
+const API_BASE_URL = "10.241.85.97";
 let cart = [];
 let grandTotal = 0;
 let ord = 0;

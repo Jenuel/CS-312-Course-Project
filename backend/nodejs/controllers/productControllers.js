@@ -281,7 +281,9 @@ const deleteProduct = async (request, response) => {
 
     // Check if product has any orders
     const [orders] = await db.query(
-      "SELECT o.Status FROM order_products p JOIN `order` o ON p.OrderID = o.OrderID WHERE p.ProductID = ? AND o.Status = 'Pending'",
+      // "SELECT o.Status FROM order_products p JOIN `order` o ON p.OrderID = o.OrderID WHERE p.ProductID = ? AND o.Status = 'inactive'",
+
+      "SELECT COUNT(*) AS orderCount FROM order_products p JOIN `order` o ON p.OrderID = o.OrderID WHERE p.ProductID = ? AND o.Status = 'inactive'",
       [productId]
     );
 
