@@ -8,8 +8,11 @@ if((urlParams.get('id'))==="none"){
     const customerId = localStorage.getItem('id');// get customer id 
   
     const hasCart =  getCart(customerId); //  result of getCart
+    //stotr hascrt.boothid = boothid
+
+    
   
-    if(hasCart){// a pedning order exists
+    if(hasCart){// a reserved order exists
       console.log("customer has existing cart")
     }else{
       window.location.href = 'http://localhost:8080/client/html/client-home.html';
@@ -201,7 +204,7 @@ function cancelOrder(orderId) {
 
 function getCart(customerId){
   let cid = parseInt(customerId);
-  fetch(`http://localhost:3000/orders/checkPendingOrder/${cid}`, { // URL for Cancel order
+  fetch(`http://localhost:3000/orders/checkReservedOrder/${cid}`, { // URL for Cancel order
     method: 'GET', 
     headers: {
         'Content-Type': 'application/json', 

@@ -387,11 +387,10 @@ USED BY: customer
 */ 
 const alterOrder = async (request, response) => {
     const db = request.db;
-    const { orderId} = request.params;
-    const {products} = request.body;
+    const { orderId } = request.params;
+    const { products } = request.body;
 
     try {
-        // First check if the order exists and is pending
         const [orderCheck] = await db.query(
             'SELECT Status FROM `order` WHERE OrderID = ?',
             [orderId]
@@ -405,49 +404,55 @@ const alterOrder = async (request, response) => {
             return response.status(400).json({ error: 'Can only remove items from reserved orders' });
         }
 
-        for (const field of products) {
-            const {productID , quantity }= field;
-            // where quantity is the new number of products TOBE inputted in  order_products
+        let isOrderEmpty = false;
 
-            const [difference] = await db.query(
-                'SELECT o.Quantity as "Initial Quantitiy", (o.Quantity - ?) as "Updated Quantity" FROM order_products o WHERE o.ProductID = ? AND o.OrderID =?',
-                [quantity,productID,orderId]
-              );
-          
-              const { 'Initial Quantitiy': currentStocks, 'Updated Quantity': updatedStocks } = difference[0];
-          
-              if (updatedStocks === currentStocks) { // new quantity is 0 
-                deleteProduct(db,orderId,productID);
-                orderId= null;
+        await db.beginTransaction();
 
-              } else { // updatedStocks either increased or decreased 
+        try {
+            for (const field of products) {
+                const { productID, quantity } = field;
 
-                await db.query(
-                  "UPDATE `order_products` SET `Quantity` = ? WHERE `order_products`.`ProductID` = ? AND `order_products`.`OrderID` = ?",
-                  [quantity,productID,orderId]
-                );// changing the quantity of the product order
+                const [difference] = await db.query(
+                    'SELECT o.Quantity as `Initial Quantity`, (o.Quantity - ?) as `Updated Quantity` FROM order_products o WHERE o.ProductID = ? AND o.OrderID = ?',
+                    [quantity, productID, orderId]
+                );
 
-                await db.query(
-                    "UPDATE order_products o SET o.Total = o.Quantity * (SELECT p.Price FROM product p WHERE p.ProductID = o.ProductID) WHERE o.ProductID = ? AND o.OrderID = ?",
-                    [productID, orderId]
-                );// updating the total price per product in order_product
-              }
-          }// end of loop 
-          
-          if(orderId === null){
-            response.json("order is removed");
-          }else{
-            updatedPrices(db,orderId);
-          }
+                if (!difference.length) continue;
 
+                const { 'Initial Quantity': currentStocks, 'Updated Quantity': updatedStocks } = difference[0];
+
+                if (updatedStocks <= 0) {
+                    isOrderEmpty = await deleteProduct(db, orderId, productID);
+                } else {
+                    await db.query(
+                        'UPDATE `order_products` SET `Quantity` = ? WHERE `ProductID` = ? AND `OrderID` = ?',
+                        [quantity, productID, orderId]
+                    );
+
+                    await db.query(
+                        'UPDATE order_products o SET o.Total = o.Quantity * (SELECT p.Price FROM product p WHERE p.ProductID = o.ProductID) WHERE o.ProductID = ? AND o.OrderID = ?',
+                        [productID, orderId]
+                    );
+                }
+            }
+
+            if (!isOrderEmpty) {
+                await updatedPrices(db, orderId);
+            }
+
+            await db.commit();
+
+            response.json({ message: isOrderEmpty ? 'Order removed' : 'Order updated successfully' });
+        } catch (error) {
+            await db.rollback();
+            throw error;
+        }
     } catch (error) {
         console.error('Error altering product from order', error);
-        response.status(500).json({ 
-            error: 'Failed to alter product from order',
-            details: error.message 
-        });
+        response.status(500).json({ error: 'Failed to alter product from order', details: error.message });
     }
 };
+
 
 /*
 helper function to update Grand total in order
@@ -476,7 +481,9 @@ async function updatedPrices (db,orderId) {
     }
     
 }
-
+/*
+helper function to delete a product and updating grand total in order
+*/
 async function deleteProduct(db, orderId, productId) {
     try{
          // Get the product's total price before removing

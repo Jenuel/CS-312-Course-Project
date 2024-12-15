@@ -71,7 +71,7 @@ function displayCart(cartItems) {
                        class="form-control form-control-sm quantity-input" 
                        value="${item.quantity || 1}" 
                        min="1" 
-                       onchange="updateCartItem(${item.productID}, this.value)"
+                       onchange="updateCartItem(${getOrderId},${item.productID}, this.value, )"
                        data-product-id="${item.productID}">
             </td>
             <td class="text-end">₱${parseFloat(item.price).toFixed(2)}</td>
@@ -89,45 +89,6 @@ function displayCart(cartItems) {
     updateCartTotal(runningTotal);
 }
 
-
-// function updateCartItem(productId, newQuantity) {
-//     const orderId = localStorage.getItem('OrderId') || localStorage.getItem('orderId');
-//     if (!orderId) {
-//         console.error("No order ID found");
-//         return;
-//     }
-
-//     const quantity = parseInt(newQuantity);
-//     if (isNaN(quantity) || quantity < 1) {
-//         alert("Please enter a valid quantity");
-//         return;
-//     }
-
-//     fetch(`http://localhost:3000/orders/updateQuantity/${orderId}/${productId}`, {
-//         method: 'PATCH',
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ quantity: quantity })
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
-//         return response.json();
-//     })
-//     .then(data => {
-//         // Refresh the cart to show updated totals
-//         const localStorageId = localStorage.getItem('id');
-//         if (localStorageId) {
-//             getCart(localStorageId);
-//         }
-//     })
-//     .catch(error => {
-//         console.error("Error updating cart item:", error);
-//         alert("Failed to update item quantity. Please try again.");
-//     });
-// }
 
 function updateCartTotal(input) {
     const cartTotalElement = document.getElementById('cart-total');
@@ -182,9 +143,7 @@ function closeProfile() {
     profile.classList.remove("open-profile");
 }
 
-/* ----------------------------------------------------------------------------------------------------- */
-// THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
-
+/* -------------------------------------Fetch Functions------------------------------------- */
 
 /**
  * Fetch for order cancelation (PATCH)
@@ -442,13 +401,67 @@ function removeCartItem(productId) {
         console.error("Error removing item:", error);
         alert("Failed to remove item from cart. Please try again.");
     });
+
+    getCart(localStorage.getItem('Customer ID'));
 }
 
 /*
-function for updateding quantitity of a product in a cart
+function for updating quantitity of a product in a cart
 (cart is an order with a reserved status)
 FROM: orderController.js
 */
+function updateCartItem(orderId,productIdValue,quantityValue) {
+    //data= ["productIDvalue,quantityvalue","1,3", "2,5"] 
+
+    const orderId = localStorage.getItem('OrderId') || localStorage.getItem('orderId');
+    if (!orderId) {
+        console.error("No order ID found");
+        return;
+    }
+    if (isNaN(parseInt(productIdValue)) || isNaN(parseInt(quantityValue))) {
+        console.error("Invalid productID or quantity");
+        return;
+    }
+
+    const data = {
+        products:[
+            {
+                productID: parseInt(productIdValue), 
+                quantity: parseInt(quantityValue)
+            }
+        ]
+    };
+
+    fetch(`http://localhost:3000/orders/alterOrder/${orderId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Refresh the cart to show updated totals
+        const localStorageId = localStorage.getItem('id');
+        if (localStorageId) {
+            getCart(localStorageId);
+        }
+    })
+    .catch(error => {
+        console.error("Error updating cart item:", error);
+        alert("Failed to update item quantity. Please try again.");
+    });
+
+    getCart(localStorage.getItem('Customer ID'));// change key name
+}
+
+
+
 
 /* -------------------------------------End Fetch Functions------------------------------------- */
 
