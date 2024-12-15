@@ -10,25 +10,13 @@ const getProducts = async (request, response) => {
   const db = request.db;
   const { boothId } = request.params;
   const {
-    query: { filter, sort},
+    query: { sort},
   } = request;
 
   try {
     let query =
       'SELECT p.ProductID AS "ProductID", p.name AS "Name", p.StocksRemaining AS "Stocks", p.Price AS "Price", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `product` p WHERE p.BoothID = ?';
     let params = [boothId];
-
-    if (filter) {
-      query += " AND p.status = ?";
-      params.push(filter);
-    }
-
-    // Apply filter for status (active or inactive)
-    if (filter === "active") {
-      query += ` AND p.status = 'active'`;
-    } else if (filter === "inactive") {
-      query += ` AND p.status = 'inactive'`;
-    }
 
     // Apply sorting logic
     if (sort) {
@@ -54,6 +42,44 @@ const getProducts = async (request, response) => {
     response.status(500).send("Failed to fetch products");
   }
 };
+
+const getLiveProducts = async (request, response) => {
+  const db = request.db;
+  const { boothId } = request.params;
+  const {
+    query: { filter, sort},
+  } = request;
+
+  try {
+    let query =
+      'SELECT p.ProductID AS "ProductID", p.name AS "Name", p.StocksRemaining AS "Stocks", p.Price AS "Price", p.status AS "Status", TO_BASE64(p.Image) AS "Image" FROM `p roduct` p WHERE p.BoothID = ? AND p.status = "Live"';
+    let params = [boothId];
+
+    // Apply sorting logic
+    if (sort) {
+      const allowedSortFields = ["name", "price"];
+      const [field, order] = sort.split(":");
+
+      if (
+        allowedSortFields.includes(field) &&
+        ["asc", "desc"].includes(order.toLowerCase())
+      ) {
+        query += ` ORDER BY p.${field} ${order.toUpperCase()}`;
+      } else {
+        return response.status(400).json({ error: "Invalid sort parameter" });
+      }
+    }
+
+    const [rows] = await db.query(query, params);
+
+    response.json(rows); // Convert response to JSON
+
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    response.status(500).send("Failed to fetch products");
+  }
+};
+
 
 
 
@@ -377,6 +403,7 @@ export statement
 */
 export {
       getProducts,
+      getLiveProducts,
       getProductDetails,
       buyProduct,
       createProduct,
