@@ -471,7 +471,7 @@ FROM: orderController.js
 function updateCartItem(orderId, productIdValue, quantityValue) {
   //data= ["productIDvalue,quantityvalue","1,3", "2,5"]
 
-//   orderId = localStorage.getItem("OrderId") || localStorage.getItem("orderId");
+  //   orderId = localStorage.getItem("OrderId") || localStorage.getItem("orderId");
   if (!orderId) {
     console.error("No order ID found");
     return;

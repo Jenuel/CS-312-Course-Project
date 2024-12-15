@@ -211,6 +211,8 @@ function createOrder(boothID, data, totalPrice, customerID) {
     customerId: id,
   };
 
+  console.log("15/12", boothID);
+
   console.log("payload: ", payload);
   fetch(`http://${API_BASE_URL}:3000/orders/create/${boothID}`, {
     method: "POST",
@@ -469,13 +471,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const boothId = localStorage.getItem("BoothId");
 
     addToCart(quantity, productId, boothId);
-    window.location.href = `client-products.html?id=${boothId}`;
+    // window.location.href = `client-products.html?id=${boothId}`;
   });
 
   backToProductsButton.addEventListener("click", (event) => {
     event.preventDefault();
     const boothId = localStorage.getItem("BoothId");
-    window.location.href = `client-products.html?id=${boothId}`;
+    // window.location.href = `client-products.html?id=${boothId}`;
   });
 
   if (productId) {
