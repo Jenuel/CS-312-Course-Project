@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://10.241.155.155:8080";
+const API_BASE_URL = "10.241.155.155";
 let box = document.querySelector(".booth-container"); // where the child will be appended
 
 // Get filter and order values
@@ -19,7 +19,7 @@ let sortSelect = document.getElementById("sortDropdown");
  */
 function getData() {
   // Use the formData object for filter and order params
-  fetch(`${API_BASE_URL}/php/boothOps/boothRoutes.php`, {
+  fetch(`http://${API_BASE_URL}:8080/php/boothOps/boothRoutes.php`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

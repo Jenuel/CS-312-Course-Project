@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://10.241.155.155:8080";
+const API_BASE_URL = "10.241.155.155";
 function logout() {
   fetch(
     `${API_BASE_URL}/php/auth/logout.php` +
@@ -17,7 +17,7 @@ function logout() {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         } else {
-          window.location.href = `${API_BASE_URL}/auth/html/index.html`;
+          window.location.href = `http://${API_BASE_URL}:8080/auth/html/index.html`;
         }
 
         responseClone = response.clone();

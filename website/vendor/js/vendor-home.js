@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://10.241.155.155:8080';
+const API_BASE_URL = '10.241.155.155';
 
 let modal, create, edit, boothImage, inputFile, searchInput, sortSelect;
 
@@ -48,7 +48,7 @@ function getData() {
   const searchTerm = searchInput?.value || "";
   const sortOption = sortSelect?.value || "A-Z";
 
-  fetch(`${API_BASE_URL}/php/boothOps/boothRoutes.php`, {
+  fetch(`http://${API_BASE_URL}:8080/php/boothOps/boothRoutes.php`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -230,7 +230,7 @@ function editBooth(boothId) {
   create.classList.remove("open-createBooth");
   document.body.classList.add("modal-open");
 
-  fetch(`${API_BASE_URL}/php/boothOps/boothRoutes.php/${boothId}`, {
+  fetch(`http://${API_BASE_URL}:8080/php/boothOps/boothRoutes.php/${boothId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -303,7 +303,7 @@ async function updateBoothFunction() {
     action: "update",
   };
 
-  fetch(`${API_BASE_URL}/php/boothOps/boothRoutes.php`, {
+  fetch(`http://${API_BASE_URL}:8080/php/boothOps/boothRoutes.php`, {
     method: "POST",
     body: JSON.stringify(formData),
     headers: {
@@ -363,7 +363,7 @@ function deleteBooth(boothId) {
     return;
   }
 
-  fetch(`${API_BASE_URL}/php/boothOps/boothRoutes.php/${boothId}`, {
+  fetch(`http://${API_BASE_URL}:8080/php/boothOps/boothRoutes.php/${boothId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -420,7 +420,7 @@ async function createBoothFunction() {
     boothIcon: imageData,
   };
 
-  fetch(`${API_BASE_URL}/php/boothOps/boothRoutes.php`, {
+  fetch(`http://${API_BASE_URL}:8080/php/boothOps/boothRoutes.php`, {
     method: "POST",
     body: JSON.stringify(formData),
     headers: {

@@ -1,5 +1,4 @@
 const API_BASE_URL = 'http://10.241.155.155:8080';
-const API_BASE_URL_NODE = 'http://10.241.155.155:3000';
 let cart = [];
 let grandTotal = 0 ;
 
@@ -14,7 +13,7 @@ if (urlParams.get("boothId") === "none") {
     // a pedning order exists
     console.log("customer has existing cart");
   } else {
-    window.location.href = `${API_BASE_URL}/client/html/client-home.html`;
+    window.location.href = `http://${API_BASE_URL}:8080/client/html/client-home.html`;
   }
 } else {
   // boothId = urlParams.get('boothId');
@@ -189,7 +188,7 @@ function to get the detils of a specific product
 FROM: productController.js
 */
 function getSpecificProduct(productId) {
-  fetch(`${API_BASE_URL_NODE}/products/details/${productId}`, {
+  fetch(`http://${API_BASE_URL}:3000/products/details/${productId}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   })
@@ -240,7 +239,7 @@ function createOrder(boothID, data, totalPrice, customerID) {
   };
 
   console.log("payload: ", payload);
-  fetch(`${API_BASE_URL_NODE}/orders/create/${boothID}`, {
+  fetch(`http://${API_BASE_URL}:3000/orders/create/${boothID}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -313,7 +312,7 @@ FROM: orderController.js
 */
 function getCart(customerId) {
   let cid = parseInt(customerId);
-  fetch(`${API_BASE_URL_NODE}/orders/checkReservedOrder/${cid}`, {
+  fetch(`http://${API_BASE_URL}:3000/orders/checkReservedOrder/${cid}`, {
     // URL for Cancel order
     method: "GET",
     headers: {
@@ -402,7 +401,7 @@ function getCart(customerId) {
  * @param {Integer} orderId 
  */
 function cancelOrder(orderId) {
-  fetch(`${API_BASE_URL_NODE}/orders/cancel/${orderId}`, { // URL for Cancel order
+  fetch(`http://${API_BASE_URL}:3000/orders/cancel/${orderId}`, { // URL for Cancel order
       method: 'PATCH', 
       headers: {
           'Content-Type': 'application/json', 

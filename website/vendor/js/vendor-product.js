@@ -1,4 +1,6 @@
-const API_BASE_URL = "http://10.241.155.155:3000/products";
+const API_BASE_URL = "10.241.155.155";
+
+http://
 let eventSetup = false;
 const boothId = sessionStorage.getItem("currentBoothId");
 const productTotal = document.getElementById("product-total");
@@ -26,7 +28,7 @@ async function fetchBoothProducts() {
   showLoading();
   try {
     // Note the updated endpoint to match your productRoutes.js
-    const response = await fetch(`${API_BASE_URL}/booth/${boothId}`, {
+    const response = await fetch(`http://http://${API_BASE_URL}:3000/products:3000/products/booth/${boothId}`, {
       method: "GET",
       credentials: "include", // Important for cookies
       headers: {
@@ -90,7 +92,7 @@ async function createProduct(formData) {
         : null,
     };
 
-    const response = await fetch(`${API_BASE_URL}/create`, {
+    const response = await fetch(`http://${API_BASE_URL}:3000/products/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -226,7 +228,7 @@ function editProductData(data, productContainer) {
 
 async function deleteProduct(productId) {
   try {
-    const response = await fetch(`${API_BASE_URL}/delete/${productId}`, {
+    const response = await fetch(`http://${API_BASE_URL}:3000/products/delete/${productId}`, {
       method: "DELETE",
       credentials: "include", // Important for cookies
       headers: {
@@ -281,7 +283,7 @@ async function updateProduct(updatedData, imageChanged) {
       }
     }
 
-    const response = await fetch(`${API_BASE_URL}/edit/${productId}`, {
+    const response = await fetch(`http://${API_BASE_URL}:3000/products/edit/${productId}`, {
       method: "PATCH",
       credentials: "include",
       headers: {
@@ -762,7 +764,7 @@ async function initializePage() {
   // Check session
   const sessionId = getSessionId();
   if (!sessionId) {
-    window.location.href = `${API_BASE_URL}/auth/html/index.html`;
+    window.location.href = `http://${API_BASE_URL}:3000/products/auth/html/index.html`;
     return;
   }
 
@@ -805,7 +807,7 @@ function getBoothIdFromSession() {
 
 // Populate Pending Orders
 function populatePendingOrders(boothId) {
-  fetch(`${API_BASE_URL}/orders/reserved/${boothId}`, {
+  fetch(`http://${API_BASE_URL}:3000/products/orders/reserved/${boothId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
   })
@@ -838,7 +840,7 @@ function populatePendingOrders(boothId) {
 
 // Populate Completed Orders
 function populateCompletedOrders(boothId) {
-  fetch(`${API_BASE_URL}/orders/complete/${boothId}`, {
+  fetch(`http://${API_BASE_URL}:3000/products/orders/complete/${boothId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
   })
@@ -885,7 +887,7 @@ function markAsCompleted(orderId) {
   console.log('Order ID:', orderId);
   console.log('Date Paid:', datePaid);
 
-  fetch(`${API_BASE_URL}/orders/approve/${orderId}`, {
+  fetch(`http://${API_BASE_URL}:3000/products/orders/approve/${orderId}`, {
       method: "PATCH",
       headers: { 
           "Content-Type": "application/json" 

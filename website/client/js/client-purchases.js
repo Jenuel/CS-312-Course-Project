@@ -1,5 +1,5 @@
-const API_BASE_URL = 'http://10.241.155.155:8080';
-const API_BASE_URL_NODE = 'http://10.241.155.155:3000';
+const API_BASE_URL = 'http://10.241.155.155';
+
 // Retrieve the parameters from the URL
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -17,7 +17,7 @@ if((urlParams.get('boothId'))==="none"){
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
     }else{
-      window.location.href = `${API_BASE_URL}/client/html/client-home.html`;
+      window.location.href = `htpp://${API_BASE_URL}:8080/client/html/client-home.html`;
     }
   
   }else{
@@ -192,7 +192,7 @@ function closeProfile() {
  * @param {Integer} orderId 
  */
 function cancelOrder(orderId) {
-    fetch(`${API_BASE_URL_NODE}/orders/cancel/${orderId}`, { // URL for Cancel order
+    fetch(`http://${API_BASE_URL}:3000/orders/cancel/${orderId}`, { // URL for Cancel order
         method: 'PATCH', 
         headers: {
             'Content-Type': 'application/json', 
@@ -230,7 +230,7 @@ function checkoutProducts() {
     }
 
     // Change the endpoint to use the products/buy endpoint instead of orders/complete
-    fetch(`${API_BASE_URL_NODE}/products/buy/${orderID}`, {
+    fetch(`http://${API_BASE_URL}:3000/products/buy/${orderID}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -299,7 +299,7 @@ function createOrder(boothID, data, totalPrice, customerId) {// PLEASE EXPLAIN H
         status: 'Pending' // Explicitly set status as Pending
     };
 
-    fetch(`${API_BASE_URL_NODE}/orders/create/${boothID}`, {
+    fetch(`http://${API_BASE_URL}:3000/orders/create/${boothID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -343,7 +343,7 @@ function getCart(customerId) {
         return;
     }
 
-    fetch(`${API_BASE_URL_NODE}/orders/checkReservedOrder/${cid}`, {
+    fetch(`http://${API_BASE_URL}:3000/orders/checkReservedOrder/${cid}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     })
@@ -409,7 +409,7 @@ function removeCartItem(productId) {
 
     console.log(`Removing product ${productId} from order ${orderId}`);
 
-    fetch(`${API_BASE_URL_NODE}/orders/removeItem/${orderId}/${productId}`, {
+    fetch(`http://${API_BASE_URL}:3000/orders/removeItem/${orderId}/${productId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
