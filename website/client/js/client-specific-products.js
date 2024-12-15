@@ -137,7 +137,8 @@ function addToCart(quantity, ProductID, Price) {
     addToOrder(orderId, cart);
   } else {
     const cid = localStorage.getItem("id");
-    const boothId = localStorage.getItem("BoothId");
+    boothId = localStorage.getItem("BoothId");
+    console.log("before create", boothId);
     createOrder(boothId, cart, grandTotal, cid);
   }
 
@@ -145,7 +146,7 @@ function addToCart(quantity, ProductID, Price) {
   cart = [];
   grandTotal = 0;
 
-  window.location.href = `client-products.html?id=${boothId}`;
+  // window.location.href = `client-products.html?id=${boothId}`;
 }
 
 function checkout() {
@@ -229,7 +230,8 @@ function createOrder(boothID, data, totalPrice, customerID) {
     })
     .then((orderData) => {
       console.log("Order created successfully:", orderData);
-      sessionStorage.setItem("OrderID", orderData.id); // Save OrderID to sessionStorage
+      localStorage.setItem("OrderID", orderData); // Save OrderID to sessionStorage
+      alert(localStorage.getItem("OrderID") + " this is the latest order");
     })
     .catch((error) => {
       console.error("Error creating order:", error);
@@ -250,6 +252,9 @@ function addToOrder(orderID, data) {
 
   const formattedProducts = data.map((entry) => {
     const [id, quantity, totalPricePerProduct] = entry.split(",");
+    console.log("quantity: ", quantity);
+    console.log("product id: ", id);
+    console.log("toal price: ", totalPricePerProduct);
     return {
       productID: id,
       quantity: parseInt(quantity, 10),
@@ -259,12 +264,9 @@ function addToOrder(orderID, data) {
 
   const payload = {
     products: formattedProducts,
-    quantity: parseInt(quantity, 10),
-    totalPricePerProduct: parseFloat(totalPricePerProduct).toFixed(2),
-    productID: id,
   };
 
-  console.log(payload);
+  console.log("This is payload" + payload);
 
   fetch(`${API_BASE_URL_NODE}/orders/addToOrder/${orderID}`, {
     method: "POST",

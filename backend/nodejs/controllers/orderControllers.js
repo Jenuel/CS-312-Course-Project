@@ -57,7 +57,13 @@ const createOrder = async (request, response) => {
   const { products, totalPrice, date, customerId } = request.body;
 
   //TESTER LOGS
-  console.log("Request body:", request.body);
+  //console.log("Request body:", request.body);
+
+  //TESTER LOGS
+  console.log("Received boothID:", boothID);
+  console.log("Received products:", products);
+  console.log("Received totalPrice:", totalPrice);
+  console.log("Received date:", date);
 
   try {
     // Validate inputs
@@ -76,12 +82,6 @@ const createOrder = async (request, response) => {
     if (!customerId || isNaN(customerId)) {
       return response.status(400).send("Invalid customerId");
     }
-
-    //TESTER LOGS
-    console.log("Received boothID:", boothId);
-    console.log("Received products:", products);
-    console.log("Received totalPrice:", totalPrice);
-    console.log("Received date:", date);
 
     // Insert order into the database
     const [orderQuery] = await db.query(
@@ -153,17 +153,32 @@ const addToOrder = async (request, response) => {
 
   try {
     // Validate totalPrice if needed
-    const [insertResult] = await db.query(
-      "INSERT INTO order_products (ProductID,`OrderID`, Quantity, Total) VALUES (?, ?, ?, ?)",
-      [productID, orderId, quantity, totalPricePerProduct]
-    );
+    for (const product of products) {
+      const { productID, quantity, totalPricePerProduct } = product;
 
-    // Additional processing for totalPrice if needed
-    console.log(`Total price of all products: ${totalPricePerProduct}`);
+      if (
+        !productID ||
+        isNaN(productID) ||
+        !quantity ||
+        isNaN(quantity) ||
+        !totalPricePerProduct ||
+        isNaN(totalPricePerProduct)
+      ) {
+        throw new Error(`Invalid product data: ${JSON.stringify(product)}`);
+      }
+
+      await db.query(
+        "INSERT INTO order_products (ProductID,`OrderID`, Quantity, Total) VALUES (?, ?, ?, ?)",
+        [productID, orderId, quantity, totalPricePerProduct]
+      );
+
+      //TESTER LOGS
+      console.log(`Product inserted: ${JSON.stringify(product)}`);
+    }
 
     response.json({
-      message: "Products updated successfully",
-      totalPricePerProduct,
+      message: "Products added successfully to order: ",
+      orderId,
     });
   } catch (error) {
     console.error("Error creating order:", error);
@@ -436,7 +451,7 @@ const alterOrder = async (request, response) => {
           "Updated Quantity": updatedStocks,
         } = difference[0];
 
-        if (updatedStocks <= 0) {
+        if (updatedStocks === currentStocks) {
           isOrderEmpty = await deleteProduct(db, orderId, productID);
         } else {
           await db.query(
