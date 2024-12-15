@@ -19,7 +19,7 @@ router.post("/addToOrder/:orderId", addToOrder); // customer *
 router.patch("/cancel/:orderId", cancelOrder); // customer *
 router.patch("/complete/:orderId", completeOrder); // vendor *
 router.get("/checkReservedOrder/:customerId", checkReservedOrder); // customer old checkPendingOrder
-router.delete("/removeItem/:orderId", removeItemFromOrder); // client
+router.delete("/removeItem/:orderId/:productId", removeItemFromOrder); // client
 router.patch("/alterOrder/:orderId", alterOrder); // customer
 
 // OLD ROUTING
