@@ -268,7 +268,7 @@ function addToOrder(orderID, data) {
 
   console.log("This is payload" + payload);
 
-  fetch(`${API_BASE_URL_NODE}/orders/addToOrder/${orderID}`, {
+  fetch(`http://${API_BASE_URL}/orders/addToOrder/${orderID}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
