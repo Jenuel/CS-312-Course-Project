@@ -1,4 +1,4 @@
-const API_BASE_URL = 10.241.155.155';
+const API_BASE_URL = '10.241.155.155';
 http://http://${API_BASE_URL}:8080:8080
 /**
  * Logs out the current user by sending a POST request to the server's logout endpoint.
