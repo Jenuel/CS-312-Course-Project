@@ -1,6 +1,6 @@
-const API_BASE_URL = 'http://10.241.155.155:8080';
+const API_BASE_URL = "10.241.155.155";
 let cart = [];
-let grandTotal = 0 ;
+let grandTotal = 0;
 
 const urlParams = new URLSearchParams(window.location.search);
 let boothId = 0;
@@ -122,56 +122,55 @@ function displaySpecificProduct(product) {
 }
 
 function initializeCart() {
-    // Clear existing cart data
-    cart = [];
-    grandTotal = 0;
-    
-    // Check if there's an existing order
-    const orderId = localStorage.getItem("OrderID");
-    if (orderId) {
-        // Load existing cart data if needed
-        const existingCart = localStorage.getItem(`cart_${orderId}`);
-        if (existingCart) {
-            cart = JSON.parse(existingCart);
-            grandTotal = cart.reduce((sum, item) => {
-                const [, , itemTotal] = item.split(",");
-                return sum + parseFloat(itemTotal);
-            }, 0);
-        }
+  // Clear existing cart data
+  cart = [];
+  grandTotal = 0;
+
+  // Check if there's an existing order
+  const orderId = localStorage.getItem("OrderID");
+  if (orderId) {
+    // Load existing cart data if needed
+    const existingCart = localStorage.getItem(`cart_${orderId}`);
+    if (existingCart) {
+      cart = JSON.parse(existingCart);
+      grandTotal = cart.reduce((sum, item) => {
+        const [, , itemTotal] = item.split(",");
+        return sum + parseFloat(itemTotal);
+      }, 0);
     }
+  }
 }
 
 function addToCart(quantity, ProductID, Price) {
-    if (cart.length === 0) {
-        initializeCart();
-    }
-    
-    const totalPrice = parseFloat(quantity) * parseFloat(Price);
-    cart.push(`${ProductID},${quantity},${totalPrice.toFixed(2)}`);
+  if (cart.length === 0) {
+    initializeCart();
+  }
 
-    // Recalculate grand total from scratch
-    grandTotal = cart.reduce((sum, item) => {
-        const [, , itemTotal] = item.split(",");
-        return sum + parseFloat(itemTotal);
-    }, 0);
+  const totalPrice = parseFloat(quantity) * parseFloat(Price);
+  cart.push(`${ProductID},${quantity},${totalPrice.toFixed(2)}`);
 
+  // Recalculate grand total from scratch
+  grandTotal = cart.reduce((sum, item) => {
+    const [, , itemTotal] = item.split(",");
+    return sum + parseFloat(itemTotal);
+  }, 0);
 
-    if (localStorage.getItem("OrderID")) {
-        const orderId = parseInt(localStorage.getItem("OrderID"), 10);
-        // Save cart state before adding to order
-        localStorage.setItem(`cart_${orderId}`, JSON.stringify(cart));
-        addToOrder(orderId, cart);
-    } else {
-        const cid = localStorage.getItem("id");
-        const boothId = localStorage.getItem("BoothId");
-        createOrder(boothId, cart, grandTotal, cid);
-    }
+  if (localStorage.getItem("OrderID")) {
+    const orderId = parseInt(localStorage.getItem("OrderID"), 10);
+    // Save cart state before adding to order
+    localStorage.setItem(`cart_${orderId}`, JSON.stringify(cart));
+    addToOrder(orderId, cart);
+  } else {
+    const cid = localStorage.getItem("id");
+    const boothId = localStorage.getItem("BoothId");
+    createOrder(boothId, cart, grandTotal, cid);
+  }
 
-    // Clear cart after creating/updating order
-    cart = [];
-    grandTotal = 0;
-    
-    window.location.href = `client-products.html?id=${boothId}`;
+  // Clear cart after creating/updating order
+  cart = [];
+  grandTotal = 0;
+
+  window.location.href = `client-products.html?id=${boothId}`;
 }
 
 function checkout() {
@@ -224,7 +223,6 @@ function createOrder(boothID, data, totalPrice, customerID) {
 
   console.log("id: ", boothId);
   console.log("id: ", customerID);
- 
 
   // Ensure the total price is a float (not a string)
   // Ensure the total price is a float (not a string)
@@ -398,34 +396,33 @@ function getCart(customerId) {
 
 /**
  * Fetch for order cancelation (PATCH)
- * @param {Integer} orderId 
+ * @param {Integer} orderId
  */
 function cancelOrder(orderId) {
-  fetch(`http://${API_BASE_URL}:3000/orders/cancel/${orderId}`, { // URL for Cancel order
-      method: 'PATCH', 
-      headers: {
-          'Content-Type': 'application/json', 
-      },
-      body: JSON.stringify({ status: 'cancelled' }), 
+  fetch(`http://${API_BASE_URL}:3000/orders/cancel/${orderId}`, {
+    // URL for Cancel order
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status: "cancelled" }),
   })
-  .then(response => {
+    .then((response) => {
       if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       return response.json();
-  })
-  .then(data => {
+    })
+    .then((data) => {
       // data is a json massgae no parsing needed
       console.log("Order cancelled successfully:", data);
-  })
-  .catch(error => {
+    })
+    .catch((error) => {
       console.error("Error cancelling order:", error);
-  });
+    });
 }
 
-
 /* -------------------------------------End Fetch Functions------------------------------------- */
-
 
 function updateTotal(quantity, price) {
   const totalElement = document.getElementById("cart-total");

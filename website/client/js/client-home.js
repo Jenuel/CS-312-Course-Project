@@ -1,4 +1,4 @@
-const API_BASE_URL = "10.241.155.155";
+// const API_BASE_URL = "10.241.155.155";
 let box = document.querySelector(".booth-container"); // where the child will be appended
 
 // Get filter and order values

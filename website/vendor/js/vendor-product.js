@@ -1,6 +1,5 @@
 const API_BASE_URL = "10.241.155.155";
 
-http://
 let eventSetup = false;
 const boothId = sessionStorage.getItem("currentBoothId");
 const productTotal = document.getElementById("product-total");
@@ -28,14 +27,17 @@ async function fetchBoothProducts() {
   showLoading();
   try {
     // Note the updated endpoint to match your productRoutes.js
-    const response = await fetch(`http://http://${API_BASE_URL}:3000/products:3000/products/booth/${boothId}`, {
-      method: "GET",
-      credentials: "include", // Important for cookies
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getSessionId()}`,
-      },
-    });
+    const response = await fetch(
+      `http://${API_BASE_URL}:3000/products/booth/${boothId}`,
+      {
+        method: "GET",
+        credentials: "include", // Important for cookies
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getSessionId()}`,
+        },
+      }
+    );
 
     if (!response.ok) throw new Error("Failed to fetch products");
     const data = await response.json();
@@ -92,14 +94,17 @@ async function createProduct(formData) {
         : null,
     };
 
-    const response = await fetch(`http://${API_BASE_URL}:3000/products/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getSessionId()}`,
-      },
-      body: JSON.stringify(requestData),
-    });
+    const response = await fetch(
+  `http://${API_BASE_URL}:3000/products/create`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getSessionId()}`,
+        },
+        body: JSON.stringify(requestData),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -129,22 +134,32 @@ function editProductData(data, productContainer) {
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="product-name" class="form-label">Product Name</label>
-                  <input type="text" class="form-control" id="product-name" value="${data.ProductName || ""}">
+                  <input type="text" class="form-control" id="product-name" value="${
+                    data.ProductName || ""
+                  }">
                 </div>
                 <div class="mb-3">
                   <label for="status" class="form-label">Status</label>
                   <select class="form-select" id="status">
-                    <option ${data.ProductStatus === "Live" ? "selected" : ""}>Live</option>
-                    <option ${data.ProductStatus === "Pending" ? "selected" : ""}>Pending</option>
+                    <option ${
+                      data.ProductStatus === "Live" ? "selected" : ""
+                    }>Live</option>
+                    <option ${
+                      data.ProductStatus === "Pending" ? "selected" : ""
+                    }>Pending</option>
                   </select>
                 </div>
                 <div class="mb-3">
                   <label for="stock" class="form-label">Stock</label>
-                  <input type="number" class="form-control" id="stock" value="${data.ProductStock || ""}">
+                  <input type="number" class="form-control" id="stock" value="${
+                    data.ProductStock || ""
+                  }">
                 </div>
                 <div class="mb-3">
                   <label for="price" class="form-label">Price</label>
-                  <input type="number" class="form-control" id="price" value="${data.ProductPrice || ""}">
+                  <input type="number" class="form-control" id="price" value="${
+                    data.ProductPrice || ""
+                  }">
                 </div>
               </div>
               <!-- Right Column -->
@@ -173,7 +188,6 @@ function editProductData(data, productContainer) {
       </div>
     </div>
   `;
-
 
   document.body.insertAdjacentHTML("beforeend", modalHtml);
 
@@ -212,9 +226,11 @@ function editProductData(data, productContainer) {
       ProductStatus: modalElement.querySelector("#status").value,
       ProductPrice: modalElement.querySelector("#price").value,
       ProductStock: modalElement.querySelector("#stock").value || null,
-      ProductImage: imageChanged ? imagePreview.src : originalImage?.value || null
+      ProductImage: imageChanged
+        ? imagePreview.src
+        : originalImage?.value || null,
     };
-    
+
     updateProduct(updatedData, imageChanged);
     modal.hide();
   });
@@ -228,14 +244,17 @@ function editProductData(data, productContainer) {
 
 async function deleteProduct(productId) {
   try {
-    const response = await fetch(`http://${API_BASE_URL}:3000/products/delete/${productId}`, {
-      method: "DELETE",
-      credentials: "include", // Important for cookies
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getSessionId()}`,
-      },
-    });
+    const response = await fetch(
+      `http://${API_BASE_URL}:3000/products/delete/${productId}`,
+      {
+        method: "DELETE",
+        credentials: "include", // Important for cookies
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getSessionId()}`,
+        },
+      }
+    );
     const data = await response.json();
 
     if (!response.ok) {
@@ -268,7 +287,10 @@ async function updateProduct(updatedData, imageChanged) {
 
     if (updatedData.ProductStatus) {
       product.push({
-        status: updatedData.ProductStatus.toLowerCase() === "live" ? "active" : "inactive"
+        status:
+          updatedData.ProductStatus.toLowerCase() === "live"
+            ? "active"
+            : "inactive",
       });
     }
 
@@ -283,15 +305,18 @@ async function updateProduct(updatedData, imageChanged) {
       }
     }
 
-    const response = await fetch(`http://${API_BASE_URL}:3000/products/edit/${productId}`, {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getSessionId()}`
-      },
-      body: JSON.stringify({ product })
-    });
+    const response = await fetch(
+      `http://${API_BASE_URL}:3000/products/edit/${productId}`,
+      {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getSessionId()}`,
+        },
+        body: JSON.stringify({ product }),
+      }
+    );
 
     const responseData = await response.text();
 
@@ -311,32 +336,33 @@ async function updateProduct(updatedData, imageChanged) {
 // UTILITIES
 
 function setupTabNavigation() {
-  const navLinks = document.querySelectorAll('.nav-link.tab-link');
-  
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
+  const navLinks = document.querySelectorAll(".nav-link.tab-link");
+
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
       e.preventDefault();
-      
+
       // Remove active class from all tabs
-      navLinks.forEach(tab => {
-        tab.classList.remove('active');
-        tab.style.color = 'rgb(98, 97, 97)';  
-        tab.style.borderBottom = 'none';       
+      navLinks.forEach((tab) => {
+        tab.classList.remove("active");
+        tab.style.color = "rgb(98, 97, 97)";
+        tab.style.borderBottom = "none";
       });
-      
+
       // Add active class to clicked tab
-      link.classList.add('active');
-      link.style.color = '#0d6efd';           
-      link.style.borderBottom = '2px solid #0d6efd';  // Add active border
-      
-      const tabType = link.getAttribute('data-tab');
-      
-      if (link.getAttribute('data-section') === 'orders') {
+      link.classList.add("active");
+      link.style.color = "#0d6efd";
+      link.style.borderBottom = "2px solid #0d6efd"; // Add active border
+
+      const tabType = link.getAttribute("data-tab");
+
+      if (link.getAttribute("data-section") === "orders") {
         showOrders();
       } else {
         showProducts();
-        const filterValue = link.getAttribute('data-filter') || link.textContent;
-        console.log("Filter TYPEEE"+filterValue)
+        const filterValue =
+          link.getAttribute("data-filter") || link.textContent;
+        console.log("Filter TYPEEE" + filterValue);
         filterProducts(filterValue);
       }
     });
@@ -485,12 +511,11 @@ function showAddProductFormData(existingData, productContainer) {
 
 //  showProductDetail
 function showProductDetail(product) {
-
   const productDetailContainer = document.createElement("div");
   productDetailContainer.className = "product-detail-container mb-4";
   productDetailContainer.id = `product-${product.ProductID}`;
 
-  console.log(product)
+  console.log(product);
   const badgeClass =
     product.ProductStatus === "Live"
       ? "bg-success"
@@ -673,8 +698,7 @@ function filterProducts(filterType) {
     return false; // Exclude anything else
   });
 
-    // return product.ProductStatus === filterType;
-
+  // return product.ProductStatus === filterType;
 
   console.log("Filtered products:", filteredProducts);
 
@@ -690,8 +714,7 @@ function filterProducts(filterType) {
 
 // Add search functionality
 function searchProducts(searchTerm) {
-
-  console.log("Searh term: " + searchTerm)
+  console.log("Searh term: " + searchTerm);
   const currentFilter = getCurrentFilter();
   tableBody.innerHTML = "";
 
@@ -711,7 +734,7 @@ function searchProducts(searchTerm) {
     const productElement = showProductDetail(product);
     tableBody.appendChild(productElement);
   });
-  
+
   updateProductTotal(searchResults.length);
 }
 
@@ -764,7 +787,7 @@ async function initializePage() {
   // Check session
   const sessionId = getSessionId();
   if (!sessionId) {
-    window.location.href = `http://${API_BASE_URL}:3000/products/auth/html/index.html`;
+    window.location.href = `http://${API_BASE_URL}:8080/auth/html/index.html`;
     return;
   }
 
@@ -773,17 +796,14 @@ async function initializePage() {
   setupEventListeners();
 }
 document.addEventListener("DOMContentLoaded", () => {
-  setupTabNavigation()
-  const activeTab = document.querySelector('.nav-link.tab-link.active');
+  setupTabNavigation();
+  const activeTab = document.querySelector(".nav-link.tab-link.active");
   if (activeTab) {
-    activeTab.style.color = '#0d6efd';
-    activeTab.style.borderBottom = '2px solid #0d6efd';
+    activeTab.style.color = "#0d6efd";
+    activeTab.style.borderBottom = "2px solid #0d6efd";
   }
-  initializePage()
+  initializePage();
 });
-
-
-
 
 // THE ORDERS TAB
 
@@ -791,13 +811,14 @@ document.addEventListener("DOMContentLoaded", () => {
 const pendingOrdersTable = document.querySelector("#pendingOrders tbody");
 const completedOrdersTable = document.querySelector("#completedOrders tbody");
 
-
 // Helper: Get current date with microseconds
 function getCurrentDateWithMicroseconds() {
-    const date = new Date();
-    const formattedDate = date.toISOString().slice(0, 19).replace("T", " ");
-    const microseconds = (date.getMilliseconds() * 1000).toString().padStart(6, "0");
-    return `${formattedDate}.${microseconds}`;
+  const date = new Date();
+  const formattedDate = date.toISOString().slice(0, 19).replace("T", " ");
+  const microseconds = (date.getMilliseconds() * 1000)
+    .toString()
+    .padStart(6, "0");
+  return `${formattedDate}.${microseconds}`;
 }
 
 // Helper: Get booth ID from session
@@ -808,21 +829,23 @@ function getBoothIdFromSession() {
 // Populate Pending Orders
 function populatePendingOrders(boothId) {
   fetch(`http://${API_BASE_URL}:3000/products/orders/reserved/${boothId}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
   })
-  .then((response) => {
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    .then((response) => {
+      if (!response.ok)
+        throw new Error(`HTTP error! Status: ${response.status}`);
       return response.json();
-  })
-  .then((orders) => {
+    })
+    .then((orders) => {
       pendingOrdersTable.innerHTML = ""; // Clear existing rows
       if (orders.length === 0) {
-          pendingOrdersTable.innerHTML = "<tr><td colspan='6'>No pending orders found.</td></tr>";
-          return;
+        pendingOrdersTable.innerHTML =
+          "<tr><td colspan='6'>No pending orders found.</td></tr>";
+        return;
       }
       orders.forEach((order) => {
-          const row = `
+        const row = `
               <tr>
                   <td>${order.OrderId}</td>
                   <td>${order.CustomerName}</td>
@@ -831,115 +854,120 @@ function populatePendingOrders(boothId) {
                   <td>₱${order.TotalPrice}</td>
                   <td><button class="btn btn-sm btn-success" onclick="markAsCompleted('${order.OrderId}')">Complete</button></td>
               </tr>`;
-          pendingOrdersTable.insertAdjacentHTML("beforeend", row);
+        pendingOrdersTable.insertAdjacentHTML("beforeend", row);
       });
-  })
-  .catch((error) => console.error("Error fetching pending orders:", error));
+    })
+    .catch((error) => console.error("Error fetching pending orders:", error));
 }
-
 
 // Populate Completed Orders
 function populateCompletedOrders(boothId) {
   fetch(`http://${API_BASE_URL}:3000/products/orders/complete/${boothId}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
   })
-      .then((response) => {
-          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-          return response.json();
-      })
-      .then((orders) => {
-          completedOrdersTable.innerHTML = ""; // Clear existing rows
+    .then((response) => {
+      if (!response.ok)
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      return response.json();
+    })
+    .then((orders) => {
+      completedOrdersTable.innerHTML = ""; // Clear existing rows
 
-          // Check if no completed orders exist
-          if (orders.length === 0) {
-              completedOrdersTable.innerHTML =
-                  "<tr><td colspan='6'>No completed orders yet.</td></tr>";
-              return;
-          }
+      // Check if no completed orders exist
+      if (orders.length === 0) {
+        completedOrdersTable.innerHTML =
+          "<tr><td colspan='6'>No completed orders yet.</td></tr>";
+        return;
+      }
 
-          // Populate the table with completed orders
-          orders.forEach((order) => {
-              const row = `
+      // Populate the table with completed orders
+      orders.forEach((order) => {
+        const row = `
                   <tr id="order-${order.OrderId}">
                       <td>${order.OrderId}</td>
                       <td>${order.CustomerName}</td>
-                      <td>${order.ProductName}</td> <!-- Display concatenated product names -->
-                      <td>${order.Quantity}</td> <!-- Display concatenated quantities -->
+                      <td>${
+                        order.ProductName
+                      }</td> <!-- Display concatenated product names -->
+                      <td>${
+                        order.Quantity
+                      }</td> <!-- Display concatenated quantities -->
                       <td>₱${order.TotalPrice}</td>
-                      <td>${new Date(order["date paid"]).toLocaleString()}</td> <!-- Format date -->
+                      <td>${new Date(
+                        order["date paid"]
+                      ).toLocaleString()}</td> <!-- Format date -->
                   </tr>`;
-              completedOrdersTable.insertAdjacentHTML("beforeend", row);
-          });
-      })
-      .catch((error) =>
-          console.error("Error fetching completed orders:", error)
-      );
+        completedOrdersTable.insertAdjacentHTML("beforeend", row);
+      });
+    })
+    .catch((error) => console.error("Error fetching completed orders:", error));
 }
-
 
 // Mark an Order as Completed
 function markAsCompleted(orderId) {
   if (!confirm("Mark this order as completed?")) return;
 
   const datePaid = getCurrentDateWithMicroseconds();
-  console.log('Marking Order Completed:');
-  console.log('Order ID:', orderId);
-  console.log('Date Paid:', datePaid);
+  console.log("Marking Order Completed:");
+  console.log("Order ID:", orderId);
+  console.log("Date Paid:", datePaid);
 
   fetch(`http://${API_BASE_URL}:3000/products/orders/approve/${orderId}`, {
-      method: "PATCH",
-      headers: { 
-          "Content-Type": "application/json" 
-      },
-      body: JSON.stringify({ datePaid }),
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ datePaid }),
   })
-  .then((response) => {
-    console.log('Response Status:', response.status);
-    // Always proceed to update tables, even if the response is not OK
-    updateTables();
+    .then((response) => {
+      console.log("Response Status:", response.status);
+      // Always proceed to update tables, even if the response is not OK
+      updateTables();
 
-    if (!response.ok) {
-        return response.text().then(errorText => {
-            console.error('Error Response Text:', errorText);
-            // Optionally, you can still throw the error for logging
-            throw new Error(`HTTP error! Status: ${response.status}, Text: ${errorText}`);
+      if (!response.ok) {
+        return response.text().then((errorText) => {
+          console.error("Error Response Text:", errorText);
+          // Optionally, you can still throw the error for logging
+          throw new Error(
+            `HTTP error! Status: ${response.status}, Text: ${errorText}`
+          );
         });
-    }
-    return response.json();
-  })
-  .then((data) => {
-    console.log(`Order ${orderId} completed successfully`, data);
-  })
-  .catch((error) => {
-    console.error("Comprehensive Error:", error);
-    console.error("Error Name:", error.name);
-    console.error("Error Message:", error.message);
-  });
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log(`Order ${orderId} completed successfully`, data);
+    })
+    .catch((error) => {
+      console.error("Comprehensive Error:", error);
+      console.error("Error Name:", error.name);
+      console.error("Error Message:", error.message);
+    });
 }
 
 // Update Tables
 function updateTables() {
-    const boothID = getBoothIdFromSession();
-    console.log("Updating tables with booth Id (orders): " + boothID)
-    if (!boothID) {
-        console.error("Booth ID is missing or invalid.");
-        return;
-    }
-    populatePendingOrders(boothID);
-    populateCompletedOrders(boothID);
+  const boothID = getBoothIdFromSession();
+  console.log("Updating tables with booth Id (orders): " + boothID);
+  if (!boothID) {
+    console.error("Booth ID is missing or invalid.");
+    return;
+  }
+  populatePendingOrders(boothID);
+  populateCompletedOrders(boothID);
 }
 
 function clearOrderTables() {
   const pendingOrdersTable = document.querySelector("#pendingOrders tbody");
   const completedOrdersTable = document.querySelector("#completedOrders tbody");
-  
+
   if (pendingOrdersTable) {
-    pendingOrdersTable.innerHTML = '';
+    pendingOrdersTable.innerHTML = "";
   }
-  
+
   if (completedOrdersTable) {
-    completedOrdersTable.innerHTML = '';
+    completedOrdersTable.innerHTML = "";
   }
 }
 
@@ -947,7 +975,7 @@ function clearOrderTables() {
 function showOrders() {
   document.getElementById("product-section").style.display = "none";
   document.getElementById("orders-section").style.display = "block";
-  updateTables(); 
+  updateTables();
 }
 
 function showProducts() {
@@ -956,14 +984,13 @@ function showProducts() {
   clearOrderTables(); // Clear order tables when switching to products
 }
 
-
 // Initialize on Page Load
 document.addEventListener("DOMContentLoaded", () => {
-  setupTabNavigation()
-    const boothID = getBoothIdFromSession();
-    if (boothID) {
-        updateTables();
-    } else {
-        console.error("No valid booth ID found. Please check session or cookies.");
-    }
+  setupTabNavigation();
+  const boothID = getBoothIdFromSession();
+  if (boothID) {
+    updateTables();
+  } else {
+    console.error("No valid booth ID found. Please check session or cookies.");
+  }
 });
