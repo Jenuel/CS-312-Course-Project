@@ -192,9 +192,15 @@ const createProduct = async (request, response) => {
     let status = "inactive";
 
     let imageBuffer = null;
-    if (image && typeof image === "string") {
-      const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-      imageBuffer = Buffer.from(base64Data, "base64");
+    if (image && typeof image === 'string') {
+      // Check if image is base64
+      if (image.includes('base64')) {
+        const base64Data = image.split('base64,')[1];
+        imageBuffer = Buffer.from(base64Data, 'base64');
+      } else {
+        // If image is already base64 without header
+        imageBuffer = Buffer.from(image, 'base64');
+      }
     }
 
     const [rows] = await db.query(

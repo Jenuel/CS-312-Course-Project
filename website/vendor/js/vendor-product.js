@@ -88,7 +88,7 @@ async function createProduct(formData) {
       stocks: parseInt(formData.ProductStock) || 0,
       price: parseFloat(formData.ProductPrice) || 0,
       name: formData.ProductName,
-      image: null,
+      image: formData.ProductImage,
     };
 
     const response = await fetch(
