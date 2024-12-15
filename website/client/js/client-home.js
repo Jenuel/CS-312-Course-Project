@@ -10,6 +10,7 @@ let formData = {
 // Variables for search and sort input
 let searchInput = document.querySelector(".searchbox");
 let sortSelect = document.getElementById("sortDropdown");
+let boothId = 0;
 
 /* ----------------------------------------------------------------------------------------------------- */
 // THE FOLLOWING FUNCTIONS BELOW ARE USED TO FETCH DATA FROM THE SERVER
@@ -157,3 +158,93 @@ document.addEventListener("DOMContentLoaded", () => {
   sortSelect.addEventListener("change", getData);
   getData();
 });
+
+function getCart(customerId) {
+  let cid = parseInt(customerId);
+  fetch(`http://${API_BASE_URL}:3000/orders/checkReservedOrder/${cid}`, {
+    // URL for Cancel order
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // add handling of data
+      if (data.error) {
+        // Handle the error message if the response contains an error
+        console.error("Error:", data.error);
+      } else {
+        /*
+     [
+        {
+            "Booth ID": 1,
+            "Order ID": 123,
+            "Grand total": 150.00,
+            "Product ID": 101,
+            "Quantity": 2,
+            "Total price per product": 30.00,
+            "Product Name": "Product A",
+            "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)",
+            "Product price": 69.0
+        },
+        {
+            "Booth ID": 2,
+            "Order ID": 123,
+            "Grand total": 150.00,
+            "Product ID": 102,
+            "Quantity": 3,
+            "Total price per product": 60.00,
+            "Product Name": "Product B",
+            "Product Image": "iVBORw0KGgoAAAANSUhEUgAA... (base64-encoded image)",
+            "Product price": 69.0
+        }
+      ]
+
+      sample handling of data 
+        // Arrays to hold product IDs, quantities, and totals
+           const orderId = data[0]['Order ID'];
+           const grandTotal = data[0]['Grand total'];
+           const boothIdData = data[0]['Booth ID'];
+           const productIds = [];
+           const quantities = [];
+           const totals = [];
+           const name = [];
+           const image = [];
+           const price = [];
+ 
+           // Loop through the response data and extract the required values
+           data.forEach(product => {
+               productIds.push(product['Product ID']);
+               quantities.push(product['Quantity']);
+               totals.push(product['Total price per product']);
+               name.push(product['Product Name']);
+               image.push(product['Product Image']);
+               price.push(product['Product price']);
+           });
+      */
+
+        localStorage.setItem("BoothId", data[0]["Booth ID"]);
+
+        const boothIdData = data[0]["Booth ID"];
+        boothId = boothIdData;
+
+        const orderId = data[0]["Order ID"];
+        localStorage.setItem("OrderId", orderId);
+      }
+    })
+    .catch((error) => {
+      console.error("Error cancelling order:", error);
+    });
+}
+
+if (getCart(localStorage.getItem("id"))) {
+  window.location.href = `http://${API_BASE_URL}:8080/client/html/client-products.html?id=${localStorage.getItem(
+    "BoothId"
+  )}`;
+}

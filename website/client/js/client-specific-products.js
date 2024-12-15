@@ -452,6 +452,7 @@ function logout() {
     });
 
   localStorage.setItem("Status", "client-specific-products.html"); // adding status
+  console.log("stat", localStorage.getItem("Status"));
 }
 
 document.addEventListener("DOMContentLoaded", () => {

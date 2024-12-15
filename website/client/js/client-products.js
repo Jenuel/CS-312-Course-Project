@@ -227,7 +227,7 @@ function cancelOrder(orderId) {
 
 function getCart(customerId) {
   let cid = parseInt(customerId);
-  fetch(`http://${API_BASE_URL}:3000/orders/checkPendingOrder/${cid}`, {
+  fetch(`http://${API_BASE_URL}:3000/orders/checkReservedOrder/${cid}`, {
     // URL for Cancel order
     method: "GET",
     headers: {
