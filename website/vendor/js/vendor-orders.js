@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://10.241.155.155';
+const API_BASE_URL = '10.241.155.155';
 // DOM Elements
 const pendingOrdersTable = document.querySelector("#pendingOrders tbody");
 const completedOrdersTable = document.querySelector("#completedOrders tbody");
@@ -22,7 +22,7 @@ function getBoothIdFromSession() {
 
 // Populate Pending Orders
 function populateReservedOrders(boothID) {
-    fetch(`http://localhost:3000/orders/reserved/${boothID}`, {
+    fetch(`http://${API_BASE_URL}:3000/orders/reserved/${boothID}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     })

@@ -2,7 +2,7 @@
  * Base URL for the analytics API.
  * This URL is used to fetch data related to booth analytics and sales trends.
  */
-const API_BASE_URL = 'http://localhost:3000/analytics';
+const API_BASE_URL = 'http://10.241.155.155:3000/analytics';
 
 /**
  * Retrieves the current booth ID from session storage.
