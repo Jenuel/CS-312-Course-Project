@@ -488,6 +488,7 @@ const alterOrder = async (request, response) => {
       }
 
       if (!isOrderEmpty) {
+        console.log("it is not empty!!");
         await updatedPrices(db, orderId);
       }
 

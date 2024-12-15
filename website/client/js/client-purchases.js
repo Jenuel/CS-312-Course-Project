@@ -92,84 +92,11 @@ function getCart(customerId) {
 
       // Update the total using the grandTotal from the first item
       if (data[0]) {
-        // updateCartTotal(data[0].grandTotal);
       }
     })
     .catch((error) => {
       console.error("Error fetching cart items:", error);
       alert("Failed to load cart items. Please try again.");
-    });
-}
-
-// Add this function at the top
-function updateCartItem(productId, newQuantity) {
-  const orderId = getOrderId();
-
-  console.log("This is the order Id:" + orderId);
-  
-  if (!orderId) {
-    alert("No active order found. Please refresh the page.");
-    return;
-  }
-
-  // Validate inputs
-  if (!productId || !newQuantity) {
-    console.error("Invalid productID or quantity");
-    return;
-  }
-
-  const quantity = parseInt(newQuantity);
-  if (isNaN(quantity) || quantity < 1) {
-    alert("Please enter a valid quantity");
-    return;
-  }
-
-  // Prepare the update data
-  const updateData = {
-    products: [
-      {
-        productID: parseInt(productId),
-        quantity: quantity,
-      },
-    ],
-  };
-
-  console.log("Sending update request:", updateData);
-
-  console.log("new quantity purchases", newQuantity);
-
-  // Send update request to the server
-  fetch(`http://localhost:3000/orders/alterOrder/${orderId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updateData),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        return response.text().then((text) => {
-          throw new Error(text || `HTTP error! Status: ${response.status}`);
-        });
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log("Update response:", data);
-      // Always refresh the cart after update
-      const customerId = localStorage.getItem("id");
-      if (customerId) {
-        getCart(customerId);
-      }
-    })
-    .catch((error) => {
-      console.error("Error updating cart item:", error);
-      alert("Failed to update item quantity. Please try again.");
-      // Refresh the cart to restore original values
-      const customerId = localStorage.getItem("id");
-      if (customerId) {
-        getCart(customerId);
-      }
     });
 }
 
@@ -192,7 +119,6 @@ function displayCart(cartItems) {
             <td colspan="7" class="text-center">Your cart is empty</td>
         `;
     cartList.appendChild(emptyRow);
-    // updateCartTotal(0);
     return;
   }
 
@@ -228,15 +154,16 @@ function displayCart(cartItems) {
         `;
     cartList.appendChild(row);
   });
-
-  // updateCartTotal(runningTotal);
 }
 
 /*
-function to update the total price of a cart
+function to update the total price of a cart 222
 */
 function updateCartItem(productId, newQuantity) {
   const orderId = getOrderId();
+
+  console.log("This is the order Id:" + orderId);
+
   if (!orderId) {
     alert("No active order found. Please refresh the page.");
     return;
@@ -253,6 +180,10 @@ function updateCartItem(productId, newQuantity) {
     alert("Please enter a valid quantity");
     return;
   }
+
+  //console.log("Sending update request:", updateData);
+
+  //console.log("new quantity purchases", newQuantity);
 
   // Prepare the update data
   const updateData = {
@@ -280,20 +211,20 @@ function updateCartItem(productId, newQuantity) {
     })
     .then((data) => {
       console.log("Update response:", data);
-      if (data === "order is removed") {
-        // Clear order-related storage and redirect
-        localStorage.removeItem("OrderId");
-        localStorage.removeItem("orderId");
-        localStorage.removeItem("OrderID");
-        localStorage.removeItem("BoothId");
-        window.location.href = "client-home.html";
-      } else {
+    //   if (data === "order is removed") {
+    //     // Clear order-related storage and redirect
+    //     localStorage.removeItem("OrderId");
+    //     localStorage.removeItem("orderId");
+    //     localStorage.removeItem("OrderID");
+    //     localStorage.removeItem("BoothId");
+    //     window.location.href = "client-home.html";
+    //   } else {
         // Refresh the cart to show updated totals
         const customerId = localStorage.getItem("id");
         if (customerId) {
           getCart(customerId);
         }
-      }
+   //   }
     })
     .catch((error) => {
       console.error("Error updating cart item:", error);
@@ -498,7 +429,6 @@ function getCart(customerId) {
       }
       displayCart(cartItems);
       //   if (cartTotal && data[0]) {
-      // updateCartTotal(data[0].grandTotal);
       //   }
     })
     .catch((error) => {
@@ -565,85 +495,6 @@ function removeCartItem(productId) {
     });
 }
 
-/*
-function for updating quantitity of a product in a cart
-(cart is an order with a reserved status)
-FROM: orderController.js
-*/
-// Updated updateCartItem function
-// function updateCartItem(productId, newQuantity) {
-//     const orderId = getOrderId();
-//     if (!orderId) {
-//         alert("No active order found. Please refresh the page.");
-//         return;
-//     }
-
-//     // Validate inputs
-//     if (!productId || !newQuantity) {
-//         console.error('Invalid productID or quantity');
-//         return;
-//     }
-
-//     const quantity = parseInt(newQuantity);
-//     if (isNaN(quantity) || quantity < 1) {
-//         alert("Please enter a valid quantity");
-//         return;
-//     }
-
-//     // Format the request body according to your API requirements
-//     const updateData = {
-//         products: [{
-//             productID: parseInt(productId),
-//             quantity: quantity
-//         }]
-//     };
-
-//     console.log('Sending update request:', updateData);
-
-//     // Send update request to the server
-//     fetch(`http://${API_BASE_URL}:3000/orders/alterOrder/${orderId}`, {
-//         method: 'PATCH',
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify(updateData)
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             return response.text().then(text => {
-//                 throw new Error(text || `HTTP error! Status: ${response.status}`);
-//             });
-//         }
-//         return response.json();
-//     })
-//     .then(data => {
-//         console.log('Update response:', data);
-//         if (data === "order is removed") {
-//             // Clear order-related storage and redirect
-//             localStorage.removeItem('OrderId');
-//             localStorage.removeItem('orderId');
-//             localStorage.removeItem('OrderID');
-//             localStorage.removeItem('BoothId');
-//             window.location.href = 'client-home.html';
-//         } else {
-//             // Refresh the cart to show updated totals
-//             const customerId = localStorage.getItem('id');
-//             if (customerId) {
-//                 getCart(customerId);
-//             }
-//         }
-//     })
-//     .catch(error => {
-//         console.error("Error updating cart item:", error);
-//         alert("Failed to update item quantity. Please try again.");
-//         // Refresh the cart to restore original values
-//         const customerId = localStorage.getItem('id');
-//         if (customerId) {
-//             getCart(customerId);
-//         }
-//     });
-// }
-
 /* -------------------------------------End Fetch Functions------------------------------------- */
 
 /*
@@ -707,7 +558,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (newQuantity > 0) {
           const orderId = getOrderId();
           if (orderId) {
-            updateCartItem(orderId, productId, newQuantity);
+            console.log("update product id ", productId);
+            console.log("update newQuantity ", newQuantity);
+
+            updateCartItem(productId, newQuantity); // CALLING OF UPDATE CART
           } else {
             console.error("Order ID not found");
             alert("Could not update cart. Please refresh the page.");

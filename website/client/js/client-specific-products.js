@@ -231,7 +231,7 @@ function createOrder(boothID, data, totalPrice, customerID) {
       return response.json(); // Parse the JSON response if it's okay
     })
     .then((orderData) => {
-      console.log("Order created successfully:", orderData);
+      console.log("Order created successfully:", orderData.id);
       ord = parseInt(orderData.id);
       console.log("parsed", ord);
       localStorage.setItem("OrderID", ord); // Save OrderID to sessionStorage
@@ -284,7 +284,7 @@ function addToOrder(orderID, data) {
     )
     .then((orderData) => {
       console.log("Order created successfully:", orderData, id);
-      localStorage.setItem("OrderID", orderData.id);
+
       // Update stocks for each product
     })
     .catch((error) => console.error("Error creating order:", error));
@@ -485,7 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
   backToProductsButton.addEventListener("click", (event) => {
     event.preventDefault();
     const boothId = localStorage.getItem("BoothId");
-    // window.location.href = `client-products.html?id=${boothId}`;
+    window.location.href = `client-products.html?id=${boothId}`;
   });
 
   if (productId) {
