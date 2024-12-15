@@ -1,4 +1,4 @@
-const API_BASE_URL = "10.241.155.155";
+API_BASE_URL = "10.241.155.155";
 
 // Retrieve the parameters from the URL
 
@@ -211,20 +211,20 @@ function updateCartItem(productId, newQuantity) {
     })
     .then((data) => {
       console.log("Update response:", data);
-    //   if (data === "order is removed") {
-    //     // Clear order-related storage and redirect
-    //     localStorage.removeItem("OrderId");
-    //     localStorage.removeItem("orderId");
-    //     localStorage.removeItem("OrderID");
-    //     localStorage.removeItem("BoothId");
-    //     window.location.href = "client-home.html";
-    //   } else {
-        // Refresh the cart to show updated totals
-        const customerId = localStorage.getItem("id");
-        if (customerId) {
-          getCart(customerId);
-        }
-   //   }
+      //   if (data === "order is removed") {
+      //     // Clear order-related storage and redirect
+      //     localStorage.removeItem("OrderId");
+      //     localStorage.removeItem("orderId");
+      //     localStorage.removeItem("OrderID");
+      //     localStorage.removeItem("BoothId");
+      //     window.location.href = "client-home.html";
+      //   } else {
+      // Refresh the cart to show updated totals
+      const customerId = localStorage.getItem("id");
+      if (customerId) {
+        getCart(customerId);
+      }
+      //   }
     })
     .catch((error) => {
       console.error("Error updating cart item:", error);

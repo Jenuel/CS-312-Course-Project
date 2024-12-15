@@ -1,11 +1,5 @@
-// const API_BASE_URL = "10.241.155.155";
+API_BASE_URL = "10.241.155.155";
 let box = document.querySelector(".booth-container"); // where the child will be appended
-
-// Get filter and order values
-let formData = {
-  filter: document.getElementById("filter").value,
-  order: document.getElementById("sortDropdown").value,
-};
 
 // Variables for search and sort input
 let searchInput = document.querySelector(".searchbox");

@@ -174,17 +174,22 @@ USED BY: vendor
 const createProduct = async (request, response) => {
   console.log("Create Product I");
   const db = request.db;
-  const { boothID, stocks, price, name, status, image } = request.body;
+  const { boothID, stocks, price, name, image } = request.body;
 
-  if (status !== "active" && status !== "inactive") {
-    return response
-      .status(400)
-      .send('Invalid status. It must be either "active" or "inactive".');
-  }
   try {
     console.log("Received image data length:", image ? image.length : 0);
 
+    if (!boothID || !name || !price || stocks === undefined) {
+      return response.status(400).json({
+        success: false,
+        error: "Missing required fields"
+      });
+    }
+
     await db.beginTransaction();
+
+
+    let status = "inactive";
 
     let imageBuffer = null;
     if (image && typeof image === "string") {
@@ -202,10 +207,19 @@ const createProduct = async (request, response) => {
       [rows.insertId, getCurrentDate(), stocks]
     ); // query to add stocks to inventory
 
-    response.json(rows);
-  } catch (error) {
+    await db.commit();
+
+    response.json({
+      success: true,
+      data: rows
+    });
+  }  catch (error) {
+    await db.rollback();
     console.error("Error creating products:", error);
-    response.status(500).send("Failed to create products");
+    response.status(500).json({
+      success: false,
+      error: "Failed to create products"
+    });
   }
 };
 

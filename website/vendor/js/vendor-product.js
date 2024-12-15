@@ -1,4 +1,4 @@
-const API_BASE_URL = "10.241.155.155";
+API_BASE_URL = "10.241.155.155";
 
 let eventSetup = false;
 const boothId = sessionStorage.getItem("currentBoothId");
@@ -88,10 +88,7 @@ async function createProduct(formData) {
       stocks: parseInt(formData.ProductStock) || 0,
       price: parseFloat(formData.ProductPrice) || 0,
       name: formData.ProductName,
-      status: "inactive",
-      image: formData.ProductImage
-        ? formData.ProductImage.split("base64,")[1]
-        : null,
+      image: null,
     };
 
     const response = await fetch(
@@ -485,10 +482,8 @@ function showAddProductFormData(existingData, productContainer) {
         ProductImage: imagePreview.src,
       };
 
-      if (existingData && productContainer) {
-      } else {
-        await createProduct(formData);
-      }
+       createProduct(formData);
+      
 
       modal.hide();
       modalElement.addEventListener("hidden.bs.modal", () => {
@@ -497,7 +492,6 @@ function showAddProductFormData(existingData, productContainer) {
 
       modalElement.remove();
 
-      alert("Product crearted successfully");
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to save product. Please try again.");

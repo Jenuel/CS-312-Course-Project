@@ -1,28 +1,15 @@
-const API_BASE_URL = "10.241.155.155";
+API_BASE_URL = "10.241.155.155";
 const urlParams = new URLSearchParams(window.location.search); // connecting to url params of html
 let boothId = 0;
 /*
 checking value in url parameter
 */
-if (urlParams.get("id") === "none") {
-  const customerId = localStorage.getItem("id"); // get customer id
 
-  const hasCart = getCart(customerId); //  result of getCart
-  //stotr hascrt.boothid = boothid
-
-  if (hasCart) {
-    // a reserved order exists
-    console.log("customer has existing cart");
-  } else {
-    window.location.href = `http://${API_BASE_URL}:8080/client/html/client-home.html`;
-  }
-} else {
-  // id has value
-  boothId = urlParams.get("id");
-  alert("from products bothid: " + boothId); // REMOVE BEFORE PASSING
-  localStorage.setItem("BoothId", boothId);
-  alert("from products bothid storage: " + localStorage.getItem("BoothId")); // REMOVE BEFORE PASSING
-}
+// id has value
+boothId = urlParams.get("id");
+alert("from products bothid: " + boothId); // REMOVE BEFORE PASSING
+localStorage.setItem("BoothId", boothId);
+alert("from products bothid storage: " + localStorage.getItem("BoothId")); // REMOVE BEFORE PASSING
 
 function getData() {
   const searchInput = document

@@ -1,4 +1,4 @@
-const API_BASE_URL = '10.241.155.155';
+API_BASE_URL = "10.241.155.155";
 
 let modal, create, edit, boothImage, inputFile, searchInput, sortSelect;
 
@@ -206,8 +206,8 @@ function showBoothsView() {
 }
 
 function viewProducts(boothId) {
+  console.log("Selected Booth ID:", boothId); // Debug log
   sessionStorage.setItem("currentBoothId", boothId);
-
   window.location.href = "vendor-product.html";
 }
 
@@ -253,9 +253,12 @@ function editBooth(boothId) {
         document.getElementById("edit-booth-form").dataset.boothId = boothId;
 
         if (booth.BoothIcon) {
-          document.getElementById("edit-image").src = `data:image/png;base64,${booth.BoothIcon}`;
+          document.getElementById(
+            "edit-image"
+          ).src = `data:image/png;base64,${booth.BoothIcon}`;
         } else {
-          document.getElementById("edit-image").src = "../res/1564534_customer_man_user_account_profile_icon.png";
+          document.getElementById("edit-image").src =
+            "../res/1564534_customer_man_user_account_profile_icon.png";
         }
       }
     })
