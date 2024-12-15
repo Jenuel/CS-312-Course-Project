@@ -1,4 +1,7 @@
+const API_BASE_URL = 'http://10.241.155.155:8080';
+const API_BASE_URL_NODE = 'http://10.241.155.155:3000';
 // Retrieve the parameters from the URL
+
 const urlParams = new URLSearchParams(window.location.search);
 let boothId = 0;
 
@@ -14,7 +17,7 @@ if((urlParams.get('boothId'))==="none"){
     if(hasCart){// a pedning order exists
       console.log("customer has existing cart")
     }else{
-      window.location.href = 'http://localhost:8080/client/html/client-home.html';
+      window.location.href = `${API_BASE_URL}/client/html/client-home.html`;
     }
   
   }else{
@@ -90,6 +93,45 @@ function displayCart(cartItems) {
 }
 
 
+// function updateCartItem(productId, newQuantity) {
+//     const orderId = localStorage.getItem('OrderId') || localStorage.getItem('orderId');
+//     if (!orderId) {
+//         console.error("No order ID found");
+//         return;
+//     }
+
+//     const quantity = parseInt(newQuantity);
+//     if (isNaN(quantity) || quantity < 1) {
+//         alert("Please enter a valid quantity");
+//         return;
+//     }
+
+//     fetch(`${API_BASE_URL_NODE}/orders/updateQuantity/${orderId}/${productId}`, {
+//         method: 'PATCH',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ quantity: quantity })
+//     })
+//     .then(response => {
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//         // Refresh the cart to show updated totals
+//         const localStorageId = localStorage.getItem('id');
+//         if (localStorageId) {
+//             getCart(localStorageId);
+//         }
+//     })
+//     .catch(error => {
+//         console.error("Error updating cart item:", error);
+//         alert("Failed to update item quantity. Please try again.");
+//     });
+// }
+
 function updateCartTotal(input) {
     const cartTotalElement = document.getElementById('cart-total');
     if (!cartTotalElement) {
@@ -150,7 +192,7 @@ function closeProfile() {
  * @param {Integer} orderId 
  */
 function cancelOrder(orderId) {
-    fetch(`http://localhost:3000/orders/cancel/${orderId}`, { // URL for Cancel order
+    fetch(`${API_BASE_URL_NODE}/orders/cancel/${orderId}`, { // URL for Cancel order
         method: 'PATCH', 
         headers: {
             'Content-Type': 'application/json', 
@@ -188,7 +230,7 @@ function checkoutProducts() {
     }
 
     // Change the endpoint to use the products/buy endpoint instead of orders/complete
-    fetch(`http://localhost:3000/products/buy/${orderID}`, {
+    fetch(`${API_BASE_URL_NODE}/products/buy/${orderID}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -257,7 +299,7 @@ function createOrder(boothID, data, totalPrice, customerId) {// PLEASE EXPLAIN H
         status: 'Pending' // Explicitly set status as Pending
     };
 
-    fetch(`http://localhost:3000/orders/create/${boothID}`, {
+    fetch(`${API_BASE_URL_NODE}/orders/create/${boothID}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -301,7 +343,7 @@ function getCart(customerId) {
         return;
     }
 
-    fetch(`http://localhost:3000/orders/checkReservedOrder/${cid}`, {
+    fetch(`${API_BASE_URL_NODE}/orders/checkReservedOrder/${cid}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     })
@@ -367,7 +409,7 @@ function removeCartItem(productId) {
 
     console.log(`Removing product ${productId} from order ${orderId}`);
 
-    fetch(`http://localhost:3000/orders/removeItem/${orderId}/${productId}`, {
+    fetch(`${API_BASE_URL_NODE}/orders/removeItem/${orderId}/${productId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',

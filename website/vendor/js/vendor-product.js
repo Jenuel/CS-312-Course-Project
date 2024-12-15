@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000/products";
+const API_BASE_URL = "http://10.241.155.155:3000/products";
 let eventSetup = false;
 const boothId = sessionStorage.getItem("currentBoothId");
 const productTotal = document.getElementById("product-total");
@@ -762,7 +762,7 @@ async function initializePage() {
   // Check session
   const sessionId = getSessionId();
   if (!sessionId) {
-    window.location.href = "localhost:8080/auth/html/index.html";
+    window.location.href = `${API_BASE_URL}/auth/html/index.html`;
     return;
   }
 
@@ -805,7 +805,7 @@ function getBoothIdFromSession() {
 
 // Populate Pending Orders
 function populatePendingOrders(boothId) {
-  fetch(`http://localhost:3000/orders/reserved/${boothId}`, {
+  fetch(`${API_BASE_URL}/orders/reserved/${boothId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
   })
@@ -838,7 +838,7 @@ function populatePendingOrders(boothId) {
 
 // Populate Completed Orders
 function populateCompletedOrders(boothId) {
-  fetch(`http://localhost:3000/orders/complete/${boothId}`, {
+  fetch(`${API_BASE_URL}/orders/complete/${boothId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
   })
@@ -885,7 +885,7 @@ function markAsCompleted(orderId) {
   console.log('Order ID:', orderId);
   console.log('Date Paid:', datePaid);
 
-  fetch(`http://localhost:3000/orders/approve/${orderId}`, {
+  fetch(`${API_BASE_URL}/orders/approve/${orderId}`, {
       method: "PATCH",
       headers: { 
           "Content-Type": "application/json" 

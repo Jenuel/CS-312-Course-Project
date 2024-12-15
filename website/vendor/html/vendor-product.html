@@ -17,7 +17,6 @@
     <script>
       // Function to show the orders section
       function showOrders() {
-        // Hide other content and show the orders section
         document.getElementById("orders-section").style.display = "block";
         document.getElementById("product-section").style.display = "none";
       }
@@ -34,7 +33,6 @@
       <header class="mb-3">
         <nav>
           <ul class="nav nav-tabs nav-links border-0">
-            
             <li class="nav-item">
               <a href="#" class="nav-link tab-link" data-section="products" data-filter="all">All Products</a>
             </li>
@@ -47,6 +45,7 @@
             <li class="nav-item">
               <a href="#" class="nav-link tab-link" data-section="orders" onclick="showOrders()">Orders</a>
             </li>
+          </ul>
         </nav>
       </header>
 
@@ -104,20 +103,20 @@
           <main class="container my-4">
             <div class="row">
               <!-- Pending Orders Table -->
-              <div class="col-md-6">
+              <div class="col-lg-6 col-md-12 mb-4">
                 <section id="pending-orders-section">
-                  <h2 class="text-primary">Pending Orders</h2>
-                  <section class="product-list-container card">
-                    <div class="table-body card-body">
-                      <table id="pendingOrders" class="table table-striped table-bordered">
-                        <thead class="table-primary">
+                  <h2 class="text-primary text-center">Pending Orders</h2>
+                  <section class="product-list-container card shadow-sm">
+                    <div class="table-responsive">
+                      <table id="pendingOrders" class="table table-striped table-hover table-bordered mb-0">
+                        <thead class="table-primary text-center">
                           <tr>
-                            <th>Order ID</th>
-                            <th>Customer Name</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                            <th>Action</th>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Customer Name</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -125,31 +124,37 @@
                         </tbody>
                       </table>
                     </div>
+                    <div class="card-footer text-muted text-center">
+                      <!-- Add any actions like pagination here -->
+                    </div>
                   </section>
                 </section>
               </div>
 
               <!-- Completed Orders Table -->
-              <div class="col-md-6">
+              <div class="col-lg-6 col-md-12 mb-4">
                 <section id="completed-orders-section">
-                  <h2 class="text-success">Completed Orders</h2>
-                  <section class="product-list-container card">
-                    <div class="table-body card-body">
-                      <table id="completedOrders" class="table table-striped table-bordered">
-                        <thead class="table-success">
+                  <h2 class="text-success text-center">Completed Orders</h2>
+                  <section class="product-list-container card shadow-sm">
+                    <div class="table-responsive">
+                      <table id="completedOrders" class="table table-striped table-hover table-bordered mb-0">
+                        <thead class="table-success text-center">
                           <tr>
-                            <th>Order ID</th>
-                            <th>Customer Name</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                            <th>Date</th>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Customer Name</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Date</th>
                           </tr>
                         </thead>
                         <tbody>
                           <!-- Completed orders will be dynamically added here -->
                         </tbody>
                       </table>
+                    </div>
+                    <div class="card-footer text-muted text-center">
+                      <!-- Add any actions like pagination here -->
                     </div>
                   </section>
                 </section>
