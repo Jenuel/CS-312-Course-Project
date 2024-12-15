@@ -59,7 +59,15 @@ function getData() {
           });
 
           console.log("Booths data:", filteredData);
-          displayBooths(filteredData);
+
+          let booth = localStorage.getItem("BoothId");
+          if (booth != undefined) {
+            window.location.href = `http://${API_BASE_URL}:8080/client/html/client-products.html?id=${localStorage.getItem(
+              "BoothId"
+            )}`;
+          } else {
+            displayBooths(filteredData);
+          }
         }
       }
     })
@@ -222,11 +230,6 @@ function getCart(customerId) {
                price.push(product['Product price']);
            });
       */
-
-        localStorage.setItem("BoothId", data[0]["Booth ID"]);
-
-        const boothIdData = data[0]["Booth ID"];
-        boothId = boothIdData;
 
         const orderId = data[0]["Order ID"];
         localStorage.setItem("OrderId", orderId);
