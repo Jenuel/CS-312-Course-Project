@@ -109,15 +109,17 @@ function cancelOrders() {
  * @param {String} order  choices: ASC || DESC
  */
 function fetchProducts(boothId, search = "", filter = "all", order = "asc") {
-  let queryParams = new URLSearchParams();
-  queryParams.append("sort", `name:${order}`);
+  // let queryParams = new URLSearchParams();
+  // console.log(order);
+  // queryParams.append("sort", `name:${order}`);
+  // if (filter !== "all") {
+  //   queryParams.append("filter", "active");
+  // }
 
-  if (filter !== "all") {
-    queryParams.append("filter", "active");
-  }
+  // console.log("Sort parameter received:", queryParams.toString());
 
   fetch(
-    `http://${API_BASE_URL}:3000/products/booth/live/${boothId}?${queryParams.toString()}`,
+    `http://${API_BASE_URL}:3000/products/booth/live/${boothId}?sort=name:${order}`,
     {
       method: "GET",
       headers: {
