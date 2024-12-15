@@ -474,7 +474,7 @@ function updateCartItem(orderId,productIdValue,quantityValue) {
         ]
     };
 
-    fetch(`http://localhost:3000/orders/alterOrder/${orderId}`, {
+    fetch(`http://${API_BASE_URL}:3000/orders/alterOrder/${orderId}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://10.241.155.155:8080';
+const API_BASE_URL = '10.241.155.155';
 /**
  * Handles the login process by capturing the form submission event,
  * sending the login data to the server, and redirecting based on the
@@ -57,7 +57,7 @@ function handleLogin(event) {
                 console.log("ID : ", localStorage.getItem('id'));
                 
                 // Redirect to the vendor home page
-                window.location.href = `http://http://${API_BASE_URL}:8080:8080/vendor/html/vendor-home.html`; 
+                window.location.href = `http://${API_BASE_URL}:8080/vendor/html/vendor-home.html`; 
             } else {
                 const id = data.UserID;
 

@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://10.241.155.155:8080';
+const API_BASE_URL = 10.241.155.155';
+http://http://${API_BASE_URL}:8080:8080
 /**
  * Logs out the current user by sending a POST request to the server's logout endpoint.
  * If the logout is successful, the user is redirected to the login page.
@@ -6,7 +7,7 @@ const API_BASE_URL = 'http://10.241.155.155:8080';
  */
 function logout() {
   // Send a POST request to the logout endpoint with the appropriate headers and body
-  fetch(`${API_BASE_URL}/php/auth/logout.php`, {
+  fetch(`http://${API_BASE_URL}:8080/php/auth/logout.php`, {
     method: "POST", // HTTP method for the request
     headers: {
       "Content-Type": "application/x-www-form-urlencoded", // Indicate that the body is URL-encoded
@@ -27,7 +28,7 @@ function logout() {
       // If the server indicates success, redirect the user to the login page
       if (data.success) {
         window.location.href =
-          `${API_BASE_URL}/auth/html/index.html`;
+          `http://${API_BASE_URL}:8080/auth/html/index.html`;
       } else {
         // If the server indicates failure, throw an error with the message from the server
         throw new Error(data.message || "Logout failed");
